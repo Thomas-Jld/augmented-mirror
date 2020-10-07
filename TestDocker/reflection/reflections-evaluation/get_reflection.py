@@ -136,7 +136,6 @@ def map_location(pose, joint: int, width: int, height: int, depth_frame, video_p
     dz = zb + za
     dy = yb - ya
     dx = xb - xa
-
     if dz != 0:
         yi = ya + (za / dz) * dy
         xi = xa + (za / dz) * dx
