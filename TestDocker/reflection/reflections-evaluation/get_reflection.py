@@ -152,8 +152,6 @@ def find_reflection(net, image_provider = VideoReader(), send = False, cpu = Fal
     upsample_ratio = 4
     num_keypoints = Pose.num_kpts
 
-    print("Running...")
-
     data = {}
 
     frames = image_provider.next_frame()
