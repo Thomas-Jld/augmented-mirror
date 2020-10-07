@@ -143,7 +143,7 @@ def map_location(pose, joint: int, width: int, height: int, depth_frame, video_p
         if not math.isnan(xi) and not math.isnan(zi):
             return [round(xi), round(zi)]
 
-    return [None, None]
+    return -1
 
 
 def find_reflection(net, image_provider = VideoReader(), send = False, cpu = False):
