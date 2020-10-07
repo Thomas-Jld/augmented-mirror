@@ -10,8 +10,7 @@ io.on('connect', socket => {
   socket.emit('greetings', "Hi !");
 
   // handle the event sent with socket.send()
-  socket.on('message', (data) => {
-    console.log(data);
+  socket.on('reflection', (data) => {
     reflection = data;
   });
 

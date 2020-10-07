@@ -1,5 +1,8 @@
 import socketio
 
+from time import sleep
+
+
 from get_reflection import *
 
 sio = socketio.Client(engineio_logger=True)
@@ -16,7 +19,9 @@ def send_data():
     while True:
         data = find_reflection(net)
         if data:
-            sio.send(str(data))
+            sio.emit("reflection", data)
+        else:
+            sleep(0.05)
     pass
 
 if __name__ == '__main__':

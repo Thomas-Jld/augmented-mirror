@@ -1,6 +1,5 @@
 let socket;
-let body_pos;
-let data = {};
+let body_pos = {};
 let display = false;
 
 function setup() {
@@ -19,22 +18,13 @@ function setup() {
 
 function draw() {
   background(200);
-  if(display){
+  if(keyIsPressed){
     socket.emit('next', true);
   }
-  for(var part in data) {
-    if(data[part] != -1){
+  for(var part in body_pos) {
+    if(body_pos[part] != -1){
       fill(0);
-      ellipse(data[part][0]/10, data[part][1]/10, 10);
+      ellipse(body_pos[part][0]/10, body_pos[part][1]/10, 10);
     }
-  }
-}
-
-function keyPressed(){
-  if(key == ENTER){
-    display = true;
-  }
-  else{
-    display = false;
   }
 }
