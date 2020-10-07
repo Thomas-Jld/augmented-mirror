@@ -4,5 +4,6 @@ torch
 torchvision
 opencv-python
 pycocotools
-python-socketio==4.4.0
+python-socketio
 requests
+eventlet
