@@ -14,7 +14,9 @@ def send_data():
     net = init()
     print("Running")
     while True:
-        sio.emit("reflection", find_reflection(net))
+        data = find_reflection(net)
+        if data:
+            sio.send(str(data))
     pass
 
 if __name__ == '__main__':

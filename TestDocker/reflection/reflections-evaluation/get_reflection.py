@@ -5,6 +5,7 @@ import numpy as np
 import torch
 import pyrealsense2 as rs
 import json
+import math
 
 from models.with_mobilenet import PoseEstimationWithMobileNet
 from modules.keypoints import extract_keypoints, group_keypoints
@@ -92,7 +93,7 @@ def infer_fast(net, img, net_input_height_size, stride, upsample_ratio, cpu,
 def get_depth(pose, joint: int, depth_frame) -> float:
     x = int(pose.keypoints[joint][0])
     y = int(pose.keypoints[joint][1])
-    return np.mean(depth_frame[y - 10 : y + 10, x - 10 : x + 10])
+    return np.mean(depth_frame[y - 20 : y + 20, x - 20 : x + 20])
 
 
 # def get_position(pose, joint, depth_frame, width, height):
@@ -139,10 +140,10 @@ def map_location(pose, joint: int, width: int, height: int, depth_frame, video_p
     if dy != 0:
         zi = za + (ya / dy) * dz
         xi = xa + (ya / dy) * dx
-        return xi, zi
+        if not math.isnan(xi) and not math.isnan(zi):
+            return [round(xi), round(zi)]
 
-    else:
-        return None, None
+    return [None, None]
 
 
 def find_reflection(net, image_provider = VideoReader(), send = False, cpu = False):
@@ -200,7 +201,7 @@ def find_reflection(net, image_provider = VideoReader(), send = False, cpu = Fal
     """
 
     if midPose != None:
-        for n in range(1,len(Pose.kpt_names)):
+        for n in range(len(Pose.kpt_names)):
             if midPose.keypoints[n][0] != 0 or midPose.keypoints[n][1] != 0:
                 data[Pose.kpt_names[n]] = map_location(
                     midPose, n, image_provider.width, image_provider.height,
