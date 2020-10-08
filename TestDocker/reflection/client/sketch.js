@@ -3,6 +3,7 @@ let body_pos = {};
 let display = false;
 
 function setup() {
+  fullscreen(true);
   createCanvas(windowWidth, windowHeight);
   socket = io.connect('http://0.0.0.0:5000');
 
@@ -18,13 +19,14 @@ function setup() {
 
 function draw() {
   background(200);
-  if(keyIsPressed){
-    socket.emit('next', true);
-  }
+  socket.emit('next', true);
   for(var part in body_pos) {
     if(body_pos[part] != -1){
       fill(0);
-      ellipse(body_pos[part][0]/10, body_pos[part][1]/10, 10);
+      let x = width/2 - body_pos[part][0];
+      let y = height/2 + body_pos[part][1];
+      ellipse(x ,y , 10);
+      text(part, x + 20, y + 20);
     }
   }
 }

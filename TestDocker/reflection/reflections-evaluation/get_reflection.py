@@ -93,7 +93,7 @@ def infer_fast(net, img, net_input_height_size, stride, upsample_ratio, cpu,
 def get_depth(pose, joint: int, depth_frame) -> float:
     x = int(pose.keypoints[joint][0])
     y = int(pose.keypoints[joint][1])
-    return np.mean(depth_frame[y - 20 : y + 20, x - 20 : x + 20])
+    return np.mean(depth_frame[y - 3 : y + 3, x - 3 : x + 3])
 
 
 # def get_position(pose, joint, depth_frame, width, height):
@@ -141,7 +141,7 @@ def map_location(pose, joint: int, width: int, height: int, depth_frame, video_p
         yi = ya + (za / dz) * dy
         xi = xa + (za / dz) * dx
         if not math.isnan(xi) and not math.isnan(yi):
-            return [round(xi), round(yi)]
+            return [round(xb), round(yb)]
 
     return -1
 
