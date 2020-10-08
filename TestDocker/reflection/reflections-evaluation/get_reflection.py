@@ -133,12 +133,12 @@ def map_location(pose, joint: int, width: int, height: int, depth_frame, video_p
     # rx = (yb-ya)*((aapx + ((yb - ya)*(aapx)**.5/(aapx**.5 + bbpx**.5))**.5)/((yb-ya)**2 +aapx**.5 + bbpx**.5)) + ya - offset
     # ry = (xb-xa)*((aapy + ((xb - xa)*(aapy)**.5/(aapy**.5 + bbpy**.5))**.5)/((xb-xa)**2 +aapy**.5 + bbpy**.5)) + xa - offset
 
-    dz = zb + za
+    dz = db + da
     dy = yb - ya
     dx = xb - xa
     if dz != 0:
-        yi = ya + (za / dz) * dy
-        xi = xa + (za / dz) * dx
+        yi = ya + (da / dz) * dy
+        xi = xa + (da / dz) * dx
         if not math.isnan(xi) and not math.isnan(yi):
             return [round(xi), round(yi)]
 
