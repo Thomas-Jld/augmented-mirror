@@ -2,7 +2,7 @@ let socket;
 let body_pos = {};
 let display = false;
 
-let xoffset = 5;  // millimeters
+let xoffset = -5;  // millimeters
 let yoffset = 10;
 
 let screenwidth = 392.85; //millimeters
