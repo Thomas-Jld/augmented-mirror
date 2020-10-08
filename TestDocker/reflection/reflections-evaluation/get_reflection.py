@@ -140,7 +140,7 @@ def map_location(pose, joint: int, width: int, height: int, depth_frame, video_p
         yi = ya + (da / dz) * dy
         xi = xa + (da / dz) * dx
         if not math.isnan(xi) and not math.isnan(yi):
-            return [round(xb), round(yb)]
+            return [round(xi), round(yi)]
 
     return -1
 
