@@ -4,7 +4,7 @@
 ```
 cd reflection/
 ```
-To build the container from the docker file, simply use `make build`.
+To build the container from the docker file, simply use `make build`.<br/>
 To execute the container, use `make run`. Make sure that you've already installed nvidia-docker and that your computer support cuda.
 
 
