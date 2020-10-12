@@ -52,11 +52,15 @@ function drawLine(){
   junctions.forEach(pair => {
     try{
     if(body_pos[keypoints[pair[0]]] != -1 && body_pos[keypoints[pair[1]]] != -1){
-      line(body_pos[keypoints[pair[0]]][0], body_pos[keypoints[pair[0]]][1], body_pos[keypoints[pair[1]]][0], body_pos[keypoints[pair[1]]][1]);
+      let x1 = width/2 - width*(body_pos[keypoints[pair[0]]][0] - xoffset)/screenwidth;
+      let y1 = height*(body_pos[keypoints[pair[0]]][1] - yoffset)/screenheight;
+      let x2 = width/2 - width*(body_pos[keypoints[pair[1]]][0] - xoffset)/screenwidth;
+      let y2 = height*(body_pos[keypoints[pair[1]]][1] - yoffset)/screenheight;
+      line(x1, y1, x2, y2);
     }
   }
   catch(e){
-    
+
   }
   });
 }
