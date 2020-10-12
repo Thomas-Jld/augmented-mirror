@@ -16,6 +16,7 @@ node server.js
 
 ### Sending position data to the server
 ```
+cd reflection/reflection-evaluation/
 python3 send-data.py
 ```
 ## Launch the app
