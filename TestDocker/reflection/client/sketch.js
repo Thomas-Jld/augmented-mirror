@@ -3,7 +3,7 @@ let body_pos = {};
 let display = false;
 
 let xoffset = -5;  // millimeters
-let yoffset = 50;
+let yoffset = 40;
 
 let screenwidth = 392.85; //millimeters
 let screenheight = 698.4;
