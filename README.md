@@ -4,14 +4,14 @@
 
 cd reflection/
 
-To build the container from the docker file, simply use `make build`
+To build the container from the docker file, simply use `make build`.
 To execute the container, use `make run`. Make sure that you've already installed nvidia-docker and that your computer support cuda.
 
 
 ### Launching the intermediate Server
 
 cd reflection/server/
-node server.js /to launch the socket
+`node server.js` to launch the socket
 
 ### Sending position data to the server
 
