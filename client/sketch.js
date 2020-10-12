@@ -2,8 +2,8 @@ let socket;
 let body_pos = {};
 let display = false;
 
-let xoffset = -5;  // millimeters
-let yoffset = 40;
+let xoffset = 50;  // millimeters
+let yoffset = 50;
 
 let screenwidth = 392.85; //millimeters
 let screenheight = 698.4;
@@ -32,7 +32,7 @@ function draw() {
       fill(200);
       let x = width/2 - width*(body_pos[part][0] - xoffset)/screenwidth;
       let y = height*(body_pos[part][1] - yoffset)/screenheight;
-      ellipse(x ,y , 10);
+      ellipse(x ,y , 30);
       text(part, x + 20, y + 20);
     }
   }
