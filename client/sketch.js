@@ -8,7 +8,9 @@ let yoffset = 50;
 let screenwidth = 392.85; //millimeters
 let screenheight = 698.4;
 
-let junctions = [[1, 2], [1, 5], [2, 3], [3, 4], [5, 6], [6, 7], [1, 8], [8, 9], [9, 10], [1, 11], [11, 12], [12, 13], [1, 0], [0, 14], [14, 16], [0, 15], [15, 17], [2, 16], [5, 17]];
+let junctions = [[1, 2], [1, 5], [2, 3], [3, 4], [5, 6], [6, 7], [1, 8], [8, 9],
+                [9, 10], [1, 11], [11, 12], [12, 13], [1, 0], [0, 14],  
+                [0, 15], [2, 16], [5, 17]];
 let keypoints = ['nose', 'neck', 'r_sho', 'r_elb', 'r_wri', 'l_sho', 'l_elb', 'l_wri', 'r_hip', 'r_knee', 'r_ank', 'l_hip', 'l_knee', 'l_ank', 'r_eye', 'l_eye', 'r_ear', 'l_ear'];
 //let clock;
 
