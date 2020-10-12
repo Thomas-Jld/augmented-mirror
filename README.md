@@ -20,7 +20,7 @@ python3 send-data.py
 ```
 ## Launch the app
 
-Open reflection/server/index.html with chrome to see result.
+Open `client/index.html` with chrome to see result.
 
 ## Ressources:
 - https://github.com/Daniil-Osokin/lightweight-human-pose-estimation.pytorch
