@@ -12,7 +12,7 @@ let Clock = ( sketch ) => {
 
   sketch.movable = true;
   sketch.latched = false;
-  sketch.activated = true;
+  sketch.activated = false;
   sketch.clickable = false;
 
   sketch.set = (p1, p2, w, h) => {

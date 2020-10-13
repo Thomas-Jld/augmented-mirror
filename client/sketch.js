@@ -51,8 +51,17 @@ function keyPressed(){
   if(key == "d"){
     modules.forEach(m => {
       m.activated = false;
+      m.selfCanvas.hide();
     });
     pose.activated = true;
+    pose.selfCanvas.show();
+  }
+
+  if(key == "a"){
+    modules.forEach(m => {
+      m.activated = true;
+      m.selfCanvas.show();
+    });
   }
 }
 

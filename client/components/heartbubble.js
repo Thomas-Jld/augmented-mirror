@@ -5,7 +5,7 @@ let HeartBubble = (sketch) => {
 
   sketch.movable = false;
   sketch.latched = false;
-  sketch.activated = true;
+  sketch.activated = false;
   sketch.clickable = true;
 
   sketch.set = (p1, p2, w, h) => {
@@ -13,7 +13,7 @@ let HeartBubble = (sketch) => {
     sketch.height = h;
     sketch.x = p1;
     sketch.y = p2;
-    canvas = sketch.createCanvas(sketch.width, sketch.height).position(sketch.x, sketch.y);
+    sketch.selfCanvas = sketch.createCanvas(sketch.width, sketch.height).position(sketch.x, sketch.y);
   };
 
 
