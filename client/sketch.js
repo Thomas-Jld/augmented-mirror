@@ -2,6 +2,7 @@
 let modules = [];
 let objectsSelected = false;
 
+let pose;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -19,7 +20,7 @@ function setup() {
   multiplications.set(0, 0, 150, 150);
   modules.push(multiplications);
 
-  let pose = new p5(Pose);
+  pose = new p5(Pose);
   pose.set(0, 0, width, height);
   modules.push(pose);
 
@@ -45,6 +46,13 @@ function keyPressed(){
     modules.forEach(m => {
       m.clearSketch();
     });
+  }
+
+  if(key == "d"){
+    modules.forEach(m => {
+      m.activated = false;
+    });
+    pose.activated = true;
   }
 }
 
