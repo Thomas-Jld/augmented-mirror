@@ -1,5 +1,4 @@
 let Pose = ( sketch ) => {
-  let socket;
   let body_pos = {};
   let display = false;
 
@@ -30,7 +29,7 @@ let Pose = ( sketch ) => {
     sketch.y = p2;
     sketch.selfCanvas = sketch.createCanvas(sketch.width, sketch.height).position(sketch.x, sketch.y);
 
-    socket = io.connect('http://0.0.0.0:5000');
+    
     socket.on('update',
       function(data) {
         body_pos = data;

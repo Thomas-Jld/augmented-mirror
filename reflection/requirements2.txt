@@ -1,0 +1,5 @@
+opencv-python
+pycocotools
+python-socketio
+requests
+eventlet

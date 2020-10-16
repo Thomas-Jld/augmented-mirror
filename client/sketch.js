@@ -4,9 +4,12 @@ let objectsSelected = false;
 
 let pose;
 
+let socket;
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
 
+  socket = io.connect('http://0.0.0.0:5000');
 
   let clock = new p5(Clock);
   clock.set(width - 200, 0, 200, 200);

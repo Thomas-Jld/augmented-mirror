@@ -11,4 +11,6 @@ RUN apt-get update && \
   pip3 install --upgrade pip && \
   pip3 install -r requirements.txt
 
+RUN pip3 install -r requirements2.txt
+
 RUN apt-get -o Dpkg::Options::="--force-confmiss" install --reinstall netbase

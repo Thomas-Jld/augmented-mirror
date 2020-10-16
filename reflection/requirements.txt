@@ -2,8 +2,3 @@ numpy
 pyrealsense2
 torch
 torchvision
-opencv-python
-pycocotools
-python-socketio
-requests
-eventlet
