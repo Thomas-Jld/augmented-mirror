@@ -32,7 +32,7 @@ class VideoReader(object):
 
         depth_sensor = profile.get_device().first_depth_sensor()
 
-        laser_power = profile.get_option(rs.option.laser_power)
+        laser_power = depth_sensor.get_option(rs.option.laser_power)
         depth_sensor.set_option(rs.option.laser_power, 0)
 
         self.depth_scale = depth_sensor.get_depth_scale()
