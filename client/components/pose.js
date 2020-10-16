@@ -40,6 +40,7 @@ let Pose = ( sketch ) => {
 
 
   sketch.show = () => {
+    sketch.selfCanvas.clear();
     socket.emit('nextreflection', true);
     for(var part in body_pos) {
       if(body_pos[part] != -1){
