@@ -14,7 +14,7 @@ io.on('connect', socket => {
     reflection = data;
   });
 
-  socket.on('next', (data) => {
+  socket.on('nextreflection', (data) => {
     socket.emit('update', reflection);
   })
 

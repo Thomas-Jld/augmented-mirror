@@ -3,7 +3,8 @@ import socketio
 from time import sleep
 
 
-from get_reflection import *
+import get_reflection as gr
+import get_temperature as gt
 
 sio = socketio.Client(engineio_logger=True)
 
@@ -14,10 +15,10 @@ def connect():
 
 
 def send_data():
-    net = init()
+    net = gt.init()
     print("Running")
     while True:
-        data = find_reflection(net)
+        data = gt.find_temperature(net)
         if data:
             sio.emit("reflection", data)
         else:

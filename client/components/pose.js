@@ -29,7 +29,7 @@ let Pose = ( sketch ) => {
     sketch.y = p2;
     sketch.selfCanvas = sketch.createCanvas(sketch.width, sketch.height).position(sketch.x, sketch.y);
 
-    
+
     socket.on('update',
       function(data) {
         body_pos = data;
@@ -40,7 +40,7 @@ let Pose = ( sketch ) => {
 
 
   sketch.show = () => {
-    socket.emit('next', true);
+    socket.emit('nextreflection', true);
     for(var part in body_pos) {
       if(body_pos[part] != -1){
         sketch.fill(200);
