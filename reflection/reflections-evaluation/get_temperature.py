@@ -25,7 +25,7 @@ class VideoReader(object):
         self.width = 640
         self.height = 480
 
-        config.enable_stream(rs.stream.depth, self.width, self.height, rs.format.z16, 30)
+        config.enable_stream(rs.stream.infrared, self.width, self.height, rs.format.z16, 30)
         config.enable_stream(rs.stream.color, self.width, self.height, rs.format.bgr8, 30)
 
         profile = self.pipe.start(config)
