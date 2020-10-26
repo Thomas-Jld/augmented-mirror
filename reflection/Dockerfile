@@ -14,7 +14,10 @@ RUN apt-get update && \
 
 RUN apt-get -o Dpkg::Options::="--force-confmiss" install --reinstall netbase
 
-RUN cd reflections-evaluation/ && \
-  git clone https://github.com/Thomas-Jld/detectron2 && \
+RUN cd reflections-evaluation/ 
+
+RUN rm -rf detectron2/; exit 0
+
+RUN git clone https://github.com/Thomas-Jld/detectron2 && \
   curl https://dl.fbaipublicfiles.com/densepose/densepose_rcnn_R_50_FPN_s1x/165712039/model_final_162be9.pkl --output detectron2/projects/DensePose/model_final_162be9.pkl && \
   python3 -m pip install -e detectron2
