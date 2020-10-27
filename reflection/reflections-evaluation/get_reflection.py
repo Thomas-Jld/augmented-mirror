@@ -17,44 +17,7 @@ from val import normalize, pad_width
 
 
 
-class VideoReader(object):
-    def __init__(self):
-        self.pipe = rs.pipeline()
-        config = rs.config()
 
-        self.width = 640
-        self.height = 480
-
-        config.enable_stream(rs.stream.depth, self.width, self.height, rs.format.z16, 30)
-        config.enable_stream(rs.stream.color, self.width, self.height, rs.format.bgr8, 30)
-
-        profile = self.pipe.start(config)
-
-        depth_sensor = profile.get_device().first_depth_sensor()
-        self.depth_scale = depth_sensor.get_depth_scale()
-
-        clipping_distance_in_meters = 3
-        clipping_distance = clipping_distance_in_meters / self.depth_scale
-
-        align_to = rs.stream.color
-        self.align = rs.align(align_to)
-
-
-    def next_frame(self):
-        frameset = self.pipe.wait_for_frames()
-
-        aligned_frames = self.align.process(frameset)
-
-        color_frame = aligned_frames.get_color_frame()
-        depth_frame = aligned_frames.get_depth_frame()
-
-        self.depth_intrinsics = depth_frame.profile.as_video_stream_profile().intrinsics
-        self.color_intrinsics = color_frame.profile.as_video_stream_profile().intrinsics
-
-        color_frame = np.asanyarray(color_frame.get_data())
-        depth_frame = np.asanyarray(depth_frame.get_data())
-
-        return [color_frame, depth_frame]
 
 
 
@@ -108,7 +71,6 @@ def get_depth(pose, joint: int, depth_frame) -> float:
 
 
 def map_location(pose, joint: int, width: int, height: int, depth_frame, video_provider):
-    offset = 10 # Offset distance of the camera from the top of the screen
     da = get_depth(pose, 0, depth_frame) # Depth of the eyes
     db = get_depth(pose, joint, depth_frame) # Depth of the joint
 
@@ -220,3 +182,4 @@ def init(cpu = False):
         net = net.cuda()
 
     return net
+
