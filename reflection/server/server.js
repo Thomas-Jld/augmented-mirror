@@ -32,6 +32,6 @@ io.on('connect', socket => {
   });
 
   socket.on('nextHands', (data) => {
-    socket.emit('updateHands', joint);
+    socket.emit('updateHands', hands);
   });
 });
