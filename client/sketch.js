@@ -3,6 +3,7 @@ let modules = [];
 let objectsSelected = false;
 
 let pose;
+let hands;
 
 let socket;
 
@@ -26,6 +27,10 @@ function setup() {
   pose = new p5(Pose);
   pose.set(0, 0, width, height);
   modules.push(pose);
+
+  hands = new p5(Hands);
+  hands.set(0, 0, width, height);
+  modules.push(hands);
 
   frameRate(30);
 }
@@ -51,13 +56,33 @@ function keyPressed(){
     });
   }
 
-  if(key == "d"){
+  if(key == "p"){
     modules.forEach(m => {
       m.activated = false;
       m.selfCanvas.hide();
     });
     pose.activated = true;
     pose.selfCanvas.show();
+  }
+
+  if(key == "h"){
+    modules.forEach(m => {
+      m.activated = false;
+      m.selfCanvas.hide();
+    });
+    hands.activated = true;
+    hands.selfCanvas.show();
+  }
+
+  if(key == "b"){
+    modules.forEach(m => {
+      m.activated = false;
+      m.selfCanvas.hide();
+    });
+    pose.activated = true;
+    pose.selfCanvas.show();
+    hands.activated = true;
+    hands.selfCanvas.show();
   }
 
   if(key == "a"){

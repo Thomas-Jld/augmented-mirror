@@ -70,8 +70,19 @@ def get_depth(pose, joint: int, depth_frame) -> float:
 #     return x, y
 
 
+def get_ratio(pose, width: int, height: int, depth_frame, video_provider):
+    da = get_depth(pose, 0, depth_frame) # Depth of the nose ~ eyes
+    xa, ya, za = rs.rs2_deproject_pixel_to_point(video_provider.depth_intrinsics, [pose.keypoints[0][0], pose.keypoints[0][1]] , da)
+    if pose.keypoints[0][0] != 0 or pose.keypoints[0][1] != 0:
+        x_ratio = xa/(pose.keypoints[0][0] - width/2)
+        y_ratio = ya/(pose.keypoints[0][1] - height/2)
+        return [x_ratio, y_ratio]
+    else:
+        return -1
+
+
 def map_location(pose, joint: int, width: int, height: int, depth_frame, video_provider):
-    da = get_depth(pose, 0, depth_frame) # Depth of the eyes
+    da = get_depth(pose, 0, depth_frame) # Depth of the nose ~ eyes
     db = get_depth(pose, joint, depth_frame) # Depth of the joint
 
     # xa, ya = get_position(pose, 0, depth_frame, width, height)
@@ -107,7 +118,7 @@ def map_location(pose, joint: int, width: int, height: int, depth_frame, video_p
     return -1
 
 
-def find_reflection(net, image_provider = VideoReader(), send = False, cpu = False):
+def find_reflection(net, img, depth, image_provider, send = False, cpu = False):
 
     height_size = 256
     stride = 8
@@ -115,11 +126,6 @@ def find_reflection(net, image_provider = VideoReader(), send = False, cpu = Fal
     num_keypoints = Pose.num_kpts
 
     data = {}
-
-    frames = image_provider.next_frame()
-
-    img = np.array(frames[0])
-    depth = np.array(frames[1])
 
     """
     Estimate the pose and find the person in the middle
@@ -164,6 +170,10 @@ def find_reflection(net, image_provider = VideoReader(), send = False, cpu = Fal
     if midPose != None:
         for n in range(len(Pose.kpt_names)):
             if midPose.keypoints[n][0] != 0 or midPose.keypoints[n][1] != 0:
+                data["ratio"] = get_ratio(
+                    midPose, image_provider.width, image_provider.height,
+                    depth, image_provider
+                )
                 data[Pose.kpt_names[n]] = map_location(
                     midPose, n, image_provider.width, image_provider.height,
                     depth, image_provider

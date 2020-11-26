@@ -30,7 +30,7 @@ let Pose = ( sketch ) => {
     sketch.selfCanvas = sketch.createCanvas(sketch.width, sketch.height).position(sketch.x, sketch.y);
 
 
-    socket.on('update',
+    socket.on('updateJoint',
       function(data) {
         body_pos = data;
         console.log(data);
@@ -41,7 +41,7 @@ let Pose = ( sketch ) => {
 
   sketch.show = () => {
     sketch.selfCanvas.clear();
-    socket.emit('nextreflection', true);
+    socket.emit('nextJoint', true);
     for(var part in body_pos) {
       if(body_pos[part] != -1){
         sketch.fill(200);
