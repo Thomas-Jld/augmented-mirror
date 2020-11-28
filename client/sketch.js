@@ -12,17 +12,17 @@ function setup() {
 
   socket = io.connect('http://0.0.0.0:5000');
 
-  // let clock = new p5(Clock);
-  // clock.set(width - 200, 0, 200, 200);
-  // modules.push(clock);
+  let clock = new p5(Clock);
+  clock.set(width - 200, 0, 200, 200);
+  modules.push(clock);
 
-  // let bubble = new p5(HeartBubble);
-  // bubble.set(0, 0, width, height);
-  // modules.push(bubble);
+  let bubble = new p5(HeartBubble);
+  bubble.set(0, 0, width, height);
+  modules.push(bubble);
 
-  // let multiplications = new p5(Multiplications);
-  // multiplications.set(0, 0, 150, 150);
-  // modules.push(multiplications);
+  let multiplications = new p5(Multiplications);
+  multiplications.set(0, 0, 150, 150);
+  modules.push(multiplications);
 
   pose = new p5(Pose);
   pose.set(0, 0, width, height);

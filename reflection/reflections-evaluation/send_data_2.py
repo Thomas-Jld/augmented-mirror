@@ -3,6 +3,7 @@ import threading
 import time
 import numpy as np
 
+import cv2 as cv
 import pyrealsense2 as rs
 
 
@@ -13,7 +14,7 @@ import get_hand_gesture as gh
 
 sio = socketio.Client(engineio_logger=True)
 
-class VideoReader(object):
+class IntelVideoReader(object):
     def __init__(self):
         self.pipe = rs.pipeline()
         config = rs.config()
@@ -52,6 +53,15 @@ class VideoReader(object):
 
         return [color_frame, depth_frame]
         
+
+class CameraVideoReader:
+    def __init__(self):
+        self.cap = cv.VideoCapture(0)
+
+    def next_frame(self):
+        ret, frame = self.cap.read()
+        return [frame, None]
+
 
 class frame_provider(threading.Thread):
     def __init__(self, threadID, feed):
@@ -147,7 +157,7 @@ class hands_provider(threading.Thread):
                     sio.emit("hands", self.data)
                     time.sleep(0.01)
                 else:
-                    time.sleep(0.1)
+                    time.sleep(0.001)
             else:
                 time.sleep(0.02)
 
@@ -157,7 +167,7 @@ class hands_provider(threading.Thread):
 @sio.event
 def connect():
     functionalities = [
-        True, # Joint
+        False, # Joint
         False, # Body mesh, requires Joint
         True, # Hands, requires Joint
     ]
@@ -178,7 +188,7 @@ def connect():
     -------------------------------------
     """)
 
-    feed = VideoReader()
+    feed = CameraVideoReader()
 
     Thread1 = frame_provider("frame", feed)
     if functionalities[0]:
