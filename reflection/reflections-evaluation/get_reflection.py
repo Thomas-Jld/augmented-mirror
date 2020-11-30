@@ -1,5 +1,7 @@
 import argparse
 
+import sys
+import os
 import cv2
 import numpy as np
 import torch
@@ -7,6 +9,8 @@ import pyrealsense2 as rs
 import json
 import math
 
+
+sys.path.append(os.path.join(os.path.dirname(__file__), "pose-estimation"))
 from models.with_mobilenet import PoseEstimationWithMobileNet
 from modules.keypoints import extract_keypoints, group_keypoints
 from modules.load_state import load_state
