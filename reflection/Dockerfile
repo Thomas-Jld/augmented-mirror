@@ -16,11 +16,5 @@ RUN apt-get -o Dpkg::Options::="--force-confmiss" install --reinstall netbase
 
 WORKDIR /reflection/reflections-evaluation/ 
 
-RUN rm -rf detectron2/; exit 0
-
 RUN  python3 -m pip install -e detectron2 
 
-RUN cp detectron2/projects/DensePose/configs/densepose_rcnn_R_50_FPN_s1x.yaml configs/densepose_rcnn_R_50_FPN_s1x.yaml  && \
-  cp detectron2/projects/DensePose/configs/Base-DensePose-RCNN-FPN.yaml configs/Base-DensePose-RCNN-FPN.yaml
-  
-  
