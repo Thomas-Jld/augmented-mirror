@@ -60,7 +60,10 @@ class CameraVideoReader:
 
     def next_frame(self):
         ret, frame = self.cap.read()
-        return [frame, None]
+        if ret:
+            return [frame, None]
+        else:
+            return [None, None]
 
 
 class frame_provider(threading.Thread):
@@ -167,9 +170,9 @@ class hands_provider(threading.Thread):
 @sio.event
 def connect():
     functionalities = [
-        False, # Joint
+        True, # Joint
         False, # Body mesh, requires Joint
-        True, # Hands, requires Joint
+        False, # Hands, requires Joint
     ]
     print(
     """
@@ -188,7 +191,7 @@ def connect():
     -------------------------------------
     """)
 
-    feed = CameraVideoReader()
+    feed = IntelVideoReader()
 
     Thread1 = frame_provider("frame", feed)
     if functionalities[0]:
