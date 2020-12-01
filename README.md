@@ -1,5 +1,11 @@
 # Miroir
 
+## Description
+
+This project uses multiples recognition softwares to project images 
+on a mirror matching the viewpoint of the person standing in front of
+it.
+
 ## Requirements
 
 - Nvidia-Docker
@@ -7,22 +13,22 @@
 - A nvidia GPU with drivers installed
 
 ## Using the Docker container
-```
-cd reflection/
-```
+
 To build the container from the docker file, simply use `make build`.<br/>
-To execute the container, use `make run`. Make sure that you've already installed nvidia-docker and that your computer support cuda.
+To execute the container, use `make run`. Make sure that you've already 
+installed nvidia-docker and that your computer supports cuda.
 
 ### Launching the intermediate Server
 In the server folder, use:
 ```
 node server.js
 ```
+Make sure to be in a docker container if your computer doesn't have node.
 
 ### Sending position data to the server
-In reflections-evaluation, use:
+In reflections, while being in a docker container, use:
 ```
-python3 send_data.py
+python3 send_data_2.py
 ```
 ## Launch the app
 
