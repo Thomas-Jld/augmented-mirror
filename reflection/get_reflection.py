@@ -81,7 +81,7 @@ def get_ratio(pose, width: int, height: int, depth_frame, video_provider):
         x_ratio = xa/(pose.keypoints[0][0] - width/2)
         y_ratio = ya/(pose.keypoints[0][1] - height/2)
         if abs(pose.keypoints[0][0] - width/2) < 3:
-            return [0, 0, -xa, ya, 1/2]
+            return [1, 1, -xa, ya, 1/2]
         return [x_ratio, y_ratio, -xa, ya, 1/2]
     else:
         return -1
