@@ -45,10 +45,10 @@ let Hands = ( sketch ) => {
       for(var index in keypoints) {
         sketch.fill(0, 255, 0);
         let ratio = hands_joints[hands_joints.length - 1];
-        let dx = - hands_joints[i][index][0]*ratio[0] - ratio[2];
-        let dy = - hands_joints[i][index][1]*ratio[1] - ratio[3];
-        let xi = ratio[2] + ratio[4]*dx;
-        let yi = ratio[3] + ratio[4]*dy;
+        let dx = hands_joints[i][index][0]*ratio[0] - ratio[2];
+        let dy = hands_joints[i][index][1]*ratio[1] - ratio[3];
+        let xi = - ratio[2] + ratio[4]*dx;
+        let yi = - ratio[3] + ratio[4]*dy;
         let x = width/2 + width*(xi - xoffset)/screenwidth;
         let y = height*(xi - yoffset)/screenheight;
         sketch.ellipse(x ,y , 5);
@@ -65,17 +65,17 @@ let Hands = ( sketch ) => {
     junctions.forEach(pair => {
       sketch.stroke(pair[2]*360/7, 255, 255)
       for(let i = 0; i < hands_joints.length - 1; i++){
-        let dx1 = - hands_joints[i][pair[0]][0]*ratio[0] - ratio[2];
-        let dy1 = - hands_joints[i][pair[0]][1]*ratio[1] - ratio[3];
-        let xi1 = ratio[2] + ratio[4]*dx1;
-        let yi1 = ratio[3] + ratio[4]*dy1;
+        let dx1 = hands_joints[i][pair[0]][0]*ratio[0] - ratio[2];
+        let dy1 = hands_joints[i][pair[0]][1]*ratio[1] - ratio[3];
+        let xi1 = -ratio[2] + ratio[4]*dx1;
+        let yi1 = -ratio[3] + ratio[4]*dy1;
         let x1 = width*(xi1 - xoffset)/screenwidth;
         let y1 = height*(yi1 - yoffset)/screenheight;
 
-        let dx2 = - hands_joints[i][pair[1]][0]*ratio[0] - ratio[2];
-        let dy2 = - hands_joints[i][pair[1]][1]*ratio[1] - ratio[3];
-        let xi2 = ratio[2] + ratio[4]*dx2;
-        let yi2 = ratio[3] + ratio[4]*dy2;
+        let dx2 = hands_joints[i][pair[1]][0]*ratio[0] - ratio[2];
+        let dy2 = hands_joints[i][pair[1]][1]*ratio[1] - ratio[3];
+        let xi2 = -ratio[2] + ratio[4]*dx2;
+        let yi2 = -ratio[3] + ratio[4]*dy2;
         let x2 = width*(xi2 - xoffset)/screenwidth;
         let y2 = height*(yi2 - yoffset)/screenheight;
         sketch.line(x1, y1, x2, y2);
