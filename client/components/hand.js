@@ -41,14 +41,15 @@ let Hands = ( sketch ) => {
     sketch.selfCanvas.clear();
     socket.emit('nextHands', true);
     let ratio = hands_joints[hands_joints.length - 1];
-    let multi = 0.1;
+    let xmul = 0.1;
+    let ymul = 0.1;
     for(let i = 0; i < hands_joints.length - 1; i++){
       for(var index in keypoints) {
         sketch.fill(0, 255, 0);
         let dx = hands_joints[i][index][0]*ratio[0] - ratio[2];
         let dy = hands_joints[i][index][1]*ratio[1] - ratio[3];
-        let xi = ratio[2] + (ratio[4]+multi)*dx;
-        let yi = ratio[3] + (ratio[4]+multi)*dy;
+        let xi = ratio[2] + (ratio[4]+xmul)*dx;
+        let yi = ratio[3] + (ratio[4]+ymul)*dy;
         let x = sketch.width/2 + sketch.width*(xi - xoffset)/screenwidth;
         let y = sketch.height*(yi - yoffset)/screenheight;
         sketch.ellipse(x ,y , 5);
@@ -62,14 +63,15 @@ let Hands = ( sketch ) => {
     sketch.stroke(0, 255, 0);
     sketch.strokeWeight(4);
     let ratio = hands_joints[hands_joints.length - 1];
-    let multi = 0.1;
+    let xmul = 0.1;
+    let ymul = 0.1;
     junctions.forEach(pair => {
       sketch.stroke(pair[2]*360/7, 255, 255)
       for(let i = 0; i < hands_joints.length - 1; i++){
         let dx1 = hands_joints[i][pair[0]][0]*ratio[0] - ratio[2];
         let dy1 = hands_joints[i][pair[0]][1]*ratio[1] - ratio[3];
-        let xi1 = ratio[2] + (ratio[4]+multi)*dx1;
-        let yi1 = ratio[3] + (ratio[4]+multi)*dy1;
+        let xi1 = ratio[2] + (ratio[4]+xmul)*dx1;
+        let yi1 = ratio[3] + (ratio[4]+ymul)*dy1;
         let x1 = sketch.width/2 + width*(xi1 - xoffset)/screenwidth;
         let y1 = height*(yi1 - yoffset)/screenheight;
 
