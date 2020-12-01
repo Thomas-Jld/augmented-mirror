@@ -77,8 +77,8 @@ let Hands = ( sketch ) => {
 
         let dx2 = hands_joints[i][pair[1]][0]*ratio[0] - ratio[2];
         let dy2 = hands_joints[i][pair[1]][1]*ratio[1] - ratio[3];
-        let xi2 = ratio[2] + (ratio[4]+multi)*dx2;
-        let yi2 = ratio[3] + (ratio[4]+multi)*dy2;
+        let xi2 = ratio[2] + (ratio[4]+xmul)*dx2;
+        let yi2 = ratio[3] + (ratio[4]+ymul)*dy2;
         let x2 = sketch.width/2 + sketch.width*(xi2 - xoffset)/screenwidth;
         let y2 = sketch.height*(yi2 - yoffset)/screenheight;
         sketch.line(x1, y1, x2, y2);
