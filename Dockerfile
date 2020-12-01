@@ -2,9 +2,9 @@ FROM nvidia/cuda:10.2-cudnn7-devel-ubuntu18.04
 
 #CMD nvidia-smi
 
-WORKDIR /Miroir/reflection
+WORKDIR /Miroir/
 
-COPY .. ..
+COPY . .
 
 RUN apt-get update && \
   apt-get -y install python3-pip libusb-1.0-0-dev libgl1-mesa-glx nano git curl && \
@@ -14,7 +14,7 @@ RUN apt-get update && \
 
 RUN apt-get -o Dpkg::Options::="--force-confmiss" install --reinstall netbase
 
-WORKDIR /Miroir/reflection/reflections-evaluation/ 
+WORKDIR /Miroir/reflection/
 
 RUN  python3 -m pip install -e detectron2 
 

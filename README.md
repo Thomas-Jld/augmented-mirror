@@ -22,7 +22,7 @@ node server.js
 ### Sending position data to the server
 In reflections-evaluation, use:
 ```
-python3 send-data.py
+python3 send_data.py
 ```
 ## Launch the app
 
