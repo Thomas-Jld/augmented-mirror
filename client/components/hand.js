@@ -49,8 +49,8 @@ let Hands = ( sketch ) => {
         let dy = hands_joints[i][index][1]*ratio[1] - ratio[3];
         let xi = - ratio[2] + ratio[4]*dx;
         let yi = - ratio[3] + ratio[4]*dy;
-        let x = width/2 + width*(xi - xoffset)/screenwidth;
-        let y = height*(xi - yoffset)/screenheight;
+        let x = sketch.width*(xi - xoffset)/screenwidth;
+        let y = sketch.height*(xi - yoffset)/screenheight;
         sketch.ellipse(x ,y , 5);
         sketch.text(index, x + 20, y + 20);
       }
@@ -76,8 +76,8 @@ let Hands = ( sketch ) => {
         let dy2 = hands_joints[i][pair[1]][1]*ratio[1] - ratio[3];
         let xi2 = -ratio[2] + ratio[4]*dx2;
         let yi2 = -ratio[3] + ratio[4]*dy2;
-        let x2 = width*(xi2 - xoffset)/screenwidth;
-        let y2 = height*(yi2 - yoffset)/screenheight;
+        let x2 = sketch.width*(xi2 - xoffset)/screenwidth;
+        let y2 = sketch.height*(yi2 - yoffset)/screenheight;
         sketch.line(x1, y1, x2, y2);
       }
     });
