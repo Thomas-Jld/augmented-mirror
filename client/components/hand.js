@@ -50,7 +50,7 @@ let Hands = ( sketch ) => {
         let xi = - ratio[2] + ratio[4]*dx;
         let yi = - ratio[3] + ratio[4]*dy;
         let x = sketch.width*(xi - xoffset)/screenwidth;
-        let y = sketch.height*(xi - yoffset)/screenheight;
+        let y = sketch.height*(yi - yoffset)/screenheight;
         sketch.ellipse(x ,y , 5);
         sketch.text(index, x + 20, y + 20);
       }
