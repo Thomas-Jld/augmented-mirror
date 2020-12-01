@@ -170,9 +170,9 @@ class hands_provider(threading.Thread):
 @sio.event
 def connect():
     functionalities = [
-        True, # Joint
+        False, # Joint
         False, # Body mesh, requires Joint
-        False, # Hands, requires Joint
+        True, # Hands, requires Joint
     ]
     print(
     """
@@ -191,7 +191,7 @@ def connect():
     -------------------------------------
     """)
 
-    feed = IntelVideoReader()
+    feed = CameraVideoReader()
 
     Thread1 = frame_provider("frame", feed)
     if functionalities[0]:

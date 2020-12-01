@@ -187,7 +187,7 @@ def find_reflection(net, img, depth, image_provider, send = False, cpu = False):
 def init(cpu = False):
     net = PoseEstimationWithMobileNet()
 
-    checkpoint_path = "checkpoint_iter_370000.pth"
+    checkpoint_path = "pose-estimation/checkpoint_iter_370000.pth"
     checkpoint = torch.load(checkpoint_path, map_location='cpu') #load the existing model
     load_state(net, checkpoint)
 
