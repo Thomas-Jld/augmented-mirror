@@ -63,7 +63,7 @@ let Hands = ( sketch ) => {
     sketch.stroke(0, 255, 0);
     sketch.strokeWeight(4);
     let ratio = hands_joints[hands_joints.length - 1];
-    ratio[4]+=0.1
+    ratio[4]+= 0.1;
     junctions.forEach(pair => {
       sketch.stroke(pair[2]*360/7, 255, 255)
       for(let i = 0; i < hands_joints.length - 1; i++){
