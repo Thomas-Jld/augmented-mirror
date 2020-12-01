@@ -45,6 +45,7 @@ let Hands = ( sketch ) => {
       for(var index in keypoints) {
         sketch.fill(0, 255, 0);
         let ratio = hands_joints[hands_joints.length - 1];
+        ratio[4] += 0.1;
         let dx = hands_joints[i][index][0]*ratio[0] - ratio[2];
         let dy = hands_joints[i][index][1]*ratio[1] - ratio[3];
         let xi = ratio[2] + ratio[4]*dx;
@@ -62,6 +63,7 @@ let Hands = ( sketch ) => {
     sketch.stroke(0, 255, 0);
     sketch.strokeWeight(4);
     let ratio = hands_joints[hands_joints.length - 1];
+    ratio[4]+=0.1
     junctions.forEach(pair => {
       sketch.stroke(pair[2]*360/7, 255, 255)
       for(let i = 0; i < hands_joints.length - 1; i++){
