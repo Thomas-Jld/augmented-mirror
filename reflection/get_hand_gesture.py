@@ -10,7 +10,7 @@ import mediapipe as mp
 
 def init():
     mp_hands = mp.solutions.hands
-    return mp_hands.Hands(min_detection_confidence=0.7, min_tracking_confidence=0.5)
+    return mp_hands.Hands(min_detection_confidence=0.5, min_tracking_confidence=0.2)
 
 
 def find_hand_pose(hands, frame):
