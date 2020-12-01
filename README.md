@@ -16,21 +16,22 @@ it.
 
 To build the container from the docker file, simply use `make build`.<br/>
 To execute the container, use `make run`. Make sure that you've already 
-installed nvidia-docker and that your computer supports cuda.
+installed nvidia-docker and that your computer supports cuda. <br/> 
+Inside the docker container execute `launch.sh` to launch the recognition software.
 
-### Launching the intermediate Server
+### Manualy launching the intermediate Server
 In the server folder, use:
 ```
 node server.js
 ```
 Make sure to be in a docker container if your computer doesn't have node.
 
-### Sending position data to the server
+### Manualy sending position data to the server
 In reflections, while being in a docker container, use:
 ```
 python3 send_data_2.py
 ```
-## Launch the app
+## Openning the app
 
 Open `client/index.html` with chrome to see result.
 
