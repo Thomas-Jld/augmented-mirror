@@ -41,15 +41,15 @@ let Hands = ( sketch ) => {
     sketch.selfCanvas.clear();
     socket.emit('nextHands', true);
     let ratio = hands_joints[hands_joints.length - 1];
+    let multi = 0.1;
     for(let i = 0; i < hands_joints.length - 1; i++){
       for(var index in keypoints) {
         sketch.fill(0, 255, 0);
-        let ratio = hands_joints[hands_joints.length - 1];
         ratio[4] = ratio[4] + 0.1;
         let dx = hands_joints[i][index][0]*ratio[0] - ratio[2];
         let dy = hands_joints[i][index][1]*ratio[1] - ratio[3];
-        let xi = ratio[2] + ratio[4]*dx;
-        let yi = ratio[3] + ratio[4]*dy;
+        let xi = ratio[2] + (ratio[4]+multi)*dx;
+        let yi = ratio[3] + (ratio[4]+multi)*dy;
         let x = sketch.width/2 + sketch.width*(xi - xoffset)/screenwidth;
         let y = sketch.height*(yi - yoffset)/screenheight;
         sketch.ellipse(x ,y , 5);
