@@ -160,7 +160,7 @@ class hands_provider(threading.Thread):
                     sio.emit("hands", self.data)
                     time.sleep(0.01)
                 else:
-                    time.sleep(0.001)
+                    time.sleep(0.01)
             else:
                 time.sleep(0.02)
 
@@ -191,7 +191,7 @@ def connect():
     -------------------------------------
     """)
 
-    feed = CameraVideoReader()
+    feed = IntelVideoReader()
 
     Thread1 = frame_provider("frame", feed)
     if functionalities[0]:
@@ -222,6 +222,6 @@ def connect():
 if __name__ == '__main__':
     color = None
     depth = None
-    ratio = [1, 1]
+    ratio = [1, 1, 0, 0, 1/2]
     threads = []
     sio.connect('http://0.0.0.0:5000')
