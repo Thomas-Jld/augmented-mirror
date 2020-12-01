@@ -6,12 +6,6 @@
 - Node.js
 - A nvidia GPU with drivers installed
 
-## Launching the intermediate Server
-```
-cd reflection/server/
-node server.js
-```
-
 ## Using the Docker container
 ```
 cd reflection/
@@ -19,9 +13,15 @@ cd reflection/
 To build the container from the docker file, simply use `make build`.<br/>
 To execute the container, use `make run`. Make sure that you've already installed nvidia-docker and that your computer support cuda.
 
-### Sending position data to the server
+### Launching the intermediate Server
+In the server folder, use:
 ```
-cd reflection/reflection-evaluation/
+node server.js
+```
+
+### Sending position data to the server
+In reflections-evaluation, use:
+```
 python3 send-data.py
 ```
 ## Launch the app
@@ -29,6 +29,11 @@ python3 send-data.py
 Open `client/index.html` with chrome to see result.
 
 ## Ressources:
+Projects : 
 - https://github.com/Daniil-Osokin/lightweight-human-pose-estimation.pytorch
+- https://google.github.io/mediapipe/solutions/hands.html
+- https://github.com/facebookresearch/detectron2/tree/master/projects/DensePose
+
+Libraries:
 - https://github.com/IntelRealSense/librealsense/
 - https://github.com/socketio/socket.io
