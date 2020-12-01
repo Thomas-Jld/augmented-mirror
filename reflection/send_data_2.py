@@ -170,7 +170,7 @@ class hands_provider(threading.Thread):
 @sio.event
 def connect():
     functionalities = [
-        False, # Joint
+        True, # Joint
         False, # Body mesh, requires Joint
         True, # Hands, requires Joint
     ]
