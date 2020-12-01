@@ -3,7 +3,7 @@ let Hands = ( sketch ) => {
   let display = false;
 
   let xoffset = 0;  // millimeters
-  let yoffset = 50;
+  let yoffset = 0;
 
   let screenwidth = 392.85; //millimeters
   let screenheight = 698.4;
