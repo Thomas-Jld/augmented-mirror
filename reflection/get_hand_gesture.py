@@ -28,8 +28,8 @@ def find_hand_pose(hands, frame):
             hand_landmarks = []
             for landmark in hands.landmark:
                 hand_landmarks.append([
-                    landmark.x*frame.shape[0],
-                    landmark.y*frame.shape[1],
+                    (landmark.x-0.5)*frame.shape[0],
+                    (landmark.y-0.5)*frame.shape[1],
                     landmark.presence,
                     landmark.visibility,
                     ])
