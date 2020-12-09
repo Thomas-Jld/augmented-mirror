@@ -4,12 +4,20 @@ FROM nvidia/cuda:10.2-cudnn7-devel-ubuntu18.04
 
 WORKDIR /Miroir/
 
+RUN apt-get update && \
+  apt-get -y install python3-pip libusb-1.0-0-dev libgl1-mesa-glx nano git curl nodejs software-properties-common && \
+  pip3 install --upgrade pip 
+
+# RUN add-apt-repository -y ppa:deadsnakes/ppa
+
+# RUN apt -y install python3.7
+
+# ADD requirements2.txt .
+# RUN python3.7 -m pip install -r requirements2.txt
+
 ADD requirements.txt .
 
-RUN apt-get update && \
-  apt-get -y install python3-pip libusb-1.0-0-dev libgl1-mesa-glx nano git curl nodejs && \
-  pip3 install --upgrade pip && \
-  pip3 install -r requirements.txt
+RUN pip install -r requirements.txt
 
 RUN apt-get -o Dpkg::Options::="--force-confmiss" install --reinstall netbase
 
