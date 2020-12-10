@@ -166,7 +166,6 @@ class hands_provider(threading.Thread):
 
 
 
-
 @sio.event
 def connect():
     functionalities = [
