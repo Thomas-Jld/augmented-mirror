@@ -182,14 +182,15 @@ def find_reflection(net, img, depth, image_provider, send = False, cpu = False):
     if midPose != None:
         for n in range(len(Pose.kpt_names)):
             if midPose.keypoints[n][0] != 0 or midPose.keypoints[n][1] != 0:
-                data["ratio"] = get_ratio(
-                    midPose, image_provider.width, image_provider.height,
-                    depth, image_provider
-                )
                 data[Pose.kpt_names[n]] = map_location(
                     midPose, n, image_provider.width, image_provider.height,
                     depth, image_provider
                 )
+            
+        data["ratio"] = get_ratio(
+            midPose, data, image_provider.width, image_provider.height,
+            depth, image_provider
+        )
     return data
 
 def init(cpu = False):
