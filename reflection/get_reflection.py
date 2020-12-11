@@ -74,22 +74,23 @@ def get_depth(pose, joint: int, depth_frame) -> float:
 #     return x, y
 
 
-def get_ratio(pose, width: int, height: int, depth_frame, video_provider):
-    da = get_depth(pose, 0, depth_frame) # Depth of the nose ~ eyes
-    xa, ya, za = rs.rs2_deproject_pixel_to_point(video_provider.depth_intrinsics, [pose.keypoints[0][0], pose.keypoints[0][1]] , da)
-    if pose.keypoints[0][0] != 0 or pose.keypoints[0][1] != 0:
-        x_ratio = xa/(pose.keypoints[0][0] - width/2)
-        y_ratio = ya/(pose.keypoints[0][1] - height/2)
-        if abs(pose.keypoints[0][0] - width/2) == 0 and abs(pose.keypoints[0][1] - height/2) != 0:
-            return [y_ratio, y_ratio, -xa, ya, 1/2]
-        elif abs(pose.keypoints[0][1] - height/2) == 0 and abs(pose.keypoints[0][0] - width/2) != 0:
-            return [x_ratio, x_ratio, -xa, ya, 1/2]
-        elif abs(pose.keypoints[0][1] - height/2) == 0 and abs(pose.keypoints[0][0] - width/2) == 0:
-            return [1, 1, -xa, ya, 1/2]
-        else:
-            return [x_ratio, y_ratio, -xa, ya, 1/2]
-    else:
-        return -1
+def get_ratio(pose, data : dict, width: int, height: int, depth_frame, video_provider):
+    xa, ya, za = rs.rs2_deproject_pixel_to_point(
+        video_provider.depth_intrinsics, 
+        [pose.keypoints[0][0], pose.keypoints[0][1]],
+        get_depth(pose, 0, depth_frame))
+    
+    count = 0
+    ratios = []
+    for name, coords in data.items():
+        n = pose.kpt_names.keys()[pose.kpt_names.values().index(name)]
+        if coords != -1 and n != 16 and n != 17:
+            count += 1 
+            d = get_depth(pose, n, depth_frame) # Depth of the joint
+            x, y, _ = rs.rs2_deproject_pixel_to_point(video_provider.depth_intrinsics, [pose.keypoints[n][0], pose.keypoints[n][1]] , d)
+            ratios.append([x/(pose.keypoints[n][0] - width/2), y/(pose.keypoints[n][1] - height/2)])
+    
+    return [sum(ratios[:, 0])/count, sum(ratios[:, 1])/count, -xa, ya, 1/2]
 
 
 def map_location(pose, joint: int, width: int, height: int, depth_frame, video_provider):
