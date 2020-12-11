@@ -84,13 +84,15 @@ def get_ratio(pose, data : dict, width: int, height: int, depth_frame, video_pro
     ratios = []
     for name, coords in data.items():
         n = pose.kpt_names.index(name)
-        if coords != -1 and n != 16 and n != 17:
+        if coords != -1 and n > 1 and n < 14:
             count += 1 
             d = get_depth(pose, n, depth_frame) # Depth of the joint
             x, y, _ = rs.rs2_deproject_pixel_to_point(video_provider.depth_intrinsics, [pose.keypoints[n][0], pose.keypoints[n][1]] , d)
             ratios.append([x/(pose.keypoints[n][0] - width/2), y/(pose.keypoints[n][1] - height/2)])
     
     ratios = np.array(ratios)
+    if len(ratios) == 0:
+        return [1, 1, 0, 0, 1/2]
     return [sum(ratios[:, 0])/count, sum(ratios[:, 1])/count, -xa, ya, 1/2]
 
 
