@@ -75,10 +75,11 @@ def get_depth(pose, joint: int, depth_frame) -> float:
 
 
 def get_ratio(pose, data : dict, width: int, height: int, depth_frame, video_provider):
+    dno = get_depth(pose, 0, depth_frame)
     xa, ya, za = rs.rs2_deproject_pixel_to_point(
         video_provider.depth_intrinsics, 
         [pose.keypoints[0][0], pose.keypoints[0][1]],
-        get_depth(pose, 0, depth_frame))
+        dno)
     
     count = 0
     ratios = []
@@ -91,9 +92,23 @@ def get_ratio(pose, data : dict, width: int, height: int, depth_frame, video_pro
             ratios.append([x/(pose.keypoints[n][0] - width/2), y/(pose.keypoints[n][1] - height/2)])
     
     ratios = np.array(ratios)
+    depth_ratio = 1/2
+    if data["r_wri"] != -1 and data["l_wri"] != -1:
+        drw = get_depth(pose, 4, depth_frame)
+        dlw = get_depth(pose, 7, depth_frame)
+        depth_ratio = 0.5*dno/(drw + dno) + 0.5*dno/(dlw + dno)
+
+    elif data["r_wri"] != -1:
+        drw = get_depth(pose, 4, depth_frame)
+        depth_ratio = dno/(drw + dno)
+        
+    elif data["l_wri"] != -1:
+        dlw = get_depth(pose, 7, depth_frame)
+        depth_ratio = dno/(dlw + dno)
+
     if len(ratios) == 0:
         return [1, 1, 0, 0, 1/2]
-    return [sum(ratios[:, 0])/count, sum(ratios[:, 1])/count, -xa, ya, 1/2]
+    return [sum(ratios[:, 0])/count, sum(ratios[:, 1])/count, -xa, ya, depth_ratio]
 
 
 def map_location(pose, joint: int, width: int, height: int, depth_frame, video_provider):
