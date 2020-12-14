@@ -1,4 +1,4 @@
-# Miroir
+# Augmented mirror
 
 ## Description
 
