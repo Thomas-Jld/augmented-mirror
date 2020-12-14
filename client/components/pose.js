@@ -2,7 +2,7 @@ let Pose = ( sketch ) => {
   let body_pos = {};
   let display = false;
 
-  let xoffset = 50;  // millimeters
+  let xoffset = 20;  // millimeters
   let yoffset = 50;
 
   let screenwidth = 392.85; //millimeters
