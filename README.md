@@ -36,11 +36,12 @@ python3 send_data.py
 Open `client/index.html` with chrome to see result.
 
 ## Ressources:
-Projects : 
+
+### Projects : 
 - https://github.com/Daniil-Osokin/lightweight-human-pose-estimation.pytorch
 - https://google.github.io/mediapipe/solutions/hands.html
 - https://github.com/facebookresearch/detectron2/tree/master/projects/DensePose
 
-Libraries:
+### Libraries:
 - https://github.com/IntelRealSense/librealsense/
 - https://github.com/socketio/socket.io
