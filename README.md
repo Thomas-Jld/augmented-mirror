@@ -29,7 +29,7 @@ Make sure to be in a docker container if your computer doesn't have node.
 ### Manualy sending position data to the server
 In reflections, while being in a docker container, use:
 ```
-python3 send_data_2.py
+python3 send_data.py
 ```
 ## Openning the app
 
