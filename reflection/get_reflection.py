@@ -45,12 +45,26 @@ def infer_fast(net, img, net_input_height_size, stride, upsample_ratio, cpu,
     stages_output = net(tensor_img)
 
     stage2_heatmaps = stages_output[-2]
-    heatmaps = np.transpose(stage2_heatmaps.squeeze().cpu().data.numpy(), (1, 2, 0))
-    heatmaps = cv2.resize(heatmaps, (0, 0), fx=upsample_ratio, fy=upsample_ratio, interpolation=cv2.INTER_CUBIC)
+    heatmaps = np.transpose(
+        stage2_heatmaps.squeeze().cpu().data.numpy(), 
+        (1, 2, 0))
+    heatmaps = cv2.resize(
+        heatmaps, 
+        (0, 0), 
+        fx=upsample_ratio, 
+        fy=upsample_ratio, 
+        interpolation=cv2.INTER_CUBIC)
 
     stage2_pafs = stages_output[-1]
-    pafs = np.transpose(stage2_pafs.squeeze().cpu().data.numpy(), (1, 2, 0))
-    pafs = cv2.resize(pafs, (0, 0), fx=upsample_ratio, fy=upsample_ratio, interpolation=cv2.INTER_CUBIC)
+    pafs = np.transpose(
+        stage2_pafs.squeeze().cpu().data.numpy(), 
+        (1, 2, 0))
+    pafs = cv2.resize(
+        pafs, 
+        (0, 0), 
+        fx=upsample_ratio, 
+        fy=upsample_ratio,
+        interpolation=cv2.INTER_CUBIC)
 
     return heatmaps, pafs, scale, pad
 
@@ -88,8 +102,13 @@ def get_ratio(pose, data : dict, width: int, height: int, depth_frame, video_pro
         if coords != -1 and n > 1 and n < 14:
             count += 1 
             d = get_depth(pose, n, depth_frame) # Depth of the joint
-            x, y, _ = rs.rs2_deproject_pixel_to_point(video_provider.depth_intrinsics, [pose.keypoints[n][0], pose.keypoints[n][1]] , d)
-            ratios.append([x/(pose.keypoints[n][0] - width/2), y/(pose.keypoints[n][1] - height/2)])
+            x, y, _ = rs.rs2_deproject_pixel_to_point(
+                video_provider.depth_intrinsics, 
+                [pose.keypoints[n][0], pose.keypoints[n][1]], 
+                d)
+            ratios.append([
+                x/(pose.keypoints[n][0] - width/2), 
+                y/(pose.keypoints[n][1] - height/2)])
     
     ratios = np.array(ratios)
     depth_ratio = 1/2
@@ -108,7 +127,11 @@ def get_ratio(pose, data : dict, width: int, height: int, depth_frame, video_pro
 
     if len(ratios) == 0:
         return [1, 1, 0, 0, 1/2]
-    return [sum(ratios[:, 0])/count, sum(ratios[:, 1])/count, -xa, ya, depth_ratio]
+    return [sum(ratios[:, 0])/count, 
+            sum(ratios[:, 1])/count, 
+            -xa, 
+            ya, 
+            depth_ratio]
 
 
 def map_location(pose, joint: int, width: int, height: int, depth_frame, video_provider):
@@ -118,8 +141,14 @@ def map_location(pose, joint: int, width: int, height: int, depth_frame, video_p
     # xa, ya = get_position(pose, 0, depth_frame, width, height)
     # xb, yb = get_position(pose, joint , depth_frame, width, height)
 
-    xa, ya, za = rs.rs2_deproject_pixel_to_point(video_provider.depth_intrinsics, [pose.keypoints[0][0], pose.keypoints[0][1]] , da)
-    xb, yb, zb = rs.rs2_deproject_pixel_to_point(video_provider.color_intrinsics, [pose.keypoints[joint][0], pose.keypoints[joint][1]], db)
+    xa, ya, _ = rs.rs2_deproject_pixel_to_point(
+        video_provider.depth_intrinsics, 
+        [pose.keypoints[0][0], pose.keypoints[0][1]] , 
+        da)
+    xb, yb, _ = rs.rs2_deproject_pixel_to_point(
+        video_provider.color_intrinsics, 
+        [pose.keypoints[joint][0], pose.keypoints[joint][1]], 
+        db)
 
     # dxa = (da**2 - xa**2)**.5
     # dya = (da**2 - ya**2)**.5
@@ -166,7 +195,10 @@ def find_reflection(net, img, depth, image_provider, send = False, cpu = False):
     total_keypoints_num = 0
     all_keypoints_by_type = []
     for kpt_idx in range(num_keypoints):  # 19th for bg
-        total_keypoints_num += extract_keypoints(heatmaps[:, :, kpt_idx], all_keypoints_by_type, total_keypoints_num)
+        total_keypoints_num += extract_keypoints(
+            heatmaps[:, :, kpt_idx], 
+            all_keypoints_by_type, 
+            total_keypoints_num)
 
     pose_entries, all_keypoints = group_keypoints(all_keypoints_by_type, pafs, demo=True)
     for kpt_id in range(all_keypoints.shape[0]):
