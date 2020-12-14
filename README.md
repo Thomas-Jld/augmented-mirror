@@ -9,7 +9,6 @@ it.
 ## Requirements
 
 - Nvidia-Docker
-- Node.js
 - A nvidia GPU with drivers installed
 
 ## Using the Docker container
