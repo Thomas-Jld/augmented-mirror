@@ -3,19 +3,16 @@ import threading
 import time
 import numpy as np
 
+import torch
+import torch.nn as nn
 import cv2 as cv
-import pyrealsense2 as rs
-
-
-import get_reflection as gr
-# import get_temperature as gt
-import get_body_mesh as gm
-import get_hand_gesture as gh
 
 sio = socketio.Client(engineio_logger=True)
 
 class IntelVideoReader(object):
     def __init__(self):
+        import pyrealsense2 as rs
+        
         self.pipe = rs.pipeline()
         config = rs.config()
 
@@ -56,7 +53,11 @@ class IntelVideoReader(object):
 
 class CameraVideoReader:
     def __init__(self):
+        self.width = 640
+        self.height = 480
         self.cap = cv.VideoCapture(0)
+        self.cap.set(3,self.width)
+        self.cap.set(4,self.height)
 
     def next_frame(self):
         ret, frame = self.cap.read()
@@ -87,13 +88,24 @@ class frame_provider(threading.Thread):
 
 
 class joint_provider(threading.Thread):
-    def __init__(self, threadID, feed, net):
+    def __init__(self, threadID, feed):
+        import get_reflection as gr
+
         threading.Thread.__init__(self)
         self.threadID = threadID
         self.feed = feed
-        self.net = net
+        self.net = gr.init()
+
+        for module in self.net.modules():
+            if type(module) == nn.Sequential and len(list(module)) == 3 and type(list(module.children())[0]) == nn.Conv2d:
+                torch.quantization.fuse_modules(module, ["0", "1", "2"], inplace=True)
+
+        self.net.cuda()
+        fake = torch.zeros((1, 3, feed.width, feed.height)).cuda()
+        self.net = torch.jit.trace(self.net, fake)
 
     def run(self):
+        import get_reflection as gr
         print(
         """
         -------------------------------------
@@ -101,24 +113,29 @@ class joint_provider(threading.Thread):
         -------------------------------------
         """)
         while 1:
+            start_t = time.time()
+
             if color is not None and depth is not None:
                 self.data = gr.find_reflection(self.net, color, depth, self.feed)
                 if self.data != {}:
                     global ratio
                     ratio = self.data["ratio"]
                     sio.emit("joint", self.data)
-                else:
-                    time.sleep(0.01)
-            else:
-                time.sleep(0.02)
+
+            end_t = time.time()
+            dt = 1/FPS - (end_t - start_t) if (end_t - start_t) < 1/FPS else 0.01
+            time.sleep(dt)
 
 
 class mesh_provider(threading.Thread):
     def __init__(self, threadID, feed):
+        import get_body_mesh as gm
         threading.Thread.__init__(self)
         self.threadID = threadID
+        gm.init_densepose()
 
     def run(self):
+        import get_body_mesh as gm
         print(
         """
         -------------------------------------
@@ -126,26 +143,31 @@ class mesh_provider(threading.Thread):
         -------------------------------------
         """)
         while 1:
+            start_t = time.time()
+
             if color is not None:
                 print("Frame ok")
                 self.data = gm.infere_on_image(color)
                 if self.data.all() is not [0, 0, 0]:
                     print("Sending mesh")
                     sio.emit("mesh", self.data.tolist())
-                else:
-                    time.sleep(0.01)
-            else:
-                time.sleep(0.02)
+
+            end_t = time.time()
+            dt = 1/FPS - (end_t - start_t) if (end_t - start_t) < 1/FPS else 0.01
+            time.sleep(dt)
 
 
 class hands_provider(threading.Thread):
-    def __init__(self, threadID, feed, hands):
+    def __init__(self, threadID, feed):
+        import get_hand_gesture as gh
+
         threading.Thread.__init__(self)
         self.threadID = threadID
         self.feed = feed
-        self.hands = hands
+        self.hands = gh.init()
 
     def run(self):
+        import get_hand_gesture as gh
         print(
         """
         -------------------------------------
@@ -153,16 +175,17 @@ class hands_provider(threading.Thread):
         -------------------------------------
         """)
         while 1:
+            start_t = time.time()
+
             if color is not None:
                 self.data = gh.find_hand_pose(self.hands, color)
                 if self.data is not None and self.data != []:
                     self.data.append(ratio)
                     sio.emit("hands", self.data)
-                    time.sleep(0.01)
-                else:
-                    time.sleep(0.01)
-            else:
-                time.sleep(0.02)
+            
+            end_t = time.time()
+            dt = 1/FPS - (end_t - start_t) if (end_t - start_t) < 1/FPS else 0.01
+            time.sleep(dt)
 
 
 
@@ -179,32 +202,22 @@ def connect():
     Connected to the server
     -------------------------------------
     """)
-    net = gr.init()
-    gm.init_densepose()
-    hands = gh.init()
 
-    print(
-    """
-    -------------------------------------
-    Data initialized
-    -------------------------------------
-    """)
-
+    # feed = CameraVideoReader()
     feed = IntelVideoReader()
 
     Thread1 = frame_provider("frame", feed)
     if functionalities[0]:
-        Thread2 = joint_provider("joint", feed, net)
+        Thread2 = joint_provider("joint", feed)
     if functionalities[1]:
         Thread3 = mesh_provider("mesh", feed)
     if functionalities[2]:
-        Thread4 = hands_provider("hands", feed, hands)
+        Thread4 = hands_provider("hands", feed)
         
-
     print(
     """
     -------------------------------------
-    Starting threads 
+    Data initialized, Starting threads
     -------------------------------------
     """)
 
@@ -217,10 +230,10 @@ def connect():
         Thread4.start()
 
 
-
 if __name__ == '__main__':
     color = None
     depth = None
     ratio = [1, 1, 0, 0, 1/2]
+    FPS = 30
     threads = []
     sio.connect('http://0.0.0.0:5000')

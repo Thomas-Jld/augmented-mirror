@@ -9,19 +9,12 @@ import pyrealsense2 as rs
 import json
 import math
 
-
 sys.path.append(os.path.join(os.path.dirname(__file__), "pose-estimation"))
 from models.with_mobilenet import PoseEstimationWithMobileNet
 from modules.keypoints import extract_keypoints, group_keypoints
 from modules.load_state import load_state
 from modules.pose import Pose
 from val import normalize, pad_width
-
-
-
-
-
-
 
 
 
@@ -39,6 +32,7 @@ def infer_fast(net, img, net_input_height_size, stride, upsample_ratio, cpu,
     padded_img, pad = pad_width(scaled_img, stride, pad_value, min_dims)
 
     tensor_img = torch.from_numpy(padded_img).permute(2, 0, 1).unsqueeze(0).float()
+    
     if not cpu:
         tensor_img = tensor_img.cuda()
 
@@ -70,22 +64,11 @@ def infer_fast(net, img, net_input_height_size, stride, upsample_ratio, cpu,
 
 
 
-
 def get_depth(pose, joint: int, depth_frame) -> float:
     x = int(pose.keypoints[joint][0])
     y = int(pose.keypoints[joint][1])
     return np.mean(depth_frame[y - 3 : y + 3, x - 3 : x + 3])
 
-
-# def get_position(pose, joint, depth_frame, width, height):
-#     """
-#     Calculates the position of a joint in space with the camera as reference
-#     """
-#     depth = get_depth(pose, joint, depth_frame)
-#     xp, yp = pose.keypoints[pose]
-#     fovh = 86
-#     fovv = 57
-#     return x, y
 
 
 def get_ratio(pose, data : dict, width: int, height: int, depth_frame, video_provider):
@@ -132,6 +115,7 @@ def get_ratio(pose, data : dict, width: int, height: int, depth_frame, video_pro
             -xa, 
             ya, 
             depth_ratio]
+
 
 
 def map_location(pose, joint: int, width: int, height: int, depth_frame, video_provider):
