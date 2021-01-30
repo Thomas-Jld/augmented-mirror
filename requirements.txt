@@ -1,4 +1,4 @@
-numpy==1.19.4
+numpy==1.19.3
 pyrealsense2==2.40.0.2483
 torchvision==0.8.1
 opencv-python==3.4.11.45
@@ -9,5 +9,5 @@ dataclasses==0.8
 av==8.0.2
 scipy==1.5.4
 setuptools==41.0.0
-mediapipe==0.8.0
+mediapipe==0.8.2
 torch==1.7.0
