@@ -9,6 +9,19 @@ import cv2 as cv
 
 sio = socketio.Client(engineio_logger=True)
 
+def add_data(name, data):
+    global AVAILABLE
+    if not AVAILABLE:
+        while not AVAILABLE:
+            time.sleep(NAP)
+    else:
+        AVAILABLE = False
+
+    DATA[name] = data
+
+    AVAILABLE = True
+
+
 class IntelVideoReader(object):
     def __init__(self):
         import pyrealsense2 as rs
@@ -67,7 +80,7 @@ class CameraVideoReader:
             return [None, None]
 
 
-class frame_provider(threading.Thread):
+class FrameProvider(threading.Thread):
     def __init__(self, threadID, feed):
         threading.Thread.__init__(self)
         self.threadID = threadID
@@ -84,50 +97,40 @@ class frame_provider(threading.Thread):
             global color
             global depth
             color, depth = self.feed.next_frame()
-            time.sleep(0.01)
+            time.sleep(1/(2*FPS))
 
 
-class joint_provider(threading.Thread):
+class BodyProvider(threading.Thread):
     def __init__(self, threadID, feed):
-        import get_reflection as gr
+        import get_body_pose as gbp
 
         threading.Thread.__init__(self)
         self.threadID = threadID
         self.feed = feed
-        self.net = gr.init()
-
-        for module in self.net.modules():
-            if type(module) == nn.Sequential and len(list(module)) == 3 and type(list(module.children())[0]) == nn.Conv2d:
-                torch.quantization.fuse_modules(module, ["0", "1", "2"], inplace=True)
-
-        self.net.cuda()
-        fake = torch.zeros((1, 3, feed.width, feed.height)).cuda()
-        self.net = torch.jit.trace(self.net, fake)
 
     def run(self):
-        import get_reflection as gr
+        import get_body_pose as gbp
         print(
         """
         -------------------------------------
-        Joint provider running
+        Body pose running
         -------------------------------------
         """)
         while 1:
             start_t = time.time()
+            self.pose = gbp.init()
 
             if color is not None and depth is not None:
-                self.data = gr.find_reflection(self.net, color, depth, self.feed)
-                if self.data != {}:
-                    global ratio
-                    ratio = self.data["ratio"]
-                    sio.emit("joint", self.data)
+                self.data = gbp.find_body_pose(self.pose, color)
+
+                add_data("body_pose", self.data)
 
             end_t = time.time()
             dt = 1/FPS - (end_t - start_t) if (end_t - start_t) < 1/FPS else 0.01
             time.sleep(dt)
 
 
-class mesh_provider(threading.Thread):
+class BodyMeshProvider(threading.Thread):
     def __init__(self, threadID, feed):
         import get_body_mesh as gm
         threading.Thread.__init__(self)
@@ -142,22 +145,21 @@ class mesh_provider(threading.Thread):
         Mesh provider running
         -------------------------------------
         """)
+
         while 1:
             start_t = time.time()
 
             if color is not None:
-                print("Frame ok")
                 self.data = gm.infere_on_image(color)
-                if self.data.all() is not [0, 0, 0]:
-                    print("Sending mesh")
-                    sio.emit("mesh", self.data.tolist())
+
+                add_data("body_mesh", self.data)
 
             end_t = time.time()
             dt = 1/FPS - (end_t - start_t) if (end_t - start_t) < 1/FPS else 0.01
             time.sleep(dt)
 
 
-class hands_provider(threading.Thread):
+class HandsProvider(threading.Thread):
     def __init__(self, threadID, feed):
         import get_hand_gesture as gh
 
@@ -179,23 +181,113 @@ class hands_provider(threading.Thread):
 
             if color is not None:
                 self.data = gh.find_hand_pose(self.hands, color)
-                if self.data is not None and self.data != []:
-                    self.data.append(ratio)
-                    sio.emit("hands", self.data)
+                add_data("hands_pose", self.data)
             
             end_t = time.time()
             dt = 1/FPS - (end_t - start_t) if (end_t - start_t) < 1/FPS else 0.01
             time.sleep(dt)
 
 
+class FaceProvider(threading.Thread):
+    def __init__(self, threadID, feed):
+        import get_face_mesh as gf
+
+        threading.Thread.__init__(self)
+        self.threadID = threadID
+        self.feed = feed
+        self.faces = gf.init()
+
+    def run(self):
+        import get_face_mesh as gf
+        print(
+        """
+        -------------------------------------
+        Face mesh running
+        -------------------------------------
+        """)
+        while 1:
+            start_t = time.time()
+
+            if color is not None:
+                self.data = gf.find_face_mesh(self.faces, color)
+                
+                add_data("face_mesh", self.data)
+            
+            end_t = time.time()
+            dt = 1/FPS - (end_t - start_t) if (end_t - start_t) < 1/FPS else 0.01
+            time.sleep(dt)
+
+
+class MultipleProvider(threading.Thread):
+    def __init__(self, threadID, feed):
+        import get_holistic as gh
+
+        threading.Thread.__init__(self)
+        self.threadID = threadID
+        self.feed = feed
+        self.holistic = gh.init()
+
+    def run(self):
+        import get_holistic as gh
+        from get_reflection import project
+        print(
+        """
+        -------------------------------------
+        Holistic running
+        -------------------------------------
+        """)
+        while 1:
+            start_t = time.time()
+
+            if color is not None and depth is not None:
+                self.data = gh.find_all_poses(self.holistic, color)
+                
+                if bool(self.data["body_pose"]):
+                    eyes = self.data["body_pose"][0][2:4]
+
+                    add_data("face_mesh", project(self.data["face_mesh"], eyes, self.feed, depth))
+                    add_data("body_pose", project(self.data["body_pose"], eyes, self.feed, depth))
+                    add_data("right_hand_pose", project(self.data["right_hand_pose"], eyes, self.feed, depth))
+                    add_data("left_hand_pose", project(self.data["left_hand_pose"], eyes, self.feed, depth))
+            
+            end_t = time.time()
+            dt = 1/FPS - (end_t - start_t) if (end_t - start_t) < 1/FPS else 0.01
+            time.sleep(dt)
+
+
+class SendData(threading.Thread):
+    def __init__(self, threadID):
+        threading.Thread.__init__(self)
+        self.threadID = threadID
+
+
+    def run(self):
+        print(
+        """
+        -------------------------------------
+        Data sender running
+        -------------------------------------
+        """)
+        while 1:
+            start_t = time.time()
+
+            global AVAILABLE
+            if not AVAILABLE:
+                while not AVAILABLE:
+                    time.sleep(NAP)
+            else:
+                AVAILABLE = False
+
+            sio.emit("global_data", DATA)
+            AVAILABLE = True
+            end_t = time.time()
+            dt = 2/FPS - (end_t - start_t) if (end_t - start_t) < 1/(2*FPS) else 0.01
+            time.sleep(dt)
+
+
 
 @sio.event
 def connect():
-    functionalities = [
-        True, # Joint
-        False, # Body mesh, requires Joint
-        True, # Hands, requires Joint
-    ]
     print(
     """
     -------------------------------------
@@ -203,16 +295,28 @@ def connect():
     -------------------------------------
     """)
 
+    functionalities = [
+        False, # Body pose, requires Face mesh
+        False, # Body mesh, requires Body pose
+        False, # Hands, requires Body pose
+        False, # Face mesh
+        True, # Holistic, Body face and hands in one
+    ]
+
     # feed = CameraVideoReader()
     feed = IntelVideoReader()
-
-    Thread1 = frame_provider("frame", feed)
+    Thread1 = FrameProvider("frame", feed)
+    
     if functionalities[0]:
-        Thread2 = joint_provider("joint", feed)
+        Thread2 = BodyProvider("body_pose", feed)
     if functionalities[1]:
-        Thread3 = mesh_provider("mesh", feed)
+        Thread3 = BodyMeshProvider("body_mesh", feed)
     if functionalities[2]:
-        Thread4 = hands_provider("hands", feed)
+        Thread4 = HandsProvider("hands_pose", feed)
+    if functionalities[3]:
+        Thread5 = FaceProvider("face_mesh", feed)
+    if functionalities[4]:
+        Thread6 = MultipleProvider("multiple_poses", feed)
         
     print(
     """
@@ -228,12 +332,30 @@ def connect():
         Thread3.start()
     if functionalities[2]:
         Thread4.start()
+    if functionalities[3]:
+        Thread5.start()
+    if functionalities[4]:
+        Thread6.start()
+
+    Messenger = SendData("server")
+    Messenger.start()
 
 
 if __name__ == '__main__':
     color = None
     depth = None
-    ratio = [1, 1, 0, 0, 1/2]
     FPS = 30
+    NAP = 0.01
+    PROJECT = True
+    AVAILABLE = True
+    DATA = {
+        "face_mesh": [],
+        "body_pose": [],
+        "left_hand_pose": [],
+        "right_hand_pose": [],
+        "eyes": [],
+    }
+
+    eyes = []
     threads = []
     sio.connect('http://0.0.0.0:5000')
