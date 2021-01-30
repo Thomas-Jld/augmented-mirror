@@ -8,10 +8,12 @@ let Hands = ( sketch ) => {
   let screenwidth = 392.85; //millimeters
   let screenheight = 698.4;
 
-  let junctions = [[ 0,  1, 0], [ 0,  5, 0], [ 0,  9, 0], [ 0, 13, 0], [ 0, 17, 0], [ 1,  2, 1], 
-                   [ 2,  3, 1], [ 3,  4, 1], [ 5,  9, 0], [ 5,  6, 2], [ 6,  7, 2], [ 7,  8, 2], 
-                   [ 9, 10, 3], [ 9, 13, 0], [10, 11, 3], [11, 12, 3], [13, 14, 4], [13, 17, 0],
-                   [14, 15, 4], [15, 16, 4], [17, 18, 5], [18, 19, 5], [19, 20, 5]];
+  let junctions = [[[ 0,  1], [ 0,  5], [ 0,  9], [ 0, 13], [ 0, 17], [ 5,  9], [ 9, 13], [13, 17]], 
+                   [[ 1,  2], [ 2,  3], [ 3,  4]], 
+                   [[ 5,  6], [ 6,  7], [ 7,  8]], 
+                   [[ 9, 10], [10, 11], [11, 12]], 
+                   [[13, 14], [14, 15], [15, 16]], 
+                   [[17, 18], [18, 19], [19, 20]]];
 
   let keypoints = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
 
@@ -41,18 +43,13 @@ let Hands = ( sketch ) => {
   sketch.show = () => {
     sketch.selfCanvas.clear();
     socket.emit('nextHands', true);
-    let ratio = hands_joints[hands_joints.length - 1];
-    for(let i = 0; i < hands_joints.length - 1; i++){
-      for(var index in keypoints) {
-        sketch.fill(0, 255, 0);
-        let dx = hands_joints[i][index][0]*ratio[0] - ratio[2];
-        let dy = hands_joints[i][index][1]*ratio[1] - ratio[3];
-        let xi = ratio[2] + (ratio[4]+xmul)*dx;
-        let yi = ratio[3] + (ratio[4]+ymul)*dy;
-        let x = sketch.width/2 + sketch.width*(xi - xoffset)/screenwidth;
-        let y = sketch.height*(yi - yoffset)/screenheight;
-        sketch.ellipse(x ,y , 5);
-        sketch.text(index, x + 20, y + 20);
+    for(var part in hands_joints) {
+      if(part.slice(2,4) != [-1,-1]){
+        sketch.fill(200);
+        let x = width/2 - width*(part[2] - xoffset)/screenwidth;
+        let y = height*(part[3] - yoffset)/screenheight;
+        sketch.ellipse(x ,y , 30);
+        sketch.text(part, x + 20, y + 20);
       }
     }
     sketch.drawLine();
@@ -62,24 +59,20 @@ let Hands = ( sketch ) => {
     sketch.stroke(0, 255, 0);
     sketch.strokeWeight(4);
     let ratio = hands_joints[hands_joints.length - 1];
-    junctions.forEach(pair => {
-      sketch.stroke(pair[2]*360/6, 255, 255)
-      for(let i = 0; i < hands_joints.length - 1; i++){
-        let dx1 = hands_joints[i][pair[0]][0]*ratio[0] - ratio[2];
-        let dy1 = hands_joints[i][pair[0]][1]*ratio[1] - ratio[3];
-        let xi1 = ratio[2] + (ratio[4]+xmul)*dx1;
-        let yi1 = ratio[3] + (ratio[4]+ymul)*dy1;
-        let x1 = sketch.width/2 + width*(xi1 - xoffset)/screenwidth;
-        let y1 = height*(yi1 - yoffset)/screenheight;
-
-        let dx2 = hands_joints[i][pair[1]][0]*ratio[0] - ratio[2];
-        let dy2 = hands_joints[i][pair[1]][1]*ratio[1] - ratio[3];
-        let xi2 = ratio[2] + (ratio[4]+xmul)*dx2;
-        let yi2 = ratio[3] + (ratio[4]+ymul)*dy2;
-        let x2 = sketch.width/2 + sketch.width*(xi2 - xoffset)/screenwidth;
-        let y2 = sketch.height*(yi2 - yoffset)/screenheight;
-        sketch.line(x1, y1, x2, y2);
-      }
+    junctions.forEach(parts => {
+      parts.forEach(pair => {
+        try{
+          if(hands_joints[pair[0]].slice(2,4) != [-1,-1] && hands_joints[pair[1]].slice(2,4) != [-1,-1]){
+            let x1 = width/2 - width*(hands_joints[pair[0]][2] - xoffset)/screenwidth;
+            let y1 = height*(hands_joints[pair[0]][3] - yoffset)/screenheight;
+            let x2 = width/2 - width*(hands_joints[pair[1]][2] - xoffset)/screenwidth;
+            let y2 = height*(hands_joints[pair[1]][3] - yoffset)/screenheight;
+            sketch.line(x1, y1, x2, y2);
+          }
+        }
+        catch(e){
+        }
+      })
     });
   }
 }

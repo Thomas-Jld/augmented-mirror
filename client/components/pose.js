@@ -8,13 +8,24 @@ let Pose = ( sketch ) => {
   let screenwidth = 392.85; //millimeters
   let screenheight = 698.4;
 
-  let junctions = [[1, 2], [1, 5], [2, 3], [3, 4], [5, 6], [6, 7], [1, 8], [8, 9],
-                  [9, 10], [1, 11], [11, 12], [12, 13], [1, 0], [0, 14], [14, 16],
-                  [0, 15], [15, 17]];
+  let junctions = [[[ 0, 1],[ 0, 4],[ 1, 2],[ 2, 3],[ 3, 7],
+                    [ 4, 5],[ 5, 6],[ 6, 8]],
+                    [[9,10]],
+                    [[11,12],[11,13],[11,23],[12,14],[12,24],
+                    [13,15],[14,16],[15,17],[15,19],[15,21],
+                    [16,18],[16,20],[16,22],[17,19],[18,20],
+                    [23,24],[23,25],[24,26],[25,27],[26,28],
+                    [27,29],[27,31],[28,30],[28,32]]];
 
-  let keypoints = ['nose', 'neck', 'r_sho', 'r_elb', 'r_wri', 'l_sho', 'l_elb',
-                  'l_wri', 'r_hip', 'r_knee', 'r_ank', 'l_hip', 'l_knee', 'l_ank',
-                  'r_eye', 'l_eye', 'r_ear', 'l_ear'];
+  let keypoints = ['nose', 'left_eye_inner', 'left_eye', 'left_eye_outer', 
+                  'right_eye_inner', 'right_eye', 'right_eye_outer',
+                  'left_ear', 'right_ear', 'mouth_left', 'mouth_right', 
+                  'left_shoulder', 'right_shoulder', 'left_elbow',
+                  'right_elbow', 'left_wrist', 'right_wrist', 'left_pinky',
+                  'right_pinky', 'left_index', 'right_index', 'left_thumb',
+                  'right_thumb', 'left_hip', 'right_hip', 'left_knee',
+                  'left_ankle', 'right_ankle', 'left_heel', 'right_heel',
+                  'left_foot_index', 'right_foot_index'];
 
 
   sketch.movable = false;
@@ -33,7 +44,7 @@ let Pose = ( sketch ) => {
     socket.on('updateJoint',
       function(data) {
         body_pos = data;
-        console.log(data);
+        // console.log(data);
       }
     );
   };
@@ -43,12 +54,12 @@ let Pose = ( sketch ) => {
     sketch.selfCanvas.clear();
     socket.emit('nextJoint', true);
     for(var part in body_pos) {
-      if(body_pos[part] != -1){
+      if(part.slice(2,4) != [-1,-1]){
         sketch.fill(200);
-        let x = width/2 - width*(body_pos[part][0] - xoffset)/screenwidth;
-        let y = height*(body_pos[part][1] - yoffset)/screenheight;
+        let x = width/2 - width*(part[2] - xoffset)/screenwidth;
+        let y = height*(part[3] - yoffset)/screenheight;
         sketch.ellipse(x ,y , 30);
-        sketch.text(part, x + 20, y + 20);
+        sketch.text(part[1], x + 20, y + 20);
       }
     }
     sketch.drawLine();
@@ -57,19 +68,20 @@ let Pose = ( sketch ) => {
   sketch.drawLine = () => {
     sketch.stroke(255);
     sketch.strokeWeight(4);
-    junctions.forEach(pair => {
-      try{
-      if(body_pos[keypoints[pair[0]]] != -1 && body_pos[keypoints[pair[1]]] != -1){
-        let x1 = width/2 - width*(body_pos[keypoints[pair[0]]][0] - xoffset)/screenwidth;
-        let y1 = height*(body_pos[keypoints[pair[0]]][1] - yoffset)/screenheight;
-        let x2 = width/2 - width*(body_pos[keypoints[pair[1]]][0] - xoffset)/screenwidth;
-        let y2 = height*(body_pos[keypoints[pair[1]]][1] - yoffset)/screenheight;
-        sketch.line(x1, y1, x2, y2);
-      }
-    }
-    catch(e){
-
-    }
+    junctions.forEach(parts => {
+      parts.forEach(pair => {
+        try{
+          if(body_pos[pair[0]].slice(2,4) != [-1,-1] && body_pos[pair[1]].slice(2,4) != [-1,-1]){
+            let x1 = width/2 - width*(body_pos[pair[0]][2] - xoffset)/screenwidth;
+            let y1 = height*(body_pos[pair[0]][3] - yoffset)/screenheight;
+            let x2 = width/2 - width*(body_pos[pair[1]][2] - xoffset)/screenwidth;
+            let y2 = height*(body_pos[pair[1]][3] - yoffset)/screenheight;
+            sketch.line(x1, y1, x2, y2);
+          }
+        }
+        catch(e){
+        }
+      })
     });
   }
 }
