@@ -5,11 +5,20 @@ let face_mesh = [];
 let right_hand_pose = [];
 let left_hand_pose = [];
 
-io.on('connect', socket => {
-  // either with send()
-  console.log(socket);
+let origin;
+let apps = [];
 
-  // or with emit() and custom event names
+io.on('connect', socket => {
+  if (socket.handshake.headers["user-agent"].split('/')[0] == "python-requests"){
+    origin = socket;
+    console.log("python: " + socket.id)
+  }
+  else{
+    apps.push(socket);
+    console.log("new app: " + socket.id)
+  }
+  
+
   socket.emit('greetings', "Hi !");
 
   socket.on('global_data', (data) => {
@@ -27,5 +36,9 @@ io.on('connect', socket => {
 
   socket.on('nextHands', (data) => {
     socket.emit('updateHands', right_hand_pose + left_hand_pose);
+  });
+
+  socket.on('pause', (data) => {
+    origin.emit('pause', data)
   });
 });
