@@ -237,22 +237,28 @@ class MultipleProvider(threading.Thread):
         -------------------------------------
         """)
         while 1:
-            start_t = time.time()
+            global PAUSED
+            if not PAUSED:
+                start_t = time.time()
 
-            if color is not None and depth is not None:
-                self.data = gh.find_all_poses(self.holistic, color)
+                if color is not None and depth is not None:
+                    self.data = gh.find_all_poses(self.holistic, color)
+                    global CHANGED
+
+                    if bool(self.data["body_pose"]):
+                        CHANGED = True
+                        eyes = self.data["body_pose"][0][2:4]
+
+                        add_data("face_mesh", project(self.data["face_mesh"], eyes, self.feed, depth))
+                        add_data("body_pose", project(self.data["body_pose"], eyes, self.feed, depth))
+                        add_data("right_hand_pose", project(self.data["right_hand_pose"], eyes, self.feed, depth))
+                        add_data("left_hand_pose", project(self.data["left_hand_pose"], eyes, self.feed, depth))
                 
-                if bool(self.data["body_pose"]):
-                    eyes = self.data["body_pose"][0][2:4]
-
-                    add_data("face_mesh", project(self.data["face_mesh"], eyes, self.feed, depth))
-                    add_data("body_pose", project(self.data["body_pose"], eyes, self.feed, depth))
-                    add_data("right_hand_pose", project(self.data["right_hand_pose"], eyes, self.feed, depth))
-                    add_data("left_hand_pose", project(self.data["left_hand_pose"], eyes, self.feed, depth))
-            
-            end_t = time.time()
-            dt = 1/FPS - (end_t - start_t) if (end_t - start_t) < 1/FPS else 0.01
-            time.sleep(dt)
+                end_t = time.time()
+                dt = 1/FPS - (end_t - start_t) if (end_t - start_t) < 1/FPS else 0.01
+                time.sleep(dt)
+            else:
+                time.sleep(5)
 
 
 class SendData(threading.Thread):
@@ -269,21 +275,33 @@ class SendData(threading.Thread):
         -------------------------------------
         """)
         while 1:
-            start_t = time.time()
+            global PAUSED
+            if not PAUSED:
+                start_t = time.time()
 
-            global AVAILABLE
-            if not AVAILABLE:
-                while not AVAILABLE:
-                    time.sleep(NAP)
+                global CHANGED
+                if CHANGED:
+                    global AVAILABLE
+                    if not AVAILABLE:
+                        while not AVAILABLE:
+                            time.sleep(NAP)
+                    else:
+                        AVAILABLE = False
+
+                    sio.emit("global_data", DATA)
+                    AVAILABLE = True
+                    CHANGED = False
+                end_t = time.time()
+                dt = 2/FPS - (end_t - start_t) if (end_t - start_t) < 1/(2*FPS) else 0.01
+                time.sleep(dt)
             else:
-                AVAILABLE = False
+                time.sleep(5)
 
-            sio.emit("global_data", DATA)
-            AVAILABLE = True
-            end_t = time.time()
-            dt = 2/FPS - (end_t - start_t) if (end_t - start_t) < 1/(2*FPS) else 0.01
-            time.sleep(dt)
 
+@sio.on('pause')
+def pause(data: bool):
+    global PAUSED
+    PAUSED = data
 
 
 @sio.event
@@ -344,10 +362,6 @@ def connect():
 if __name__ == '__main__':
     color = None
     depth = None
-    FPS = 30
-    NAP = 0.01
-    PROJECT = True
-    AVAILABLE = True
     DATA = {
         "face_mesh": [],
         "body_pose": [],
@@ -355,7 +369,15 @@ if __name__ == '__main__':
         "right_hand_pose": [],
         "eyes": [],
     }
-
     eyes = []
     threads = []
+
+    FPS = 30
+    NAP = 0.01
+
+    PROJECT = True
+    AVAILABLE = True
+    CHANGED = True
+    PAUSED = False
+    
     sio.connect('http://0.0.0.0:5000')
