@@ -31,4 +31,4 @@ WORKDIR /Miroir/reflection/
 
 RUN python3 -m pip install -e detectron2 
 
-# CMD launch.sh
+CMD ./launch_reflection.sh
