@@ -10,9 +10,9 @@ build:
 run:
 	sudo nvidia-docker run -it --expose 5000 --network="host" --privileged --volume=/dev:/dev mirror_release
 	#  --mount type=bind,source=${CURDIR},target=/Miroir
+
+launch:
+	sudo nvidia-docker run --expose 5000 --network="host" --privileged --volume=/dev:/dev mirror_release
 	
 restart:
 	sudo systemctl restart docker
-
-install:
-	sudo apt install docker git
