@@ -76,7 +76,9 @@ let Pose = ( sketch ) => {
             let y1 = height*(body_pos[pair[0]][3] - yoffset)/screenheight;
             let x2 = width/2 - width*(body_pos[pair[1]][2] - xoffset)/screenwidth;
             let y2 = height*(body_pos[pair[1]][3] - yoffset)/screenheight;
-            sketch.line(x1, y1, x2, y2);
+            if(x1 > 0 && x2 > 0){
+              sketch.line(x1, y1, x2, y2);  
+            }
           }
         }
         catch(e){

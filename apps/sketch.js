@@ -6,9 +6,10 @@ let pose;
 let hands;
 
 let socket;
+let canvas;
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  canvas = createCanvas(windowWidth, windowHeight);
 
   socket = io.connect('http://0.0.0.0:5000');
 
@@ -33,6 +34,8 @@ function setup() {
   modules.push(hands);
 
   frameRate(30);
+
+  setInterval(reshape, 5000);
 }
 
 function draw() {
@@ -47,7 +50,9 @@ function draw() {
   });
 }
 
-
+function reshape(){
+  resizeCanvas(windowWidth, windowHeight);
+}
 
 function keyPressed(){
   if(key == "c"){
