@@ -58,7 +58,7 @@ let Pose = ( sketch ) => {
         sketch.fill(200);
         let x = width/2 - width*(part[2] - xoffset)/screenwidth;
         let y = height*(part[3] - yoffset)/screenheight;
-        sketch.ellipse(x ,y , 30);
+        sketch.ellipse(x ,y ,30);
         sketch.text(part[1], x + 20, y + 20);
       }
     }
@@ -70,19 +70,18 @@ let Pose = ( sketch ) => {
     sketch.strokeWeight(4);
     junctions.forEach(parts => {
       parts.forEach(pair => {
-        try{
-          if(body_pos[pair[0]].slice(2,4) != [-1,-1] && body_pos[pair[1]].slice(2,4) != [-1,-1]){
-            let x1 = width/2 - width*(body_pos[pair[0]][2] - xoffset)/screenwidth;
-            let y1 = height*(body_pos[pair[0]][3] - yoffset)/screenheight;
-            let x2 = width/2 - width*(body_pos[pair[1]][2] - xoffset)/screenwidth;
-            let y2 = height*(body_pos[pair[1]][3] - yoffset)/screenheight;
-            if(x1 > 0 && x2 > 0){
-              sketch.line(x1, y1, x2, y2);  
+        try {
+          if (body_pos[pair[0]].slice(2, 4) != [-1, -1] &&
+            body_pos[pair[1]].slice(2, 4) != [-1, -1]) {
+            let x1 = width / 2 - width * (body_pos[pair[0]][2] - xoffset) / screenwidth;
+            let y1 = height * (body_pos[pair[0]][3] - yoffset) / screenheight;
+            let x2 = width / 2 - width * (body_pos[pair[1]][2] - xoffset) / screenwidth;
+            let y2 = height * (body_pos[pair[1]][3] - yoffset) / screenheight;
+            if (y1 > 0 && y2 > 0) {
+              sketch.line(x1, y1, x2, y2);
             }
           }
-        }
-        catch(e){
-        }
+        } catch (e) {}
       })
     });
   }
