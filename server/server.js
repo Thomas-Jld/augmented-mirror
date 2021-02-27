@@ -1,4 +1,5 @@
 const io = require('socket.io')(5000);
+// const { exec } = require('child_process');
 
 let body_pose = [];
 let face_mesh = [];
@@ -7,6 +8,18 @@ let left_hand_pose = [];
 
 let origin;
 let apps = [];
+
+
+// exec('ls | grep js', (err, stdout, stderr) => {
+//   if (err) {
+//     //some err occurred
+//     console.error(err)
+//   } else {
+//    // the *entire* stdout and stderr (buffered)
+//    console.log(`stdout: ${stdout}`);
+//    console.log(`stderr: ${stderr}`);
+//   }
+// });
 
 io.on('connect', socket => {
   if (socket.handshake.headers["user-agent"].split('/')[0] == "python-requests"){
@@ -41,4 +54,6 @@ io.on('connect', socket => {
   socket.on('pause', (data) => {
     origin.emit('pause', data)
   });
+
+  socket.on('so')
 });
