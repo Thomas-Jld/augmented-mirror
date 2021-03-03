@@ -8,7 +8,7 @@ let hands;
 let socket;
 let canvas;
 
-let xoffset = 0; // millimeters
+let xoffset = 20; // millimeters
 let yoffset = -200;
 
 let screenwidth = 392.85; //millimeters
