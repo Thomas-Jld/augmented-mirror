@@ -2,7 +2,7 @@ delete:
 	sudo nvidia-docker image rm -f mirror_release_2
 
 clear:
-	sudo nvidia-docker container prune
+	sudo nvidia-docker rm mirror_release_2
 
 build:
 	sudo nvidia-docker build -t mirror_release_2 .
