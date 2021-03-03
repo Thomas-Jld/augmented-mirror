@@ -1,11 +1,5 @@
 let Hands = (sketch) => {
 
-    let xoffset = 0; // millimeters
-    let yoffset = 100;
-
-    let screenwidth = 392.85; //millimeters
-    let screenheight = 698.4;
-
     // let xmul = 0.16
     // let ymul = -0.15
 
@@ -112,18 +106,18 @@ let Hands = (sketch) => {
         get_update() {
             socket.emit(this.name, true);
         }
- 
+
         show() {
             if (this.hand_pose == []) {
                 return
             }
-            
+
             let transposed = [];
             sketch.fill(200);
-            
-            this.hand_pose.forEach(function(part){
 
-                if(part.slice(2,4) != [-1,-1]){
+            this.hand_pose.forEach(function (part) {
+
+                if (part.slice(2, 4) != [-1, -1]) {
                     let x = width / 2 - width * (part[2] - xoffset) / screenwidth;
                     let y = height * (part[3] - yoffset) / screenheight;
 
@@ -139,8 +133,7 @@ let Hands = (sketch) => {
                         sketch.ellipse(x, y, 30);
                         //sketch.text(part, x + 20, y + 20);
                     }
-                }
-                else{
+                } else {
                     transposed.push([0, 0])
                 }
 
@@ -154,16 +147,18 @@ let Hands = (sketch) => {
         show_lines(transposed) {
             sketch.stroke(255);
             sketch.strokeWeight(4);
-            this.junctions.forEach(parts => {
-                parts.forEach(pair => {
-                    try {
-                        if (transposed[pair[0]][1] > 0 && transposed[pair[1]][1] > 0) {
-                            sketch.line(transposed[pair[0]][0], transposed[pair[0]][1], transposed[pair[1]][0], transposed[pair[1]][1]);
+            this.junctions.forEach(groups => {
+                groups.forEach(parts => {
+                    parts.forEach(pair => {
+                        try {
+                            if (transposed[pair[0]][1] > 0 && transposed[pair[1]][1] > 0) {
+                                sketch.line(transposed[pair[0]][0], transposed[pair[0]][1], transposed[pair[1]][0], transposed[pair[1]][1]);
+                            }
+                        } catch (e) {
+                            console.log(e);
                         }
-                    } catch (e) {
-                        console.log(e);
-                    }
-                })
+                    })
+                });
             });
         }
     }

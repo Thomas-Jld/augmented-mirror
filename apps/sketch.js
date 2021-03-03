@@ -8,6 +8,14 @@ let hands;
 let socket;
 let canvas;
 
+let xoffset = 0; // millimeters
+let yoffset = -200;
+
+let screenwidth = 392.85; //millimeters
+let screenheight = 698.4;
+
+let angle = PI/3;
+
 function setup() {
   canvas = createCanvas(windowWidth, windowHeight);
 

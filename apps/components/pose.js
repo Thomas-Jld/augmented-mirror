@@ -1,11 +1,5 @@
 let Pose = (sketch) => {
 
-    let xoffset = 20; // millimeters
-    let yoffset = 50;
-
-    let screenwidth = 392.85; //millimeters
-    let screenheight = 698.4;
-
     let particules = [];
 
     sketch.movable = false;
