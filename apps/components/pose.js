@@ -110,24 +110,30 @@ let Pose = (sketch) => {
             }
 
             let transposed = [];
+            sketch.fill(200);
 
             this.body_pose.forEach(function (part) {
-                sketch.fill(200);
-                let x = width / 2 - width * (part[2] - xoffset) / screenwidth;
-                let y = height * (part[3] - yoffset) / screenheight;
 
-                transposed.push([x, y]);
+                if(part.slice(2,4) != [-1,-1]){
+                    let x = width / 2 - width * (part[2] - xoffset) / screenwidth;
+                    let y = height * (part[3] - yoffset) / screenheight;
 
-                if (sketch.show_particules) {
-                    if (frameCount % 5 == 0) {
-                        particules.push(new Particule(x, y));
+                    transposed.push([x, y]);
+
+                    if (sketch.show_particules) {
+                        if (frameCount % 5 == 0) {
+                            particules.push(new Particule(x, y));
+                        }
+                    }
+
+                    if (sketch.show_body_points) {
+                        //sketch.fill(255);
+                        sketch.ellipse(x, y, 30);
+                        //sketch.text(part[1].toString(), x + 20, y + 20);
                     }
                 }
-
-                if (sketch.show_body_points) {
-                    //sketch.fill(255);
-                    sketch.ellipse(x, y, 30);
-                    //sketch.text(part[1].toString(), x + 20, y + 20);
+                else{
+                    transposed.push([0, 0])
                 }
             });
 
