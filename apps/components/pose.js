@@ -25,6 +25,10 @@ let Pose = (sketch) => {
         sketch.selfCanvas = sketch.createCanvas(sketch.width, sketch.height).position(sketch.x, sketch.y);
 
         sketch.pose = new Body("pose");
+        socket.on("send_pose", function (data) {
+            sketch.pose.body_pose = data;
+        });
+
     };
 
 
@@ -93,11 +97,11 @@ let Pose = (sketch) => {
             this.body_pose = [];
             this.name = name;
 
-            setInterval(socket.emit('get_' + this.name, true), 40);
+            setInterval(this.get_update, 40);
+        }
 
-            socket.on('send_' + this.name,
-                this.update
-            );
+        get_update() {
+            socket.emit('get_pose', true);
         }
 
         show() {
@@ -144,10 +148,6 @@ let Pose = (sketch) => {
                     }
                 })
             });
-        }
-
-        update(data) {
-            this.body_pose = data;
         }
     }
 }
