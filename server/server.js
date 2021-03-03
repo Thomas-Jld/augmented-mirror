@@ -39,21 +39,23 @@ io.on('connect', socket => {
     right_hand_pose = data["right_hand_pose"];
     left_hand_pose = data["left_hand_pose"];
     face_mesh = data["face_mesh"];
-    console.log(data);
+    // console.log(data);
   });
 
 
-  socket.on('nextJoint', (data) => {
-    socket.emit('updateJoint', body_pose);
+  socket.on('get_pose', (data) => {
+    socket.emit('send_pose', body_pose);
   });
 
-  socket.on('nextHands', (data) => {
-    socket.emit('updateHands', right_hand_pose + left_hand_pose);
+  socket.on('get_right_hand', (data) => {
+    socket.emit('send_right_hand', right_hand_pose);
+  });
+
+  socket.on('get_left_hand', (data) => {
+    socket.emit('send_left_hand', left_hand_pose);
   });
 
   socket.on('pause', (data) => {
     origin.emit('pause', data)
   });
-
-  socket.on('so')
 });
