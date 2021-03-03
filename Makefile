@@ -25,4 +25,4 @@ open:
 	DISPLAY=:0 chromium apps/index.html --start-fullscreen
 
 logs:
-	sudo docker logs mirror_release_2
+	sudo docker logs --follow mirror_release_2
