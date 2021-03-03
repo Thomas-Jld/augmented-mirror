@@ -13,6 +13,26 @@ function setup() {
 
   socket = io.connect('http://0.0.0.0:5000');
 
+  frameRate(30);
+
+  setTimeout(reshape, 5000);
+}
+
+function draw() {
+  background(0);
+  modules.forEach(m => {
+    if(m.activated){
+      m.show();
+      if(m.latched){
+        m.setPosition(mouseX - m.OffsetX, mouseY - m.OffsetY);
+      }
+    }
+  });
+}
+
+function reshape(){
+  resizeCanvas(windowWidth, windowHeight);
+
   // let clock = new p5(Clock);
   // clock.set(width - 200, 0, 200, 200);
   // modules.push(clock);
@@ -32,26 +52,6 @@ function setup() {
   // hands = new p5(Hands);
   // hands.set(0, 0, width, height);
   // modules.push(hands);
-
-  frameRate(30);
-
-  setInterval(reshape, 5000);
-}
-
-function draw() {
-  background(0);
-  modules.forEach(m => {
-    if(m.activated){
-      m.show();
-      if(m.latched){
-        m.setPosition(mouseX - m.OffsetX, mouseY - m.OffsetY);
-      }
-    }
-  });
-}
-
-function reshape(){
-  resizeCanvas(windowWidth, windowHeight);
 }
 
 function keyPressed(){
