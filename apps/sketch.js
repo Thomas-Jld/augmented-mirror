@@ -8,10 +8,10 @@ let hands;
 let socket;
 let canvas;
 
-let xoffset = 20; // millimeters
-let yoffset = -200;
+let xoffset = 60; // millimeters
+let yoffset = -160;
 
-let screenwidth = 392.85; //millimeters
+let screenwidth = 392.85 - 20; //millimeters
 let screenheight = 698.4;
 
 let angle = PI/3;
