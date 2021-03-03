@@ -144,7 +144,7 @@ let Hands = (sketch) => {
             setInterval(socket.emit('get_' + this.name, true), 40);
 
             socket.on('send_' + this.name,
-                this.update(data)
+                this.update
             );
         }
  
