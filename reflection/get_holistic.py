@@ -6,7 +6,7 @@ import mediapipe as mp
 
 def init():
     mp_holistic = mp.solutions.holistic
-    return mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.8)
+    return mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5)
 
 
 def find_all_poses(holistic, frame):
