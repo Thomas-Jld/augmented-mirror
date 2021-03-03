@@ -6,50 +6,6 @@ let Hands = (sketch) => {
     let screenwidth = 392.85; //millimeters
     let screenheight = 698.4;
 
-    let junctions = [
-        [
-            [0, 1],
-            [0, 5],
-            [0, 9],
-            [0, 13],
-            [0, 17],
-            [5, 9],
-            [9, 13],
-            [13, 17]
-        ],
-        [
-            [1, 2],
-            [2, 3],
-            [3, 4]
-        ],
-        [
-            [5, 6],
-            [6, 7],
-            [7, 8]
-        ],
-        [
-            [9, 10],
-            [10, 11],
-            [11, 12]
-        ],
-        [
-            [13, 14],
-            [14, 15],
-            [15, 16]
-        ],
-        [
-            [17, 18],
-            [18, 19],
-            [19, 20]
-        ]
-    ];
-
-    let keypoints = [0, 1, 2, 3, 4, 5,
-        6, 7, 8, 9, 10, 11,
-        12, 13, 14, 15, 16, 17,
-        18, 19, 20
-    ];
-
     // let xmul = 0.16
     // let ymul = -0.15
 
@@ -181,7 +137,7 @@ let Hands = (sketch) => {
         show_lines(transposed) {
             sketch.stroke(255);
             sketch.strokeWeight(4);
-            junctions.forEach(parts => {
+            this.junctions.forEach(parts => {
                 parts.forEach(pair => {
                     try {
                         if (transposed[pair[0]][1] > 0 && transposed[pair[1]][1] > 0) {
