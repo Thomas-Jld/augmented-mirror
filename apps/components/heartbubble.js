@@ -24,7 +24,7 @@ let HeartBubble = (sketch) => {
     	Balls[i].show();
     	Balls[i].update();
   	}
-    sketch.pop();;
+    sketch.pop();
   };
 
 
