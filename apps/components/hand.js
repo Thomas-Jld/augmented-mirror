@@ -98,6 +98,7 @@ let Hands = (sketch) => {
             ];
 
             this.hand_pose = [];
+            this.hand_pose_t = []; //After projection 
             this.name = name;
 
             setInterval(this.get_update, 40);
@@ -111,8 +112,6 @@ let Hands = (sketch) => {
             if (this.hand_pose == []) {
                 return
             }
-            
-            let transposed = [];
             sketch.fill(200);
             
             this.hand_pose.forEach(function(part){
@@ -121,7 +120,7 @@ let Hands = (sketch) => {
                     let x = width / 2 - width * (part[2] - xoffset) / screenwidth;
                     let y = height * (part[3] - yoffset) / screenheight;
 
-                    transposed.push([x, y]);
+                    hand_pose_t.push([x, y]);
 
                     if (sketch.show_particules) {
                         if (frameCount % 5 == 0) {
@@ -135,24 +134,24 @@ let Hands = (sketch) => {
                     }
                 }
                 else{
-                    transposed.push([0, 0])
+                    this.hand_pose_t.push([0, 0]);
                 }
 
             });
 
             if (sketch.show_hands_lines) {
-                this.show_lines(transposed);
+                this.show_lines();
             }
         }
 
-        show_lines(transposed) {
+        show_lines() {
             sketch.stroke(255);
             sketch.strokeWeight(4);
             this.junctions.forEach(parts => {
                 parts.forEach(pair => {
                     try {
-                        if (transposed[pair[0]][1] > 0 && transposed[pair[1]][1] > 0) {
-                            sketch.line(transposed[pair[0]][0], transposed[pair[0]][1], transposed[pair[1]][0], transposed[pair[1]][1]);
+                        if (this.hand_pose_t[pair[0]][1] > 0 && this.hand_pose_t[pair[1]][1] > 0) {
+                            sketch.line(this.hand_pose_t[pair[0]][0], this.hand_pose_t[pair[0]][1], this.hand_pose_t[pair[1]][0], this.hand_pose_t[pair[1]][1]);
                         }
                     } catch (e) {
                         console.log(e);
