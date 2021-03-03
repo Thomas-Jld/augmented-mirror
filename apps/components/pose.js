@@ -6,7 +6,7 @@ let Pose = (sketch) => {
     let screenwidth = 392.85; //millimeters
     let screenheight = 698.4;
 
-    let particules;
+    let particules = [];
 
     sketch.movable = false;
     sketch.latched = false;
@@ -108,8 +108,10 @@ let Pose = (sketch) => {
             if (this.body_pose == []) {
                 return
             }
+
             let transposed = [];
-            for (var part in this.body_pose) {
+
+            this.body_pose.forEach(function (part) {
                 sketch.fill(200);
                 let x = width / 2 - width * (part[2] - xoffset) / screenwidth;
                 let y = height * (part[3] - yoffset) / screenheight;
@@ -123,11 +125,11 @@ let Pose = (sketch) => {
                 }
 
                 if (sketch.show_body_points) {
+                    //sketch.fill(255);
                     sketch.ellipse(x, y, 30);
-                    sketch.text(part[1], x + 20, y + 20);
+                    //sketch.text(part[1].toString(), x + 20, y + 20);
                 }
-
-            }
+            });
 
             if (sketch.show_body_lines) {
                 this.show_lines(transposed);

@@ -27,8 +27,17 @@ let Hands = (sketch) => {
         sketch.y = p2;
         sketch.selfCanvas = sketch.createCanvas(sketch.width, sketch.height).position(sketch.x, sketch.y);
 
-        sketch.right_hand = new Hand("right_hand");
-        sketch.left_hand = new Hand("left_hand");
+        sketch.right_hand = new Hand("get_right_hand");
+        sketch.left_hand = new Hand("get_left_hand");
+
+        socket.on("send_right_hand", function (data) {
+            sketch.right_hand.hand_pose = data;
+        });
+
+
+        socket.on("send_left_hand", function (data) {
+            sketch.left_hand.hand_pose = data;
+        });
 
         sketch.colorMode(HSB);
     };
@@ -97,19 +106,20 @@ let Hands = (sketch) => {
             this.hand_pose = [];
             this.name = name;
 
-            setInterval(socket.emit('get_' + this.name, true), 40);
+            setInterval(this.get_update, 40);
+        }
 
-            socket.on('send_' + this.name,
-                this.update
-            );
+        get_update() {
+            socket.emit(this.name, true);
         }
  
         show() {
             if (this.hand_pose == []) {
                 return
             }
+            
             let transposed = [];
-            for (var part in this.hand_pose) {
+            this.hand_pose.forEach(function(part){
                 sketch.fill(200);
                 let x = width / 2 - width * (part[2] - xoffset) / screenwidth;
                 let y = height * (part[3] - yoffset) / screenheight;
@@ -124,10 +134,10 @@ let Hands = (sketch) => {
 
                 if (sketch.show_hands_points) {
                     sketch.ellipse(x, y, 30);
-                    sketch.text(part, x + 20, y + 20);
+                    //sketch.text(part, x + 20, y + 20);
                 }
 
-            }
+            });
 
             if (sketch.show_hands_lines) {
                 this.show_lines(transposed);
@@ -148,10 +158,6 @@ let Hands = (sketch) => {
                     }
                 })
             });
-        }
-
-        update(data) {
-            this.hand_pose = data;
         }
     }
 }
