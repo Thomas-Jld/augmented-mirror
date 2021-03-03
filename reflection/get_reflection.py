@@ -37,5 +37,5 @@ def project(points: list, eyes: list, video_provider, depth_frame):
     projected = []
     for i,point in enumerate(points):
         if bool(point[2:4]):
-            projected.append([point[0:2] + map_location(point[2:4], eyes, video_provider, depth_frame), get_depth(point[2:4], depth_frame, 4)])
+            projected.append(point[0:2] + map_location(point[2:4], eyes, video_provider, depth_frame) + [get_depth(point[2:4], depth_frame, 4)])
     return projected
