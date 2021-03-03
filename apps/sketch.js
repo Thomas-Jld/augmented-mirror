@@ -57,9 +57,9 @@ function reshape(){
   pose.set(0, 0, width, height);
   modules.push(pose);
 
-  // hands = new p5(Hands);
-  // hands.set(0, 0, width, height);
-  // modules.push(hands);
+  hands = new p5(Hands);
+  hands.set(0, 0, width, height);
+  modules.push(hands);
 }
 
 function keyPressed(){
