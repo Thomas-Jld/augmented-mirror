@@ -40,7 +40,7 @@ let Pose = (sketch) => {
 
     class Body {
         constructor(name) {
-            let junctions = [
+            this.junctions = [
                 [
                     [0, 1],
                     [0, 4],
@@ -82,7 +82,7 @@ let Pose = (sketch) => {
                 ]
             ];
 
-            let keypoints = ['nose', 'left_eye_inner', 'left_eye', 'left_eye_outer',
+            this.keypoints = ['nose', 'left_eye_inner', 'left_eye', 'left_eye_outer',
                 'right_eye_inner', 'right_eye', 'right_eye_outer',
                 'left_ear', 'right_ear', 'mouth_left', 'mouth_right',
                 'left_shoulder', 'right_shoulder', 'left_elbow',
