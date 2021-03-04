@@ -2,13 +2,13 @@ import numpy as np
 import pyrealsense2 as rs
 import math
 
-theta = math.pi/8
+theta = math.radians(10)
 
 def get_depth(point: list, depth_frame, r: int) -> float:
     x = int(point[0])
     y = int(point[1])
     x = x if x >= 0 else 0
-    x = x if x < len(depth_frame) else len(depth_frame[0])
+    x = x if x < len(depth_frame[0]) else len(depth_frame[0])
     y = y if y >= 0 else 0
     y = y if y < len(depth_frame) else len(depth_frame)
 
@@ -19,9 +19,10 @@ def get_depth(point: list, depth_frame, r: int) -> float:
 
 
 
-def map_location(point: list, eyes: list, video_provider, depth_frame, r: int = 3):
+def map_location(point: list, eyes: list, video_provider, depth_frame, ref, r: int = 3):
     da = get_depth(eyes, depth_frame, 4) # Depth of the eye
-    db = get_depth(point, depth_frame, r) # Depth of the point
+
+    db = get_depth(point, depth_frame, r) if ref == 0 else ref # Depth of the point
 
     xa, ya, za = rs.rs2_deproject_pixel_to_point(
         video_provider.depth_intrinsics, 
@@ -46,9 +47,9 @@ def map_location(point: list, eyes: list, video_provider, depth_frame, r: int = 
 
     return [-1, -1]
 
-def project(points: list, eyes: list, video_provider, depth_frame, r):
+def project(points: list, eyes: list, video_provider, depth_frame, r, ref = 0):
     projected = []
     for i,point in enumerate(points):
         if bool(point[2:4]):
-            projected.append(point[0:2] + map_location(point[2:4], eyes, video_provider, depth_frame, r) + [get_depth(point[2:4], depth_frame, r)])
+            projected.append(point[0:2] + map_location(point[2:4], eyes, video_provider, depth_frame, ref, r) + [get_depth(point[2:4], depth_frame, r)])
     return projected
