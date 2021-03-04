@@ -14,7 +14,7 @@ run:
 	#  --mount type=bind,source=${CURDIR},target=/Miroir
 
 launch:
-	sudo nvidia-docker rm $(IMNAME)
+	-sudo nvidia-docker rm $(IMNAME)
 	sudo nvidia-docker run -d --expose 5000 --network="host" --privileged --volume=/dev:/dev --name=$(IMNAME) $(IMNAME)
 	
 restart:
@@ -22,7 +22,7 @@ restart:
 
 stop:
 	sudo docker stop -t 0 $(IMNAME)
-	sleep 5
+	sleep 1
 
 open:
 	DISPLAY=:0 chromium apps/index.html --start-fullscreen

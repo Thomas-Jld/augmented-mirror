@@ -2,12 +2,16 @@ import numpy as np
 import pyrealsense2 as rs
 import math
 
-theta = math.pi/6
+theta = math.pi/8
 
 def get_depth(point: list, depth_frame, r: int) -> float:
     x = int(point[0])
-    y = int(point[1])
-    return np.mean(depth_frame[y - r : y + r, x - r : x + r])
+    y = int(point[1])    
+    try:
+        return np.float64(np.min(depth_frame[max(y - r, 0) : min(y + r, len(depth_frame)), max(x - r, 0) : min(x + r, len(depth_frame[0]))]))
+    except:
+        return np.float64(depth_frame(x, y))
+
 
 
 def map_location(point: list, eyes: list, video_provider, depth_frame, r: int = 3):
@@ -23,8 +27,9 @@ def map_location(point: list, eyes: list, video_provider, depth_frame, r: int = 
         point, 
         db)
 
-    ya = ya*math.cos(theta) - za*math.sin(theta)
-    yb = yb*math.cos(theta) - zb*math.sin(theta)
+    ya = ya*math.cos(theta) + za*math.sin(theta)
+    yb = yb*math.cos(theta) + zb*math.sin(theta)
+    
     dz = db + da
     dy = yb - ya
     dx = xb - xa
