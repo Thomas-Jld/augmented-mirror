@@ -9,7 +9,7 @@ let socket;
 let canvas;
 
 let xoffset = 60; // millimeters
-let yoffset = -160;
+let yoffset = -180;
 
 let screenwidth = 392.85 - 20; //millimeters
 let screenheight = 698.4;
