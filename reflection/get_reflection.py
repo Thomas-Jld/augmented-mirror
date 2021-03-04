@@ -6,11 +6,16 @@ theta = math.pi/8
 
 def get_depth(point: list, depth_frame, r: int) -> float:
     x = int(point[0])
-    y = int(point[1])    
+    y = int(point[1])
+    x = x if x >= 0 else 0
+    x = x if x < len(depth_frame) else len(depth_frame[0])
+    y = y if y >= 0 else 0
+    y = y if y < len(depth_frame) else len(depth_frame)
+
     try:
         return np.float64(np.min(depth_frame[max(y - r, 0) : min(y + r, len(depth_frame)), max(x - r, 0) : min(x + r, len(depth_frame[0]))]))
     except:
-        return np.float64(depth_frame(x, y))
+        return np.float64(depth_frame[x, y])
 
 
 
