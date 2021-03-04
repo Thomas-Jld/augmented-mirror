@@ -14,6 +14,9 @@ let Hands = (sketch) => {
     sketch.show_hands_points = true;
     sketch.show_hands_lines = true;
 
+    sketch.right_hand_data;
+    sketch.left_hand_data;
+
     sketch.set = (p1, p2, w, h) => {
         sketch.width = w;
         sketch.height = h;
@@ -26,12 +29,12 @@ let Hands = (sketch) => {
 
         setInterval(() => {socket.emit("get_right_hand", true);}, 40);
         socket.on("send_right_hand", function (data) {
-            sketch.right_hand.update(data);
+            sketch.right_hand_data = data;
         });
 
         setInterval(() => {socket.emit("get_left_hand", true);}, 40);
         socket.on("send_left_hand", function (data) {
-            sketch.left_hand.update(data);
+            sketch.left_hand_data = data;
         });
 
         sketch.colorMode(HSB);
@@ -41,8 +44,11 @@ let Hands = (sketch) => {
 
     sketch.show = () => {
         sketch.selfCanvas.clear();
-
+        
+        sketch.right_hand.update(sketch.right_hand_data);
         sketch.right_hand.show();
+
+        sketch.left_hand.update(sketch.left_hand_data);
         sketch.left_hand.show();
 
         if (sketch.show_particules) {
@@ -102,13 +108,7 @@ let Hands = (sketch) => {
             this.hand_pose = [];
             this.hand_pose_t = []; //After projection 
             this.hand_name = hand_name;
-
-            // setInterval(this.get_update, 40);
         }
-
-        // get_update() {
-        //     socket.emit(this.name, true);
-        // }
  
         show() {
             if (this.hand_pose == []) {
