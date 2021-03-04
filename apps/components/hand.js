@@ -24,11 +24,12 @@ let Hands = (sketch) => {
         sketch.right_hand = new Hand("get_right_hand");
         sketch.left_hand = new Hand("get_left_hand");
 
+        setInterval(() => {socket.emit("get_right_hand", true);}, 40);
         socket.on("send_right_hand", function (data) {
             sketch.right_hand.hand_pose = data;
         });
 
-
+        setInterval(() => {socket.emit("get_left_hand", true);}, 40);
         socket.on("send_left_hand", function (data) {
             sketch.left_hand.hand_pose = data;
         });
@@ -101,12 +102,12 @@ let Hands = (sketch) => {
             this.hand_pose_t = []; //After projection 
             this.name = name;
 
-            setInterval(this.get_update, 40);
+            // setInterval(this.get_update, 40);
         }
 
-        get_update() {
-            socket.emit(this.name, true);
-        }
+        // get_update() {
+        //     socket.emit(this.name, true);
+        // }
  
         show() {
             if (this.hand_pose == []) {
