@@ -249,10 +249,10 @@ class MultipleProvider(threading.Thread):
                         CHANGED = True
                         eyes = self.data["body_pose"][0][2:4]
 
-                        add_data("face_mesh", project(self.data["face_mesh"], eyes, self.feed, depth))
-                        add_data("body_pose", project(self.data["body_pose"], eyes, self.feed, depth))
-                        add_data("right_hand_pose", project(self.data["right_hand_pose"], eyes, self.feed, depth))
-                        add_data("left_hand_pose", project(self.data["left_hand_pose"], eyes, self.feed, depth))
+                        add_data("face_mesh", project(self.data["face_mesh"], eyes, self.feed, depth, 2))
+                        add_data("body_pose", project(self.data["body_pose"], eyes, self.feed, depth, 3))
+                        add_data("right_hand_pose", project(self.data["right_hand_pose"], eyes, self.feed, depth, 1))
+                        add_data("left_hand_pose", project(self.data["left_hand_pose"], eyes, self.feed, depth, 1))
                 
                 end_t = time.time()
                 dt = 1/FPS - (end_t - start_t) if (end_t - start_t) < 1/FPS else 0.01

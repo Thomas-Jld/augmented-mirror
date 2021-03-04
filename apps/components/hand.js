@@ -122,7 +122,7 @@ let Hands = (sketch) => {
             sketch.fill(200);
 
             this.hand_pose_t = [];
-            this.hand_pose.forEach(function (part) {
+            this.hand_pose.forEach(part => {
                 if (part.slice(2, 4) != [-1, -1]) {
                     let x = width / 2 - width * (part[2] - xoffset) / screenwidth;
                     let y = height * (part[3] - yoffset) / screenheight;
@@ -136,7 +136,7 @@ let Hands = (sketch) => {
                     }
 
                     if (sketch.show_hands_points) {
-                        sketch.ellipse(x, y, 30);
+                        sketch.ellipse(x, y, 10);
                         //sketch.text(part, x + 20, y + 20);
                     }
                 } else {

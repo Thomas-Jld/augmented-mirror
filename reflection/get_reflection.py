@@ -33,9 +33,9 @@ def map_location(point: list, eyes: list, video_provider, depth_frame, r: int = 
 
     return [-1, -1]
 
-def project(points: list, eyes: list, video_provider, depth_frame):
+def project(points: list, eyes: list, video_provider, depth_frame, r):
     projected = []
     for i,point in enumerate(points):
         if bool(point[2:4]):
-            projected.append(point[0:2] + map_location(point[2:4], eyes, video_provider, depth_frame) + [get_depth(point[2:4], depth_frame, 4)])
+            projected.append(point[0:2] + map_location(point[2:4], eyes, video_provider, depth_frame, r) + [get_depth(point[2:4], depth_frame, r)])
     return projected
