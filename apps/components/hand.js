@@ -26,12 +26,12 @@ let Hands = (sketch) => {
 
         setInterval(() => {socket.emit("get_right_hand", true);}, 40);
         socket.on("send_right_hand", function (data) {
-            sketch.right_hand.hand_pose = data;
+            sketch.right_hand.update(data);
         });
 
         setInterval(() => {socket.emit("get_left_hand", true);}, 40);
         socket.on("send_left_hand", function (data) {
-            sketch.left_hand.hand_pose = data;
+            sketch.left_hand.update(data);
         });
 
         sketch.colorMode(HSB);
@@ -54,7 +54,7 @@ let Hands = (sketch) => {
     }
 
     class Hand {
-        constructor(name) {
+        constructor(hand_name) {
             this.junctions = [
                 [
                     [0, 1],
@@ -101,7 +101,7 @@ let Hands = (sketch) => {
 
             this.hand_pose = [];
             this.hand_pose_t = []; //After projection 
-            this.name = name;
+            this.hand_name = hand_name;
 
             // setInterval(this.get_update, 40);
         }
@@ -116,8 +116,9 @@ let Hands = (sketch) => {
             }
             sketch.fill(200);
             
-            this.hand_pose.forEach(function(part){
+            this.hand_pose_t = [];
 
+            this.hand_pose.forEach(function(part){
                 if(part.slice(2,4) != [-1,-1]){
                     let x = width / 2 - width * (part[2] - xoffset) / screenwidth;
                     let y = height * (part[3] - yoffset) / screenheight;
@@ -144,7 +145,6 @@ let Hands = (sketch) => {
             if (sketch.show_hands_lines && this.hand_pose_t != []) {
                 this.show_lines();
             }
-            this.hand_pose_t = [];
         }
 
         show_lines() {
@@ -157,10 +157,14 @@ let Hands = (sketch) => {
                             sketch.line(this.hand_pose_t[pair[0]][0], this.hand_pose_t[pair[0]][1], this.hand_pose_t[pair[1]][0], this.hand_pose_t[pair[1]][1]);
                         }
                     } catch (e) {
-                        console.log(e);
+                        //console.log(e);
                     }
                 })
             });
+        }
+
+        update(data){
+            this.hand_pose = data;
         }
     }
 }

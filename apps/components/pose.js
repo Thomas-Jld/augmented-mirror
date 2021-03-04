@@ -148,7 +148,7 @@ let Pose = (sketch) => {
                             sketch.line(transposed[pair[0]][0], transposed[pair[0]][1], transposed[pair[1]][0], transposed[pair[1]][1]);
                         }
                     } catch (e) {
-                        console.log(e);
+                        //console.log(e);
                     }
                 })
             });
