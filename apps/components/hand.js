@@ -14,8 +14,8 @@ let Hands = (sketch) => {
     sketch.show_hands_points = true;
     sketch.show_hands_lines = true;
 
-    sketch.right_hand_data;
-    sketch.left_hand_data;
+    sketch.right_hand_data = [];
+    sketch.left_hand_data = [];
 
     sketch.set = (p1, p2, w, h) => {
         sketch.width = w;
@@ -27,12 +27,16 @@ let Hands = (sketch) => {
         sketch.right_hand = new Hand("get_right_hand");
         sketch.left_hand = new Hand("get_left_hand");
 
-        setInterval(() => {socket.emit("get_right_hand", true);}, 40);
+        setInterval(() => {
+            socket.emit("get_right_hand", true);
+        }, 40);
         socket.on("send_right_hand", function (data) {
             sketch.right_hand_data = data;
         });
 
-        setInterval(() => {socket.emit("get_left_hand", true);}, 40);
+        setInterval(() => {
+            socket.emit("get_left_hand", true);
+        }, 40);
         socket.on("send_left_hand", function (data) {
             sketch.left_hand_data = data;
         });
@@ -44,7 +48,7 @@ let Hands = (sketch) => {
 
     sketch.show = () => {
         sketch.selfCanvas.clear();
-        
+
         sketch.right_hand.update(sketch.right_hand_data);
         sketch.right_hand.show();
 
@@ -99,27 +103,27 @@ let Hands = (sketch) => {
                 ]
             ];
 
-            this.keypoints = [0, 1, 2, 3, 4, 5,
+            this.keypoints = [
+                0, 1, 2, 3, 4, 5,
                 6, 7, 8, 9, 10, 11,
-                12, 13, 14, 15, 16, 17,
-                18, 19, 20
+                12, 13, 14, 15, 16,
+                17, 18, 19, 20
             ];
 
             this.hand_pose = [];
             this.hand_pose_t = []; //After projection 
             this.hand_name = hand_name;
         }
- 
+
         show() {
             if (this.hand_pose == []) {
                 return
             }
             sketch.fill(200);
-            
-            this.hand_pose_t = [];
 
-            this.hand_pose.forEach(function(part){
-                if(part.slice(2,4) != [-1,-1]){
+            this.hand_pose_t = [];
+            this.hand_pose.forEach(function (part) {
+                if (part.slice(2, 4) != [-1, -1]) {
                     let x = width / 2 - width * (part[2] - xoffset) / screenwidth;
                     let y = height * (part[3] - yoffset) / screenheight;
 
@@ -135,8 +139,7 @@ let Hands = (sketch) => {
                         sketch.ellipse(x, y, 30);
                         //sketch.text(part, x + 20, y + 20);
                     }
-                }
-                else{
+                } else {
                     this.hand_pose_t.push([0, 0]);
                 }
 
@@ -163,8 +166,9 @@ let Hands = (sketch) => {
             });
         }
 
-        update(data){
+        update(data) {
             this.hand_pose = data;
+            //console.log(data);
         }
     }
 }

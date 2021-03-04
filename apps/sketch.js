@@ -14,7 +14,7 @@ let yoffset = -180;
 let screenwidth = 392.85 - 20; //millimeters
 let screenheight = 698.4;
 
-let angle = PI/3;
+let angle = Math.PI/3;
 
 function setup() {
   canvas = createCanvas(windowWidth, windowHeight);
