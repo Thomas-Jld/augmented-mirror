@@ -4,6 +4,7 @@ let objectsSelected = false;
 
 let pose;
 let hands;
+let face;
 
 let socket;
 let canvas;
@@ -60,6 +61,10 @@ function reshape(){
   hands = new p5(Hands);
   hands.set(0, 0, width, height);
   modules.push(hands);
+
+  face = new p5(Faces);
+  face.set(0, 0, width, height);
+  modules.push(face);
 }
 
 function keyPressed(){
@@ -85,6 +90,15 @@ function keyPressed(){
     });
     hands.activated = true;
     hands.selfCanvas.show();
+  }
+
+  if(key == "f"){
+    modules.forEach(m => {
+      m.activated = false;
+      m.selfCanvas.hide();
+    });
+    face.activated = true;
+    face.selfCanvas.show();
   }
 
   if(key == "b"){

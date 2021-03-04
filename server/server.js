@@ -42,6 +42,9 @@ io.on('connect', socket => {
     // console.log(data);
   });
 
+  socket.on('get_face', (data) => {
+    socket.emit('send_face', face_mesh);
+  });
 
   socket.on('get_pose', (data) => {
     socket.emit('send_pose', body_pose);
