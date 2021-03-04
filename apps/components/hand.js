@@ -10,7 +10,7 @@ let Hands = (sketch) => {
     sketch.activated = true;
     sketch.clickable = false;
 
-    sketch.show_particules = true;
+    sketch.show_particules = false;
     sketch.show_hands_points = true;
     sketch.show_hands_lines = true;
 
@@ -121,7 +121,7 @@ let Hands = (sketch) => {
                     let x = width / 2 - width * (part[2] - xoffset) / screenwidth;
                     let y = height * (part[3] - yoffset) / screenheight;
 
-                    hand_pose_t.push([x, y]);
+                    this.hand_pose_t.push([x, y]);
 
                     if (sketch.show_particules) {
                         if (frameCount % 5 == 0) {
@@ -140,7 +140,7 @@ let Hands = (sketch) => {
 
             });
 
-            if (sketch.show_hands_lines) {
+            if (sketch.show_hands_lines && this.hand_pose_t != []) {
                 this.show_lines();
             }
         }
