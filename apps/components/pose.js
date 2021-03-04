@@ -4,7 +4,7 @@ let Pose = (sketch) => {
 
     sketch.movable = false;
     sketch.latched = false;
-    sketch.activated = true;
+    sketch.activated = false;
     sketch.clickable = false;
 
     sketch.show_particules = true;
@@ -22,6 +22,8 @@ let Pose = (sketch) => {
         socket.on("send_pose", function (data) {
             sketch.pose.body_pose = data;
         });
+
+        sketch.activated = true;
 
     };
 

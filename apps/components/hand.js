@@ -7,7 +7,7 @@ let Hands = (sketch) => {
 
     sketch.movable = false;
     sketch.latched = false;
-    sketch.activated = true;
+    sketch.activated = false;
     sketch.clickable = false;
 
     sketch.show_particules = false;
@@ -35,6 +35,7 @@ let Hands = (sketch) => {
         });
 
         sketch.colorMode(HSB);
+        sketch.activated = true;
     };
 
 
@@ -143,6 +144,7 @@ let Hands = (sketch) => {
             if (sketch.show_hands_lines && this.hand_pose_t != []) {
                 this.show_lines();
             }
+            this.hand_pose_t = [];
         }
 
         show_lines() {
