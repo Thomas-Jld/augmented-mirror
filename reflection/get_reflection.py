@@ -2,6 +2,7 @@ import numpy as np
 import pyrealsense2 as rs
 import math
 
+theta = math.pi/6
 
 def get_depth(point: list, depth_frame, r: int) -> float:
     x = int(point[0])
@@ -13,15 +14,17 @@ def map_location(point: list, eyes: list, video_provider, depth_frame, r: int = 
     da = get_depth(eyes, depth_frame, 4) # Depth of the eye
     db = get_depth(point, depth_frame, r) # Depth of the point
 
-    xa, ya, _ = rs.rs2_deproject_pixel_to_point(
+    xa, ya, za = rs.rs2_deproject_pixel_to_point(
         video_provider.depth_intrinsics, 
         eyes , 
         da)
-    xb, yb, _ = rs.rs2_deproject_pixel_to_point(
+    xb, yb, zb = rs.rs2_deproject_pixel_to_point(
         video_provider.color_intrinsics, 
         point, 
         db)
 
+    ya = ya*math.cos(theta) - za*math.sin(theta)
+    yb = yb*math.cos(theta) - zb*math.sin(theta)
     dz = db + da
     dy = yb - ya
     dx = xb - xa
