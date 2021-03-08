@@ -58,8 +58,8 @@ class IntelVideoReader(object):
         self.depth_intrinsics = depth_frame.profile.as_video_stream_profile().intrinsics
         self.color_intrinsics = color_frame.profile.as_video_stream_profile().intrinsics
 
-        color_frame = np.asanyarray(color_frame.get_data())
-        depth_frame = np.asanyarray(depth_frame.get_data())
+        color_frame = np.fliplr(np.asanyarray(color_frame.get_data()))
+        depth_frame = np.fliplr(np.asanyarray(depth_frame.get_data()))
 
         return [color_frame, depth_frame]
         
@@ -251,9 +251,9 @@ class MultipleProvider(threading.Thread):
 
                         body = project(self.data["body_pose"], eyes, self.feed, depth, 4)
                         add_data("body_pose", body)
-                        add_data("right_hand_pose", project(self.data["right_hand_pose"], eyes, self.feed, depth, 2, body[20][-1]))
-                        add_data("left_hand_pose", project(self.data["left_hand_pose"], eyes, self.feed, depth, 2, body[19][-1]))
-                        add_data("face_mesh", project(self.data["face_mesh"], eyes, self.feed, depth, 2, self.data["body_pose"][0][-1]))
+                        add_data("right_hand_pose", project(self.data["right_hand_pose"], eyes, self.feed, depth, 2, body[19][-1]))
+                        add_data("left_hand_pose", project(self.data["left_hand_pose"], eyes, self.feed, depth, 2, body[20][-1]))
+                        add_data("face_mesh", project(self.data["face_mesh"], eyes, self.feed, depth, 2, body[2][-1]))
                 
                 end_t = time.time()
                 dt = 1/FPS - (end_t - start_t) if (end_t - start_t) < 1/FPS else 0.01

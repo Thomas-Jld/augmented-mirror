@@ -1,5 +1,4 @@
 let Faces = (sketch) => {
-
     let particules = [];
 
     sketch.movable = false;
@@ -99,7 +98,7 @@ let Faces = (sketch) => {
             this.face_mesh.forEach(function (part) {
 
                 if (part.slice(2, 4) != [-1, -1]) {
-                    let x = width / 2 - width * (part[2] - xoffset) / screenwidth;
+                    let x = width * (part[2] - xoffset) / screenwidth;
                     let y = height * (part[3] - yoffset) / screenheight;
 
                     transposed.push([x, y]);

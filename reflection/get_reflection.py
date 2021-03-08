@@ -2,7 +2,7 @@ import numpy as np
 import pyrealsense2 as rs
 import math
 
-theta = math.radians(10)
+theta = math.radians(13.8)
 
 def get_depth(point: list, depth_frame, r: int) -> float:
     x = int(point[0])
@@ -35,7 +35,7 @@ def map_location(point: list, eyes: list, video_provider, depth_frame, ref, r: i
 
     ya = ya*math.cos(theta) + za*math.sin(theta)
     yb = yb*math.cos(theta) + zb*math.sin(theta)
-    
+
     dz = db + da
     dy = yb - ya
     dx = xb - xa
@@ -49,7 +49,7 @@ def map_location(point: list, eyes: list, video_provider, depth_frame, ref, r: i
 
 def project(points: list, eyes: list, video_provider, depth_frame, r, ref = 0):
     projected = []
-    for i,point in enumerate(points):
+    for i, point in enumerate(points):
         if bool(point[2:4]):
             projected.append(point[0:2] + map_location(point[2:4], eyes, video_provider, depth_frame, ref, r) + [get_depth(point[2:4], depth_frame, r)])
     return projected
