@@ -131,6 +131,15 @@ function keyPressed() {
         hands.selfCanvas.show();
     }
 
+    if (key == "s") {
+        modules.forEach(m => {
+            m.activated = false;
+            m.selfCanvas.hide();
+        });
+        selector.activated = true;
+        selector.selfCanvas.show();
+    }
+
     if (key == "a") {
         modules.forEach(m => {
             m.activated = true;
