@@ -39,7 +39,7 @@ function draw() {
             }
         });
         if (hands.left_hand.hand_pose_t[8] !== undefined && hands.left_hand.hand_pose_t[5] !== undefined) {
-            if (hands.left_hand.hand_pose_t[5][1] - hands.left_hand.hand_pose_t[8][1] > 15){
+            if (hands.left_hand.hand_pose_t[8][0] - hands.left_hand.hand_pose_t[5][0] > 80){
                 selector.display_bubbles = true;
             }
             else{

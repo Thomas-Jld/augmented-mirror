@@ -39,7 +39,7 @@ let Selector = (sketch) => {
             this.d = d;
             this.choices = choices;
     
-            this.slots = [Math.PI, 2 * Math.PI / 3, Math.PI / 3, 0];
+            this.slots = [Math.PI / 2, Math.PI / 6, - Math.PI / 6, - Math.PI / 2];
             this.bubbles = [];
     
             for (let i = 0; i < nb; i++) {
@@ -57,7 +57,7 @@ let Selector = (sketch) => {
             this.choice = choice;
             this.r = this.d / 2;
             this.per = 0;
-            this.mul = 0.97;
+            this.mul = 0.92;
             this.color = 200;
         }
     
@@ -69,8 +69,8 @@ let Selector = (sketch) => {
         }
     
         update(x, y) {
-            this.x = lerp(this.x, x, 0.8);
-            this.y = lerp(this.y, y, 0.8);
+            this.x = lerp(this.x, x, 0.6);
+            this.y = lerp(this.y, y, 0.6);
             if (!sketch.display_bubbles) {
                 this.per *= this.mul;
             } else {
