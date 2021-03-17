@@ -19,7 +19,7 @@ let Selector = (sketch) => {
         sketch.y = p2;
         sketch.selfCanvas = sketch.createCanvas(sketch.width, sketch.height).position(sketch.x, sketch.y);
         sketch.angleMode(RADIANS);
-        sketch.menu = new Menu(sketch.x, sketch.y, 4, 100, [0, 1, 2, 3]);
+        sketch.menu = new Menu(sketch.x, sketch.y, 4, 150, [0, 1, 2, 3]);
     };
 
 
@@ -95,7 +95,7 @@ let Selector = (sketch) => {
                 if (this.per < 1) {
                     this.per += 0.04;
                 }
-                if(!this.selected && sketch.dist(this.x + this.per * this.d * Math.cos(this.angle), this.y - this.per * this.d * Math.sin(this.angle), sketch.cursor[0], sketch.cursor[1]) < 1.5*this.r){
+                if(!this.selected && sketch.dist(this.x + this.per * this.d * Math.cos(this.angle), this.y - this.per * this.d * Math.sin(this.angle), sketch.cursor[0], sketch.cursor[1]) < 1.2*this.r){
                     this.c += 1;
                     sketch.stroke(255);
                     sketch.strokeWeight(4);
