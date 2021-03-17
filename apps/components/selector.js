@@ -50,8 +50,8 @@ let Selector = (sketch) => {
 
     class Bubble {
         constructor(x, y, angle, d, choice) {
-            this.x = x + this.per * this.d * Math.cos(this.angle);
-            this.y = y - this.per * this.d * Math.sin(this.angle);
+            this.x = x;
+            this.y = y;
             this.angle = angle;
             this.d = d;
             this.choice = choice;
@@ -64,13 +64,13 @@ let Selector = (sketch) => {
         show() {
             sketch.stroke(255);
             sketch.fill(200, 0.7);
-            sketch.ellipse(this.x , this.y, this.r * this.per);
+            sketch.ellipse(this.x + this.per * this.d * Math.cos(this.angle), this.y - this.per * this.d * Math.sin(this.angle), this.r * this.per);
             // ellipse(this.x, this.y, this.r * this.per);
         }
     
         update(x, y) {
-            this.x = x + this.per * this.d * Math.cos(this.angle);
-            this.y = y - this.per * this.d * Math.sin(this.angle);
+            this.x = x;
+            this.y = y;
             if (!sketch.display_bubbles) {
                 this.per *= this.mul;
             } else {
