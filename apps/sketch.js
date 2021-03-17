@@ -107,6 +107,9 @@ function choseAction(opt){
             m.activated = false;
             m.selfCanvas.hide();
         });
+        hands.activated = true;
+        selector.activated = true;
+        selector.selfCanvas.show();
         face.activated = true;
         face.selfCanvas.show();
     }
@@ -119,6 +122,8 @@ function choseAction(opt){
         pose.selfCanvas.show();
         hands.activated = true;
         hands.selfCanvas.show();
+        selector.activated = true;
+        selector.selfCanvas.show();
     }
 }
 
