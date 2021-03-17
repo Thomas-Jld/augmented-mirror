@@ -69,8 +69,8 @@ let Selector = (sketch) => {
         }
     
         update(x, y) {
-            this.x = sketch.lerp(this.x, x, 0.97) + this.per * this.d * Math.cos(this.angle);
-            this.y = sketch.lerp(this.y, y, 0.97) - this.per * this.d * Math.sin(this.angle);
+            this.x = x + this.per * this.d * Math.cos(this.angle);
+            this.y = y - this.per * this.d * Math.sin(this.angle);
             if (!sketch.display_bubbles) {
                 this.per *= this.mul;
             } else {
