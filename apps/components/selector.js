@@ -17,7 +17,7 @@ let Selector = (sketch) => {
         sketch.x = p1;
         sketch.y = p2;
         sketch.selfCanvas = sketch.createCanvas(sketch.width, sketch.height).position(sketch.x, sketch.y);
-        sketch.angleMode(DEGREES);
+        sketch.angleMode(RADIANS);
         sketch.menu = new Menu(sketch.x, sketch.y, 3, 100, [])
     };
 
