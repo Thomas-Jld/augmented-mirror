@@ -82,7 +82,7 @@ let Selector = (sketch) => {
             else{
                 sketch.fill(100, 0.7);
             }
-            if(this.per > 10){
+            if(this.per > 0.1){
                 sketch.ellipse(this.x + this.per * this.d * Math.cos(this.angle), this.y - this.per * this.d * Math.sin(this.angle), this.r * this.per);
             }
             // ellipse(this.x, this.y, this.r * this.per);
