@@ -51,8 +51,8 @@ let Selector = (sketch) => {
         }
 
         unselect(){
-            for(let bubble in this.bubbles){
-                bubble.selected = false;
+            for(let i = 0; i < this.bubbles.length; i++){
+                this.bubbles[i].selected = false;
             }
         }
     }
