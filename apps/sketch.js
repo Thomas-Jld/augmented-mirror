@@ -5,9 +5,12 @@ let objectsSelected = false;
 let pose;
 let hands;
 let face;
+let selector;
 
 let socket;
 let canvas;
+
+let started = false;
 
 let xoffset = -235; // millimeters
 let yoffset = 50;
@@ -22,22 +25,25 @@ function setup() {
 
   frameRate(30);
 
-  setTimeout(reshape, 5000);
+  setTimeout(reshape, 1000);
 }
 
 function draw() {
   background(0);
-  modules.forEach(m => {
-    if(m.activated){
-      m.show();
-      if(m.latched){
-        m.setPosition(mouseX - m.OffsetX, mouseY - m.OffsetY);
+  if(started){
+    modules.forEach(m => {
+      if(m.activated){
+        m.show();
+        if(m.latched){
+          m.setPosition(mouseX - m.OffsetX, mouseY - m.OffsetY);
+        }
       }
+    });
+    if(hands.left_hand.hand_pose_t[8] !== undefined){
+      selector.mx = hands.left_hand.hand_pose_t[8][0];
+      selector.my = hands.left_hand.hand_pose_t[8][1];
     }
-  });
-
-  selector.mx = hands.left_hand.hand_pose_t[8][0];
-  selector.my = hands.left_hand.hand_pose_t[8][1];
+  }
 }
 
 function reshape(){
@@ -70,6 +76,8 @@ function reshape(){
   selector = new p5(Selector);
   selector.set(0,0, width, height);
   modules.push(selector);
+
+  started = true;
 }
 
 function keyPressed(){
