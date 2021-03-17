@@ -10,6 +10,7 @@ let Pose = (sketch) => {
     sketch.show_particules = true;
     sketch.show_body_points = true;
     sketch.show_body_lines = true;
+    sketch.show_head = false;
 
     sketch.set = (p1, p2, w, h) => {
         sketch.width = w;
@@ -122,7 +123,7 @@ let Pose = (sketch) => {
                         }
                     }
 
-                    if (sketch.show_body_points) {
+                    if (sketch.show_body_points && (sketch.show_head || part[1] > 10)) {
                         //sketch.fill(255);
                         sketch.ellipse(x, y, 30);
                         //sketch.text(part[1].toString(), x + 20, y + 20);
@@ -144,7 +145,7 @@ let Pose = (sketch) => {
             this.junctions.forEach(parts => {
                 parts.forEach(pair => {
                     try {
-                        if (transposed[pair[0]][1] > 0 && transposed[pair[1]][1] > 0) {
+                        if (transposed[pair[0]][1] > 0 && transposed[pair[1]][1] > 0 && (sketch.show_head || (pair[1] > 10 && pair[0] > 10))) {
                             sketch.line(transposed[pair[0]][0], transposed[pair[0]][1], transposed[pair[1]][0], transposed[pair[1]][1]);
                         }
                     } catch (e) {
