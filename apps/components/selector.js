@@ -57,7 +57,7 @@ let Selector = (sketch) => {
             this.choice = choice;
             this.r = this.d / 2;
             this.per = 0;
-            this.mul = 0.99;
+            this.mul = 0.97;
             this.color = 200;
         }
     
