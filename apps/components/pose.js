@@ -11,6 +11,7 @@ let Pose = (sketch) => {
     sketch.show_body_points = true;
     sketch.show_body_lines = true;
     sketch.show_head = false;
+    sketch.show_wrist = false;
 
     sketch.set = (p1, p2, w, h) => {
         sketch.width = w;
@@ -123,7 +124,7 @@ let Pose = (sketch) => {
                         }
                     }
 
-                    if (sketch.show_body_points && (sketch.show_head || part[1] > 10)) {
+                    if (sketch.show_body_points && (sketch.show_head || part[1] > 10) && (sketch.show_wrist || ![17,18,19,20].includes(part[1]))) {
                         //sketch.fill(255);
                         sketch.ellipse(x, y, 30);
                         //sketch.text(part[1].toString(), x + 20, y + 20);
@@ -145,7 +146,10 @@ let Pose = (sketch) => {
             this.junctions.forEach(parts => {
                 parts.forEach(pair => {
                     try {
-                        if (transposed[pair[0]][1] > 0 && transposed[pair[1]][1] > 0 && (sketch.show_head || (pair[1] > 10 && pair[0] > 10))) {
+                        if (transposed[pair[0]][1] > 0 && transposed[pair[1]][1] > 0 && 
+                            (sketch.show_head || (pair[1] > 10 && pair[0] > 10)) &&
+                            (sketch.show_wrist || (![17,18,19,20].includes(pair[0]) &&  ![17,18,19,20].includes(pair[1])))
+                            ) {
                             sketch.line(transposed[pair[0]][0], transposed[pair[0]][1], transposed[pair[1]][0], transposed[pair[1]][1]);
                         }
                     } catch (e) {
