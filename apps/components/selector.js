@@ -9,6 +9,8 @@ let Selector = (sketch) => {
     sketch.mx = 0;
     sketch.my = 0;
 
+    sketch.cursor = [0, 0];
+
     sketch.set = (p1, p2, w, h) => {
         sketch.width = w;
         sketch.height = h;
@@ -38,10 +40,10 @@ let Selector = (sketch) => {
             this.nb = nb;
             this.d = d;
             this.choices = choices;
-    
-            this.slots = [Math.PI / 2, Math.PI / 6, - Math.PI / 6, - Math.PI / 2];
+
+            this.slots = [Math.PI / 2, Math.PI / 6, -Math.PI / 6, -Math.PI / 2];
             this.bubbles = [];
-    
+
             for (let i = 0; i < nb; i++) {
                 this.bubbles.push(new Bubble(this.x, this.y, this.slots[i], this.d, this.choices[i]));
             }
@@ -59,15 +61,17 @@ let Selector = (sketch) => {
             this.per = 0;
             this.mul = 0.92;
             this.color = 200;
+            this.c = 0;
         }
-    
+
         show() {
             sketch.stroke(255);
-            sketch.fill(200, 0.7);
+            sketch.strokeWeight(3);
+            sketch.fill(100, 0.7);
             sketch.ellipse(this.x + this.per * this.d * Math.cos(this.angle), this.y - this.per * this.d * Math.sin(this.angle), this.r * this.per);
             // ellipse(this.x, this.y, this.r * this.per);
         }
-    
+
         update(x, y) {
             this.x = lerp(this.x, x, 0.6);
             this.y = lerp(this.y, y, 0.6);
@@ -77,11 +81,21 @@ let Selector = (sketch) => {
                 if (this.per < 1) {
                     this.per += 0.04;
                 }
+                if(sketch.dist(this.x + this.per * this.d * Math.cos(this.angle), this.y - this.per * this.d * Math.sin(this.angle), sketch.cursor[0], sketch.cursor[1]) < this.r){
+                    this.c += 1;
+                    sketch.stroke(255);
+                    sketch.strokeWeight(3);
+                    sketch.arc(this.x + this.per * this.d * Math.cos(this.angle, 
+                                this.y - this.per * this.d * Math.sin(this.angle),
+                                1.5*this.r, 1.5*this.r,
+                                0, 2*Math.PI*this.c/60));
+                }
             }
+
         }
 
         // clicked() {
-            
+
         // }
     }
 }
