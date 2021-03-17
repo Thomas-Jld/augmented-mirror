@@ -75,14 +75,16 @@ let Selector = (sketch) => {
 
         show() {
             sketch.stroke(255);
-            sketch.strokeWeight(3);
+            sketch.strokeWeight(6);
             if(this.selected){
-                sketch.fill(255);
+                sketch.fill(255, 129, 0);
             }
             else{
                 sketch.fill(100, 0.7);
             }
-            sketch.ellipse(this.x + this.per * this.d * Math.cos(this.angle), this.y - this.per * this.d * Math.sin(this.angle), this.r * this.per);
+            if(this.per > 10){
+                sketch.ellipse(this.x + this.per * this.d * Math.cos(this.angle), this.y - this.per * this.d * Math.sin(this.angle), this.r * this.per);
+            }
             // ellipse(this.x, this.y, this.r * this.per);
         }
 
@@ -95,7 +97,7 @@ let Selector = (sketch) => {
                 if (this.per < 1) {
                     this.per += 0.04;
                 }
-                if(!this.selected && sketch.dist(this.x + this.per * this.d * Math.cos(this.angle), this.y - this.per * this.d * Math.sin(this.angle), sketch.cursor[0], sketch.cursor[1]) < 1.2*this.r){
+                if(!this.selected && sketch.dist(this.x + this.per * this.d * Math.cos(this.angle), this.y - this.per * this.d * Math.sin(this.angle), sketch.cursor[0], sketch.cursor[1]) < this.r){
                     this.c += 1;
                     sketch.stroke(255);
                     sketch.strokeWeight(4);
@@ -104,8 +106,8 @@ let Selector = (sketch) => {
                     sketch.arc(this.x + this.per * this.d * Math.cos(this.angle), 
                                 this.y - this.per * this.d * Math.sin(this.angle),
                                 2*this.r, 2*this.r,
-                                0, 2*Math.PI*this.c/60);
-                    if(this.c >= 60){
+                                0, 2*Math.PI*this.c/40);
+                    if(this.c >= 40){
                         this.parent.unselect();
                         this.selected = true;
                         choseAction(this.choice);
@@ -117,9 +119,5 @@ let Selector = (sketch) => {
             }
 
         }
-
-        // clicked() {
-
-        // }
     }
 }

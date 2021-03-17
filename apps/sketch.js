@@ -38,26 +38,30 @@ function draw() {
                 }
             }
         });
-        if (hands.left_hand.hand_pose_t[8] !== undefined && hands.left_hand.hand_pose_t[5] !== undefined && hands.right_hand.hand_pose_t[8] !== undefined) {
-            if (hands.left_hand.hand_pose_t[8][0] - hands.left_hand.hand_pose_t[5][0] > 80){
-                selector.display_bubbles = true;
-            }
-            else{
-                selector.display_bubbles = false;
-            }
-            selector.mx = hands.left_hand.hand_pose_t[8][0];
-            selector.my = hands.left_hand.hand_pose_t[8][1];
-            selector.cursor = hands.right_hand.hand_pose_t[8];
+        select();
+    }
+}
+
+function select(){
+    if (hands.left_hand.hand_pose_t[8] !== undefined && hands.left_hand.hand_pose_t[5] !== undefined && hands.right_hand.hand_pose_t[8] !== undefined) {
+        if (hands.left_hand.hand_pose_t[8][0] - hands.left_hand.hand_pose_t[5][0] > 80){
+            selector.display_bubbles = true;
         }
+        else{
+            selector.display_bubbles = false;
+        }
+        selector.mx = hands.left_hand.hand_pose_t[8][0];
+        selector.my = hands.left_hand.hand_pose_t[8][1];
+        selector.cursor = hands.right_hand.hand_pose_t[8];
     }
 }
 
 function reshape() {
     resizeCanvas(windowWidth, windowHeight);
 
-    // let clock = new p5(Clock);
-    // clock.set(width - 200, 0, 200, 200);
-    // modules.push(clock);
+    let clock = new p5(Clock);
+    clock.set(width - 200, 0, 200, 200);
+    modules.push(clock);
 
     // let bubble = new p5(HeartBubble);
     // bubble.set(0, 0, width, height);

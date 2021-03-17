@@ -30,14 +30,14 @@ let Hands = (sketch) => {
 
         setInterval(() => {
             socket.emit("get_right_hand", true);
-        }, 40);
+        }, 20);
         socket.on("send_right_hand", function (data) {
             sketch.right_hand_data = data;
         });
 
         setInterval(() => {
             socket.emit("get_left_hand", true);
-        }, 40);
+        }, 20);
         socket.on("send_left_hand", function (data) {
             sketch.left_hand_data = data;
         });

@@ -97,7 +97,7 @@ let Pose = (sketch) => {
             this.body_pose = [];
             this.name = name;
 
-            setInterval(this.get_update, 40);
+            setInterval(this.get_update, 20);
         }
 
         get_update() {

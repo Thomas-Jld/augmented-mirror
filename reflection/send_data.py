@@ -373,7 +373,7 @@ if __name__ == '__main__':
     eyes = []
     threads = []
 
-    FPS = 30
+    FPS = 60
     NAP = 0.01
 
     PROJECT = True
