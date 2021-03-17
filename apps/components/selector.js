@@ -69,8 +69,8 @@ let Selector = (sketch) => {
         }
     
         update(x, y) {
-            this.x = x;
-            this.y = y;
+            this.x = lerp(this.x, x, 0.8);
+            this.y = lerp(this.y, y, 0.8);
             if (!sketch.display_bubbles) {
                 this.per *= this.mul;
             } else {
