@@ -86,7 +86,7 @@ let Selector = (sketch) => {
                     sketch.stroke(255);
                     sketch.strokeWeight(3);
                     noFill();
-                    console.log(this.c);
+                    //console.log(this.c);
                     sketch.arc(this.x + this.per * this.d * Math.cos(this.angle), 
                                 this.y - this.per * this.d * Math.sin(this.angle),
                                 2*this.r, 2.5*this.r,
