@@ -79,9 +79,7 @@ let Pose = (sketch) => {
                     [28, 32]
                 ]
             ];
-
-            this.head = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-            this.wrists = [17, 18, 19, 20, 21, 22];
+            
 
             this.keypoints = ['nose', 'left_eye_inner', 'left_eye', 'left_eye_outer',
                 'right_eye_inner', 'right_eye', 'right_eye_outer',
@@ -115,7 +113,7 @@ let Pose = (sketch) => {
 
             this.body_pose.forEach(function (part) {
 
-                if (part.slice(2, 4) != [-1, -1]) {
+                if(part.slice(2,4) != [-1,-1]){
                     let x = width * (part[2] - xoffset) / screenwidth;
                     let y = height * (part[3] - yoffset) / screenheight;
 
@@ -127,12 +125,13 @@ let Pose = (sketch) => {
                         }
                     }
 
-                    if (sketch.show_body_points && (sketch.show_head || !((this.head).includes(part[1]))) && (sketch.show_wrist || !((this.wrists).includes(part[1])))) {
+                    if (sketch.show_body_points && (sketch.show_head || part[1] > 10) && (sketch.show_wrist || ![17,18,19,20, 21, 22].includes(part[1]))) {
                         //sketch.fill(255);
                         sketch.ellipse(x, y, 30);
                         //sketch.text(part[1].toString(), x + 20, y + 20);
                     }
-                } else {
+                }
+                else{
                     transposed.push([0, 0])
                 }
             });
@@ -148,10 +147,10 @@ let Pose = (sketch) => {
             this.junctions.forEach(parts => {
                 parts.forEach(pair => {
                     try {
-                        if (transposed[pair[0]][1] > 0 && transposed[pair[1]][1] > 0 &&
-                            (sketch.show_head || (!((this.head).includes(pair[0])) && !((this.head).includes(pair[1])))) &&
-                            (sketch.show_wrist || (!((this.wrists).includes(pair[0])) && !((this.wrists).includes(pair[1]))))
-                        ) {
+                        if (transposed[pair[0]][1] > 0 && transposed[pair[1]][1] > 0 && 
+                            (sketch.show_head || (pair[1] > 10 && pair[0] > 10)) &&
+                            (sketch.show_wrist || (![17,18,19,20].includes(pair[0]) &&  ![17, 18, 19, 20, 21, 22].includes(pair[1])))
+                            ) {
                             sketch.line(transposed[pair[0]][0], transposed[pair[0]][1], transposed[pair[1]][0], transposed[pair[1]][1]);
                         }
                     } catch (e) {
