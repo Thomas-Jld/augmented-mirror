@@ -115,7 +115,7 @@ let Pose = (sketch) => {
 
             this.body_pose.forEach(function (part) {
 
-                if(part.slice(2,4) != [-1,-1]){
+                if (part.slice(2, 4) != [-1, -1]) {
                     let x = width * (part[2] - xoffset) / screenwidth;
                     let y = height * (part[3] - yoffset) / screenheight;
 
@@ -127,13 +127,12 @@ let Pose = (sketch) => {
                         }
                     }
 
-                    if (sketch.show_body_points && (sketch.show_head || !this.head.includes(part[1])) && (sketch.show_wrist || !this.wrists.includes(part[1]))) {
+                    if (sketch.show_body_points && (sketch.show_head || !((this.head).includes(part[1]))) && (sketch.show_wrist || !((this.wrists).includes(part[1])))) {
                         //sketch.fill(255);
                         sketch.ellipse(x, y, 30);
                         //sketch.text(part[1].toString(), x + 20, y + 20);
                     }
-                }
-                else{
+                } else {
                     transposed.push([0, 0])
                 }
             });
@@ -149,10 +148,10 @@ let Pose = (sketch) => {
             this.junctions.forEach(parts => {
                 parts.forEach(pair => {
                     try {
-                        if (transposed[pair[0]][1] > 0 && transposed[pair[1]][1] > 0 && 
-                            (sketch.show_head || (!this.head.includes(pair[0]) && !this.head.includes(pair[1]))) &&
-                            (sketch.show_wrist || (!this.wrists.includes(pair[0]) &&  !this.wrists.includes(pair[1])))
-                            ) {
+                        if (transposed[pair[0]][1] > 0 && transposed[pair[1]][1] > 0 &&
+                            (sketch.show_head || (!((this.head).includes(pair[0])) && !((this.head).includes(pair[1])))) &&
+                            (sketch.show_wrist || (!((this.wrists).includes(pair[0])) && !((this.wrists).includes(pair[1]))))
+                        ) {
                             sketch.line(transposed[pair[0]][0], transposed[pair[0]][1], transposed[pair[1]][0], transposed[pair[1]][1]);
                         }
                     } catch (e) {
