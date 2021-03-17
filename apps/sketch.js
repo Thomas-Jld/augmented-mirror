@@ -35,6 +35,9 @@ function draw() {
       }
     }
   });
+
+  selector.mx = hands.left_hand.hand_pose_t[8][0];
+  selector.my = hands.left_hand.hand_pose_t[8][1];
 }
 
 function reshape(){
@@ -63,6 +66,10 @@ function reshape(){
   face = new p5(Faces);
   face.set(0, 0, width, height);
   modules.push(face);
+
+  selector = new p5(Selector);
+  selector.set(0,0, width, height);
+  modules.push(selector);
 }
 
 function keyPressed(){

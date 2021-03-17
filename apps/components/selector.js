@@ -6,6 +6,9 @@ let Selector = (sketch) => {
     sketch.clickable = true;
     sketch.display_bubbles = true;
 
+    sketch.mx = 0;
+    sketch.my = 0;
+
     sketch.set = (p1, p2, w, h) => {
         sketch.width = w;
         sketch.height = h;
@@ -22,7 +25,7 @@ let Selector = (sketch) => {
         sketch.push();
         for (let i = 0; i < sketch.menu.bubbles.length; i++) {
             sketch.menu.bubbles[i].show();
-            sketch.menu.bubbles[i].update(sketch.x, sketch.y);
+            sketch.menu.bubbles[i].update(sketch.mx, sketch.my);
         }
         sketch.pop();
     };
@@ -36,7 +39,7 @@ let Selector = (sketch) => {
             this.d = d;
             this.choices = choices;
     
-            this.slots = [Math.PI / 3, 2 * Math.PI / 3, Math.PI, 0];
+            this.slots = [Math.PI, 2 * Math.PI / 3, Math.PI / 3, 0];
             this.bubbles = [];
     
             for (let i = 0; i < nb; i++) {
@@ -54,7 +57,6 @@ let Selector = (sketch) => {
             this.choice = choice;
             this.r = this.d / 2;
             this.per = 0;
-            this.c = 0;
             this.mul = 0.99;
             this.color = 200;
         }
@@ -69,7 +71,7 @@ let Selector = (sketch) => {
         update(x, y) {
             this.x = x + this.per * this.d * Math.cos(this.angle);
             this.y = y - this.per * this.d * Math.sin(this.angle);
-            if (!display_bubbles) {
+            if (!sketch.display_bubbles) {
                 this.per *= this.mul;
             } else {
                 if (this.per < 1) {
