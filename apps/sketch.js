@@ -110,6 +110,16 @@ function choseAction(opt){
         face.activated = true;
         face.selfCanvas.show();
     }
+    else if (opt == 3) {
+        modules.forEach(m => {
+            m.activated = false;
+            m.selfCanvas.hide();
+        });
+        pose.activated = true;
+        pose.selfCanvas.show();
+        hands.activated = true;
+        hands.selfCanvas.show();
+    }
 }
 
 function keyPressed() {
