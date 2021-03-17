@@ -81,6 +81,7 @@ let Selector = (sketch) => {
                 if (this.per < 1) {
                     this.per += 0.04;
                 }
+                console.log(sketch.cursor);
                 if(sketch.dist(this.x + this.per * this.d * Math.cos(this.angle), this.y - this.per * this.d * Math.sin(this.angle), sketch.cursor[0], sketch.cursor[1]) < this.r){
                     this.c += 1;
                     sketch.stroke(255);
@@ -89,6 +90,9 @@ let Selector = (sketch) => {
                                 this.y - this.per * this.d * Math.sin(this.angle),
                                 1.5*this.r, 1.5*this.r,
                                 0, 2*Math.PI*this.c/60));
+                }
+                else{
+                    this.c = 0;
                 }
             }
 
