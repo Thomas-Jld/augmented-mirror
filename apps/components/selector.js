@@ -1,5 +1,6 @@
 let Selector = (sketch) => {
-
+    sketch.name = "selector";
+    
     sketch.movable = true;
     sketch.latched = false;
     sketch.activated = true;
@@ -18,7 +19,7 @@ let Selector = (sketch) => {
         sketch.y = p2;
         sketch.selfCanvas = sketch.createCanvas(sketch.width, sketch.height).position(sketch.x, sketch.y);
         sketch.angleMode(RADIANS);
-        sketch.menu = new Menu(sketch.x, sketch.y, 3, 100, [])
+        sketch.menu = new Menu(sketch.x, sketch.y, 3, 100, [0,1,2])
     };
 
 
@@ -45,13 +46,19 @@ let Selector = (sketch) => {
             this.bubbles = [];
 
             for (let i = 0; i < nb; i++) {
-                this.bubbles.push(new Bubble(this.x, this.y, this.slots[i], this.d, this.choices[i]));
+                this.bubbles.push(new Bubble(this.x, this.y, this.slots[i], this.d, this.choices[i], this));
+            }
+        }
+
+        unselect(){
+            for(let bubble in this.bubbles){
+                bubble.selected = false;
             }
         }
     }
 
     class Bubble {
-        constructor(x, y, angle, d, choice) {
+        constructor(x, y, angle, d, choice, parent) {
             this.x = x;
             this.y = y;
             this.angle = angle;
@@ -62,12 +69,19 @@ let Selector = (sketch) => {
             this.mul = 0.92;
             this.color = 200;
             this.c = 0;
+            this.selected = false;
+            this.parent = parent;
         }
 
         show() {
             sketch.stroke(255);
             sketch.strokeWeight(3);
-            sketch.fill(100, 0.7);
+            if(this.selected){
+                sketch.fill(255);
+            }
+            else{
+                sketch.fill(100, 0.7);
+            }
             sketch.ellipse(this.x + this.per * this.d * Math.cos(this.angle), this.y - this.per * this.d * Math.sin(this.angle), this.r * this.per);
             // ellipse(this.x, this.y, this.r * this.per);
         }
@@ -81,16 +95,21 @@ let Selector = (sketch) => {
                 if (this.per < 1) {
                     this.per += 0.04;
                 }
-                if(sketch.dist(this.x + this.per * this.d * Math.cos(this.angle), this.y - this.per * this.d * Math.sin(this.angle), sketch.cursor[0], sketch.cursor[1]) < this.r){
+                if(!this.selected && sketch.dist(this.x + this.per * this.d * Math.cos(this.angle), this.y - this.per * this.d * Math.sin(this.angle), sketch.cursor[0], sketch.cursor[1]) < 1.5*this.r){
                     this.c += 1;
                     sketch.stroke(255);
-                    sketch.strokeWeight(3);
+                    sketch.strokeWeight(4);
                     noFill();
                     //console.log(this.c);
                     sketch.arc(this.x + this.per * this.d * Math.cos(this.angle), 
                                 this.y - this.per * this.d * Math.sin(this.angle),
-                                2*this.r, 2.5*this.r,
+                                2*this.r, 2*this.r,
                                 0, 2*Math.PI*this.c/60);
+                    if(this.c >= 60){
+                        this.parent.unselect();
+                        this.selected = true;
+                        choseAction(this.choice);
+                    }
                 }
                 else{
                     this.c = 0;

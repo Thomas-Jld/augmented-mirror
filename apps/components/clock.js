@@ -1,4 +1,5 @@
 let Clock = ( sketch ) => {
+  sketch.name = "clock";
 
   let r;
   let ec = 10;
@@ -8,7 +9,6 @@ let Clock = ( sketch ) => {
   let prevsec;
 
   let color;
-
 
   sketch.movable = true;
   sketch.latched = false;

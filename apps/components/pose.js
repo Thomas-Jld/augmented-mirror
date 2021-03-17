@@ -1,4 +1,5 @@
 let Pose = (sketch) => {
+    sketch.name = "pose";
 
     let particules = [];
 

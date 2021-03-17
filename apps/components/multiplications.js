@@ -1,4 +1,5 @@
 let Multiplications = (sketch) => {
+  sketch.name = "multiplications";
 
 
   let tbl = 6;

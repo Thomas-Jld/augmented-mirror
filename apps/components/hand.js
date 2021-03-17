@@ -1,4 +1,5 @@
 let Hands = (sketch) => {
+    sketch.name = "hands";
 
     // let xmul = 0.16
     // let ymul = -0.15

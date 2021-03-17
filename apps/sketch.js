@@ -86,6 +86,32 @@ function reshape() {
     started = true;
 }
 
+function choseAction(opt){
+    if (opt == 0){
+        modules.forEach(m => {
+            m.activated = true;
+            m.selfCanvas.show();
+        });   
+    }
+    else if(opt == 1){
+        modules.forEach(m => {
+            m.activated = false;
+            m.selfCanvas.hide();
+        });
+        hands.activated = true;
+        selector.activated = true;
+        selector.selfCanvas.show();
+    }
+    else if (opt == 2) {
+        modules.forEach(m => {
+            m.activated = false;
+            m.selfCanvas.hide();
+        });
+        face.activated = true;
+        face.selfCanvas.show();
+    }
+}
+
 function keyPressed() {
     if (key == "c") {
         modules.forEach(m => {
@@ -136,6 +162,7 @@ function keyPressed() {
             m.activated = false;
             m.selfCanvas.hide();
         });
+        hands.activated = true;
         selector.activated = true;
         selector.selfCanvas.show();
     }

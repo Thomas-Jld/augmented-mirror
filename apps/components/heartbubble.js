@@ -1,5 +1,6 @@
 let HeartBubble = (sketch) => {
-
+  sketch.name = "heart";
+  
   let Balloon;
   let Balls = [];
 
