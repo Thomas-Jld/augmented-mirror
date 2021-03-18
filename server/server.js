@@ -10,16 +10,17 @@ let origin;
 let apps = [];
 
 
-// exec('ls | grep js', (err, stdout, stderr) => {
-//   if (err) {
-//     //some err occurred
-//     console.error(err)
-//   } else {
-//    // the *entire* stdout and stderr (buffered)
-//    console.log(`stdout: ${stdout}`);
-//    console.log(`stderr: ${stderr}`);
-//   }
-// });
+setInterval(heartbeat, 33);
+
+function heartbeat() {
+  for(let i = 0; i < apps; i++){
+    // apps[i].emit('send_pose', body_pose);
+    // apps[i].emit('send_face', face_mesh);
+    apps[i].emit('send_right_hand', right_hand_pose);
+    apps[i].emit('send_left_hand', left_hand_pose);
+  }
+}
+
 
 io.on('connect', socket => {
   if (socket.handshake.headers["user-agent"].split('/')[0] == "python-requests"){
