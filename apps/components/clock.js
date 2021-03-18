@@ -83,12 +83,12 @@ let Clock = ( sketch ) => {
     sketch.stroke(100, 255, 200);
     sketch.arc(0,0,2*r+3*ec,2*r+3*ec,0,emilli);
 
-    sketch.push();
-    sketch.rotate(emilli);
-    sketch.stroke(100, 255, 200);
-    sketch.line(0,0,r * 0.9,0);
-    sketch.pop();
-    sketch.pop();
+    // sketch.push();
+    // sketch.rotate(emilli);
+    // sketch.stroke(100, 255, 200);
+    // sketch.line(0,0,r * 0.9,0);
+    // sketch.pop();
+    // sketch.pop();
   };
 
   sketch.clearSketch = () => {
