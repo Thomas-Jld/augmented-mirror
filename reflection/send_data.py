@@ -3,10 +3,6 @@ import threading
 import time
 import numpy as np
 
-import torch
-import torch.nn as nn
-import cv2 as cv
-
 sio = socketio.Client(engineio_logger=True)
 
 def add_data(name, data):
@@ -66,6 +62,7 @@ class IntelVideoReader(object):
 
 class CameraVideoReader:
     def __init__(self):
+        import cv2 as cv
         self.width = 640
         self.height = 480
         self.cap = cv.VideoCapture(0)
