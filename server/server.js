@@ -10,14 +10,14 @@ let origin;
 let apps = [];
 
 
-setInterval(heartbeat, 33);
+// setInterval(heartbeat, 33);
 
-function heartbeat() {
-    io.sockets.emit('send_pose', body_pose);
-    io.sockets.emit('send_face', face_mesh);
-    io.sockets.emit('send_right_hand', right_hand_pose);
-    io.sockets.emit('send_left_hand', left_hand_pose);
-}
+// function heartbeat() {
+//     io.sockets.emit('send_pose', body_pose);
+//     io.sockets.emit('send_face', face_mesh);
+//     io.sockets.emit('send_right_hand', right_hand_pose);
+//     io.sockets.emit('send_left_hand', left_hand_pose);
+// }
 
 
 io.on('connect', socket => {
