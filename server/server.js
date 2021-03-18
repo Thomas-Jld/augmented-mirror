@@ -13,12 +13,10 @@ let apps = [];
 setInterval(heartbeat, 33);
 
 function heartbeat() {
-  for(let i = 0; i < apps; i++){
-    // apps[i].emit('send_pose', body_pose);
-    // apps[i].emit('send_face', face_mesh);
-    apps[i].emit('send_right_hand', right_hand_pose);
-    apps[i].emit('send_left_hand', left_hand_pose);
-  }
+    io.sockets.emit('send_pose', body_pose);
+    io.sockets.emit('send_face', face_mesh);
+    io.sockets.emit('send_right_hand', right_hand_pose);
+    io.sockets.emit('send_left_hand', left_hand_pose);
 }
 
 

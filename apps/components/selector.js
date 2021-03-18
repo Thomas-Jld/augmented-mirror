@@ -5,7 +5,7 @@ let Selector = (sketch) => {
     sketch.latched = false;
     sketch.activated = true;
     sketch.clickable = true;
-    sketch.display_bubbles = true;
+    sketch.display_bubbles = false;
 
     sketch.mx = 0;
     sketch.my = 0;

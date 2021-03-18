@@ -80,7 +80,7 @@ let Faces = (sketch) => {
             this.face_mesh = [];
             this.name = name;
 
-            setInterval(this.get_update, 40);
+            // setInterval(this.get_update, 40);
         }
 
         get_update() {
