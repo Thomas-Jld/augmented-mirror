@@ -88,7 +88,7 @@ let Clock = ( sketch ) => {
     // sketch.stroke(100, 255, 200);
     // sketch.line(0,0,r * 0.9,0);
     // sketch.pop();
-    // sketch.pop();
+    sketch.pop();
   };
 
   sketch.clearSketch = () => {
