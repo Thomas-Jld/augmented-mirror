@@ -123,7 +123,7 @@ let Hands = (sketch) => {
             sketch.fill(200);
 
             this.hand_pose_t = [];
-            for(let i = 0; i < this.hand_pose; i++){
+            for(let i = 0; i < this.hand_pose.length; i++){
                 if (this.hand_pose[i].slice(2, 4) != [-1, -1]) {
                     let x = width * (this.hand_pose[i][2] - xoffset) / screenwidth;
                     let y = height * (this.hand_pose[i][3] - yoffset) / screenheight;
@@ -144,7 +144,7 @@ let Hands = (sketch) => {
                     this.hand_pose_t.push([0, 0]);
                 }
             }
-
+            
             if (sketch.show_hands_lines && this.hand_pose_t != []) {
                 this.show_lines();
             }
