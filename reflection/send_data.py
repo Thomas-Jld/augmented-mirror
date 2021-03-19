@@ -5,6 +5,10 @@ import numpy as np
 
 sio = socketio.Client(engineio_logger=True)
 
+
+"""
+Works as a queue to add data in the global DATA variable
+"""
 def add_data(name, data):
     global AVAILABLE
     if not AVAILABLE:
@@ -18,6 +22,10 @@ def add_data(name, data):
     AVAILABLE = True
 
 
+
+"""
+A class that reads frames from the intel Realsense D435I Camera (color and depth frames)
+"""
 class IntelVideoReader(object):
     def __init__(self):
         import pyrealsense2 as rs
@@ -59,7 +67,9 @@ class IntelVideoReader(object):
 
         return [color_frame, depth_frame]
         
-
+"""
+A class that reads frames from the webcam (color only)
+"""
 class CameraVideoReader:
     def __init__(self):
         import cv2 as cv
@@ -76,7 +86,11 @@ class CameraVideoReader:
         else:
             return [None, None]
 
-
+"""
+A thread that reads frames using the 2 previous classes' functions 
+and stores them into global variables. (global) depth will be none if
+the camera isn't the D435
+"""
 class FrameProvider(threading.Thread):
     def __init__(self, threadID, feed):
         threading.Thread.__init__(self)
@@ -91,12 +105,15 @@ class FrameProvider(threading.Thread):
         -------------------------------------
         """)
         while 1:
-            global color
+            global color 
             global depth
-            color, depth = self.feed.next_frame()
-            time.sleep(1/(2*FPS))
+            color, depth = self.feed.next_frame() #Updates global variales
+            time.sleep(1/(2*FPS)) # Runs faster to be sure to get the 
 
 
+"""
+A thread that gets body pose from lightweight pose estimation
+"""
 class BodyProvider(threading.Thread):
     def __init__(self, threadID, feed):
         import get_body_pose as gbp
@@ -106,27 +123,30 @@ class BodyProvider(threading.Thread):
         self.feed = feed
 
     def run(self):
-        import get_body_pose as gbp
+        import get_body_pose as gbp # Import the code from another python file if the cwd
         print(
         """
         -------------------------------------
         Body pose running
         -------------------------------------
         """)
+        self.pose = gbp.init()
         while 1:
-            start_t = time.time()
-            self.pose = gbp.init()
+            start_t = time.time() # Used to mesure the elapsed time of each loop
 
             if color is not None and depth is not None:
-                self.data = gbp.find_body_pose(self.pose, color)
+                self.data = gbp.find_body_pose(self.pose, color) # Infer on image
 
-                add_data("body_pose", self.data)
+                add_data("body_pose", self.data) # Stores the data through the availability queue
 
             end_t = time.time()
             dt = 1/FPS - (end_t - start_t) if (end_t - start_t) < 1/FPS else 0.01
-            time.sleep(dt)
+            time.sleep(dt) # Sleeps for 1/FPS (e.g: 33ms if FPS=60) if the code is fast enough, else 10 ms
 
 
+"""
+A thread that gets body mesh from detectron
+"""
 class BodyMeshProvider(threading.Thread):
     def __init__(self, threadID, feed):
         import get_body_mesh as gm
