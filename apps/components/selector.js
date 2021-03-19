@@ -1,6 +1,6 @@
 let Selector = (sketch) => {
     sketch.name = "selector";
-    
+
     sketch.movable = true;
     sketch.latched = false;
     sketch.activated = true;
@@ -11,6 +11,8 @@ let Selector = (sketch) => {
     sketch.my = 0;
 
     sketch.cursor = [0, 0];
+
+    sketch.rotation = 0;
 
     sketch.set = (p1, p2, w, h) => {
         sketch.width = w;
@@ -50,8 +52,8 @@ let Selector = (sketch) => {
             }
         }
 
-        unselect(){
-            for(let i = 0; i < this.bubbles.length; i++){
+        unselect() {
+            for (let i = 0; i < this.bubbles.length; i++) {
                 this.bubbles[i].selected = false;
             }
         }
@@ -74,18 +76,20 @@ let Selector = (sketch) => {
         }
 
         show() {
+            sketch.push();
+            sketch.rotate(-sketch.rotation);
             sketch.stroke(255);
             sketch.strokeWeight(6);
-            if(this.selected){
+            if (this.selected) {
                 sketch.fill(255, 129, 0);
-            }
-            else{
+            } else {
                 sketch.fill(100, 0.7);
             }
-            if(this.per > 0.1){
+            if (this.per > 0.1) {
                 sketch.ellipse(this.x + this.per * this.d * Math.cos(this.angle), this.y - this.per * this.d * Math.sin(this.angle), this.r * this.per);
             }
             // ellipse(this.x, this.y, this.r * this.per);
+            sketch.pop();
         }
 
         update(x, y) {
@@ -97,27 +101,37 @@ let Selector = (sketch) => {
                 if (this.per < 1) {
                     this.per += 0.04;
                 }
-                if(!this.selected && sketch.dist(this.x + this.per * this.d * Math.cos(this.angle), this.y - this.per * this.d * Math.sin(this.angle), sketch.cursor[0], sketch.cursor[1]) < this.r){
+                if (!this.selected && sketch.dist(this.x + this.per * this.d * Math.cos(this.angle), this.y - this.per * this.d * Math.sin(this.angle), sketch.cursor[0], sketch.cursor[1]) < this.r) {
                     this.c += 1;
                     sketch.stroke(255);
                     sketch.strokeWeight(4);
                     noFill();
                     //console.log(this.c);
-                    sketch.arc(this.x + this.per * this.d * Math.cos(this.angle), 
-                                this.y - this.per * this.d * Math.sin(this.angle),
-                                2*this.r, 2*this.r,
-                                0, 2*Math.PI*this.c/40);
-                    if(this.c >= 40){
+                    sketch.arc(this.x + this.per * this.d * Math.cos(this.angle),
+                        this.y - this.per * this.d * Math.sin(this.angle),
+                        2 * this.r, 2 * this.r,
+                        0, 2 * Math.PI * this.c / 40);
+                    if (this.c >= 40) {
                         this.parent.unselect();
+                        sketch.rotation = this.angle;
                         this.selected = true;
                         choseAction(this.choice);
                     }
-                }
-                else{
+                } else {
                     this.c = 0;
                 }
             }
 
+        }
+    }
+
+    class SelectBar {
+        constructor(x, y, d, choice, parent) {
+            this.x = x;
+            this.y = y;
+            this.d = d;
+            this.choice = choice;
+            this.parent = parent;
         }
     }
 }

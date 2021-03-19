@@ -117,10 +117,10 @@ let Pose = (sketch) => {
                     let x;
                     let y;
                     if (this.body_pose_t.length == this.body_pose.length){
-                        x = lerp(this.hand_pose_t[i][0], width * (this.body_pose[i][2] - xoffset) / screenwidth, 0.6);
-                        y = lerp(this.hand_pose_t[i][1], height * (this.body_pose[i][3] - yoffset) / screenheight, 0.6);
+                        x = lerp(this.body_pose_t[i][0], width * (this.body_pose[i][2] - xoffset) / screenwidth, 0.6);
+                        y = lerp(this.body_pose_t[i][1], height * (this.body_pose[i][3] - yoffset) / screenheight, 0.6);
     
-                        this.hand_pose_t[i] = [x, y];
+                        this.body_pose_t[i] = [x, y];
                     }
                     else{
                         x = width * (this.body_pose[i][2] - xoffset) / screenwidth;
