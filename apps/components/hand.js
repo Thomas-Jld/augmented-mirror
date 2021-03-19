@@ -122,13 +122,22 @@ let Hands = (sketch) => {
             }
             sketch.fill(200);
 
-            this.hand_pose_t = [];
             for(let i = 0; i < this.hand_pose.length; i++){
                 if (this.hand_pose[i].slice(2, 4) != [-1, -1]) {
-                    let x = width * (this.hand_pose[i][2] - xoffset) / screenwidth;
-                    let y = height * (this.hand_pose[i][3] - yoffset) / screenheight;
+                    let x;
+                    let y;
+                    if (this.hand_pose_t.length == this.hand_pose.length){
+                        x = lerp(this.hand_pose_t[i][0], width * (this.hand_pose[i][2] - xoffset) / screenwidth,0.6);
+                        y = lerp(this.hand_pose_t[i][1], height * (this.hand_pose[i][3] - yoffset) / screenheight,0.6);
 
-                    this.hand_pose_t.push([x, y]);
+                        this.hand_pose_t[i] = [x, y];
+                    }
+                    else{
+                        x = width * (this.hand_pose[i][2] - xoffset) / screenwidth;
+                        y = height * (this.hand_pose[i][3] - yoffset) / screenheight;
+
+                        this.hand_pose_t.push([x, y]);
+                    }
 
                     if (sketch.show_particules) {
                         if (frameCount % 5 == 0) {
