@@ -12,7 +12,7 @@ let Selector = (sketch) => {
 
     sketch.cursor = [0, 0];
 
-    sketch.rotation = 0;
+    // sketch.rotation = 0;
 
     sketch.set = (p1, p2, w, h) => {
         sketch.width = w;
@@ -44,7 +44,7 @@ let Selector = (sketch) => {
             this.d = d;
             this.choices = choices;
 
-            this.slots = [Math.PI / 2, Math.PI / 6, -Math.PI / 6, -Math.PI / 2];
+            this.slots = [-2 * this.d, -this.d, 0, this.d, 2 * this.d];
             this.bubbles = [];
 
             for (let i = 0; i < nb; i++) {
@@ -60,10 +60,13 @@ let Selector = (sketch) => {
     }
 
     class Bubble {
-        constructor(x, y, angle, d, choice, parent) {
+        constructor(x, y, slide, d, choice, parent) {
             this.x = x;
             this.y = y;
-            this.angle = angle;
+            // this.angle = angle;
+            this.slide = slide;
+            this.rx = this.x;
+            this.ry = this.y;
             this.d = d;
             this.choice = choice;
             this.r = this.d / 2;
@@ -84,7 +87,7 @@ let Selector = (sketch) => {
                 sketch.fill(100, 0.7);
             }
             if (this.per > 0.1) {
-                sketch.ellipse(this.x + this.per * this.d * Math.cos(this.angle - sketch.rotation), this.y - this.per * this.d * Math.sin(this.angle - sketch.rotation), this.r * this.per);
+                sketch.ellipse(this.rx, this.ry, this.r * this.per);
             }
             // ellipse(this.x, this.y, this.r * this.per);
         }
@@ -92,21 +95,22 @@ let Selector = (sketch) => {
         update(x, y) {
             this.x = lerp(this.x, x, 0.6);
             this.y = lerp(this.y, y, 0.6);
+            this.rx = this.x + this.per * this.d;
+            this.ry = this.y + this.per * this.slide;
             if (!sketch.display_bubbles) {
                 this.per *= this.mul;
             } else {
                 if (this.per < 1) {
                     this.per += 0.04;
                 }
-                if (!this.selected && sketch.dist(this.x + this.per * this.d * Math.cos(this.angle - sketch.rotation),
-                        this.y - this.per * this.d * Math.sin(this.angle - sketch.rotation), sketch.cursor[0], sketch.cursor[1]) < this.r) {
+                if (!this.selected && sketch.dist(this.rx,
+                        this.ry, sketch.cursor[0], sketch.cursor[1]) < this.r) {
                     this.c += 1;
                     sketch.stroke(255);
                     sketch.strokeWeight(4);
                     sketch.noFill();
                     //console.log(this.c);
-                    sketch.arc(this.x + this.per * this.d * Math.cos(this.angle - sketch.rotation),
-                        this.y - this.per * this.d * Math.sin(this.angle - sketch.rotation),
+                    sketch.arc(this.rx, this.ry,
                         2 * this.r, 2 * this.r,
                         0, 2 * Math.PI * this.c / 40);
                     if (this.c >= 40) {
