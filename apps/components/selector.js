@@ -76,8 +76,6 @@ let Selector = (sketch) => {
         }
 
         show() {
-            sketch.push();
-            sketch.rotate(-sketch.rotation);
             sketch.stroke(255);
             sketch.strokeWeight(6);
             if (this.selected) {
@@ -86,10 +84,9 @@ let Selector = (sketch) => {
                 sketch.fill(100, 0.7);
             }
             if (this.per > 0.1) {
-                sketch.ellipse(this.x + this.per * this.d * Math.cos(this.angle), this.y - this.per * this.d * Math.sin(this.angle), this.r * this.per);
+                sketch.ellipse(this.x + this.per * this.d * Math.cos(this.angle - sketch.rotation), this.y - this.per * this.d * Math.sin(this.angle - sketch.rotation), this.r * this.per);
             }
             // ellipse(this.x, this.y, this.r * this.per);
-            sketch.pop();
         }
 
         update(x, y) {
@@ -101,14 +98,15 @@ let Selector = (sketch) => {
                 if (this.per < 1) {
                     this.per += 0.04;
                 }
-                if (!this.selected && sketch.dist(this.x + this.per * this.d * Math.cos(this.angle), this.y - this.per * this.d * Math.sin(this.angle), sketch.cursor[0], sketch.cursor[1]) < this.r) {
+                if (!this.selected && sketch.dist(this.x + this.per * this.d * Math.cos(this.angle - sketch.rotation),
+                        this.y - this.per * this.d * Math.sin(this.angle - sketch.rotation), sketch.cursor[0], sketch.cursor[1]) < this.r) {
                     this.c += 1;
                     sketch.stroke(255);
                     sketch.strokeWeight(4);
-                    noFill();
+                    sketch.noFill();
                     //console.log(this.c);
-                    sketch.arc(this.x + this.per * this.d * Math.cos(this.angle),
-                        this.y - this.per * this.d * Math.sin(this.angle),
+                    sketch.arc(this.x + this.per * this.d * Math.cos(this.angle - sketch.rotation),
+                        this.y - this.per * this.d * Math.sin(this.angle - sketch.rotation),
                         2 * this.r, 2 * this.r,
                         0, 2 * Math.PI * this.c / 40);
                     if (this.c >= 40) {
