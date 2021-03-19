@@ -13,6 +13,7 @@ let Selector = (sketch) => {
     sketch.cursor = [0, 0];
 
     // sketch.rotation = 0;
+    sketch.sliding = 0;
 
     sketch.set = (p1, p2, w, h) => {
         sketch.width = w;
@@ -95,8 +96,8 @@ let Selector = (sketch) => {
         update(x, y) {
             this.x = lerp(this.x, x, 0.6);
             this.y = lerp(this.y, y, 0.6);
-            this.rx = this.x + this.per * this.d;
-            this.ry = this.y + this.per * this.slide;
+            this.rx = this.x + this.per * this.d / 2;
+            this.ry = this.y + this.per * this.slide - sketch.sliding;
             if (!sketch.display_bubbles) {
                 this.per *= this.mul;
             } else {
@@ -115,7 +116,7 @@ let Selector = (sketch) => {
                         0, 2 * Math.PI * this.c / 40);
                     if (this.c >= 40) {
                         this.parent.unselect();
-                        sketch.rotation = this.angle;
+                        sketch.sliding = this.slide;
                         this.selected = true;
                         choseAction(this.choice);
                     }
