@@ -127,8 +127,8 @@ let Hands = (sketch) => {
                     let x;
                     let y;
                     if (this.hand_pose_t.length == this.hand_pose.length){
-                        x = lerp(this.hand_pose_t[i][0], width * (this.hand_pose[i][2] - xoffset) / screenwidth,0.6);
-                        y = lerp(this.hand_pose_t[i][1], height * (this.hand_pose[i][3] - yoffset) / screenheight,0.6);
+                        x = lerp(this.hand_pose_t[i][0], width * (this.hand_pose[i][2] - xoffset) / screenwidth,0.8);
+                        y = lerp(this.hand_pose_t[i][1], height * (this.hand_pose[i][3] - yoffset) / screenheight,0.8);
 
                         this.hand_pose_t[i] = [x, y];
                     }
@@ -149,9 +149,7 @@ let Hands = (sketch) => {
                         sketch.ellipse(x, y, 10);
                         //sketch.text(part, x + 20, y + 20);
                     }
-                } else {
-                    this.hand_pose_t.push([0, 0]);
-                }
+                } 
             }
             
             if (sketch.show_hands_lines && this.hand_pose_t != []) {

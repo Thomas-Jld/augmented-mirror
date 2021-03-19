@@ -80,7 +80,7 @@ let Pose = (sketch) => {
                     [28, 32]
                 ]
             ];
-            
+
 
             this.keypoints = ['nose', 'left_eye_inner', 'left_eye', 'left_eye_outer',
                 'right_eye_inner', 'right_eye', 'right_eye_outer',
@@ -95,6 +95,8 @@ let Pose = (sketch) => {
 
 
             this.body_pose = [];
+            this.body_pose_t = [];
+
             this.name = name;
 
             setInterval(this.get_update, 20);
@@ -108,17 +110,24 @@ let Pose = (sketch) => {
             if (this.body_pose == []) {
                 return
             }
-
-            let transposed = [];
             sketch.fill(200);
 
-            this.body_pose.forEach(function (part) {
-
-                if(part.slice(2,4) != [-1,-1]){
-                    let x = width * (part[2] - xoffset) / screenwidth;
-                    let y = height * (part[3] - yoffset) / screenheight;
-
-                    transposed.push([x, y]);
+            for (let i = 0; i < this.body_pose.length; i++) {
+                if (this.body_pose[i].slice(2, 4) != [-1, -1]) {
+                    let x;
+                    let y;
+                    if (this.body_pose_t.length == this.body_pose.length){
+                        x = lerp(this.hand_pose_t[i][0], width * (this.body_pose[i][2] - xoffset) / screenwidth, 0.6);
+                        y = lerp(this.hand_pose_t[i][1], height * (this.body_pose[i][3] - yoffset) / screenheight, 0.6);
+    
+                        this.hand_pose_t[i] = [x, y];
+                    }
+                    else{
+                        x = width * (this.body_pose[i][2] - xoffset) / screenwidth;
+                        y = height * (this.body_pose[i][3] - yoffset) / screenheight;
+    
+                        this.body_pose_t.push([x, y]);
+                    }
 
                     if (sketch.show_particules) {
                         if (frameCount % 5 == 0) {
@@ -126,19 +135,16 @@ let Pose = (sketch) => {
                         }
                     }
 
-                    if (sketch.show_body_points && (sketch.show_head || part[1] > 10) && (sketch.show_wrist || ![17, 18, 19, 20, 21, 22].includes(part[1]))) {
+                    if (sketch.show_body_points && (sketch.show_head || this.body_pose[i][1] > 10) && (sketch.show_wrist || ![17, 18, 19, 20, 21, 22].includes(this.body_pose[i][1]))) {
                         //sketch.fill(255);
                         sketch.ellipse(x, y, 30);
                         //sketch.text(part[1].toString(), x + 20, y + 20);
                     }
                 }
-                else{
-                    transposed.push([0, 0])
-                }
-            });
+            }
 
             if (sketch.show_body_lines) {
-                this.show_lines(transposed);
+                this.show_lines(this.body_pose_t);
             }
         }
 
@@ -148,10 +154,10 @@ let Pose = (sketch) => {
             this.junctions.forEach(parts => {
                 parts.forEach(pair => {
                     try {
-                        if (transposed[pair[0]][1] > 0 && transposed[pair[1]][1] > 0 && 
+                        if (transposed[pair[0]][1] > 0 && transposed[pair[1]][1] > 0 &&
                             (sketch.show_head || (pair[1] > 10 && pair[0] > 10)) &&
-                            (sketch.show_wrist || (![17,18,19,20].includes(pair[0]) &&  ![17, 18, 19, 20, 21, 22].includes(pair[1])))
-                            ) {
+                            (sketch.show_wrist || (![17, 18, 19, 20].includes(pair[0]) && ![17, 18, 19, 20, 21, 22].includes(pair[1])))
+                        ) {
                             sketch.line(transposed[pair[0]][0], transposed[pair[0]][1], transposed[pair[1]][0], transposed[pair[1]][1]);
                         }
                     } catch (e) {
