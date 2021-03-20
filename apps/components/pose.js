@@ -20,7 +20,8 @@ let Pose = (sketch) => {
         sketch.x = p1;
         sketch.y = p2;
         sketch.selfCanvas = sketch.createCanvas(sketch.width, sketch.height).position(sketch.x, sketch.y);
-
+        sketch.selfCanvas.hide();
+        
         sketch.pose = new Body("pose");
         socket.on("send_pose", function (data) {
             sketch.pose.body_pose = data;

@@ -24,6 +24,7 @@ let Hands = (sketch) => {
         sketch.x = p1;
         sketch.y = p2;
         sketch.selfCanvas = sketch.createCanvas(sketch.width, sketch.height).position(sketch.x, sketch.y);
+        // sketch.selfCanvas.hide();
 
         sketch.right_hand = new Hand("get_right_hand");
         sketch.left_hand = new Hand("get_left_hand");

@@ -1,10 +1,10 @@
 let Selector = (sketch) => {
     sketch.name = "selector";
 
-    sketch.movable = true;
+    sketch.movable = false;
     sketch.latched = false;
-    sketch.activated = true;
-    sketch.clickable = true;
+    sketch.activated = false;
+    sketch.clickable = false;
     sketch.display_bubbles = false;
 
     sketch.mx = 0;
@@ -22,40 +22,63 @@ let Selector = (sketch) => {
         sketch.y = p2;
         sketch.selfCanvas = sketch.createCanvas(sketch.width, sketch.height).position(sketch.x, sketch.y);
         sketch.angleMode(RADIANS);
-        sketch.menu = new Menu(sketch.x, sketch.y, 4, 150, [0, 1, 2, 3]);
+        sketch.textAlign(CENTER, CENTER);
+        sketch.textStyle()
+        sketch.menu = new Menu(sketch.x, sketch.y, 150, [
+            0, 
+            1,
+            ["Show Face", "Show Clock", "Show Pose", "Show Hands"],
+        ]);
+        sketch.activated = true;
     };
 
 
     sketch.show = () => {
         sketch.clear();
         sketch.push();
-        for (let i = 0; i < sketch.menu.bubbles.length; i++) {
-            sketch.menu.bubbles[i].show();
-            sketch.menu.bubbles[i].update(sketch.mx, sketch.my);
+        if (selector.display_bubbles) {
+            sketch.menu.show();
+            sketch.menu.update(sketch.mx, sketch.my);
         }
         sketch.pop();
     };
 
 
     class Menu {
-        constructor(x, y, nb, d, choices) {
+        constructor(x, y, d, choices) {
             this.x = x;
             this.y = y;
-            this.nb = nb;
             this.d = d;
             this.choices = choices;
 
-            this.slots = [-2 * this.d, -this.d, 0, this.d, 2 * this.d];
+            this.slots = [0, -this.d, this.d, -2 * this.d, 2 * this.d];
             this.bubbles = [];
 
-            for (let i = 0; i < nb; i++) {
+            for (let i = 0; i < this.choices.length; i++) {
                 this.bubbles.push(new Bubble(this.x, this.y, this.slots[i], this.d, this.choices[i], this));
             }
         }
 
         unselect() {
             for (let i = 0; i < this.bubbles.length; i++) {
-                this.bubbles[i].selected = false;
+                if (this.bubbles[i].selected) {
+                    this.bubbles[i].selected = false;
+                    for (let j = 0; j < this.bubbles[i].bars.length; j++) {
+                        this.bubbles[i].bars[j].per = 0;
+                    }
+                }
+            }
+        }
+
+        update(x, y) {
+            for (let i = 0; i < this.bubbles.length; i++) {
+                this.bubbles[i].update(x, y);
+            }
+        }
+
+        show() {
+            for (let i = 0; i < this.bubbles.length; i++) {
+                this.bubbles[i].show();
             }
         }
     }
@@ -73,10 +96,18 @@ let Selector = (sketch) => {
             this.r = this.d / 2;
             this.per = 0;
             this.mul = 0.92;
-            this.color = 200;
             this.c = 0;
             this.selected = false;
             this.parent = parent;
+
+            this.slots = [0, -3 * this.d / 4, 3 * this.d / 4, 3 * this.d / 2, -3 * this.d / 2, 2 * this.d];
+            this.bars = [];
+
+            if (typeof (this.choice) == "object") {
+                for (let i = 0; i < this.choice.length; i++) {
+                    this.bars.push(new SelectBar(this.rx, this.ry, this.slots[i], this.d, this.choice[i], this));
+                }
+            }
         }
 
         show() {
@@ -91,6 +122,11 @@ let Selector = (sketch) => {
                 sketch.ellipse(this.rx, this.ry, this.r * this.per);
             }
             // ellipse(this.x, this.y, this.r * this.per);
+            if (this.selected) {
+                for (let i = 0; i < this.bars.length; i++) {
+                    this.bars[i].show();
+                }
+            }
         }
 
         update(x, y) {
@@ -103,38 +139,161 @@ let Selector = (sketch) => {
             } else {
                 if (this.per < 1) {
                     this.per += 0.04;
-                }
-                if (!this.selected && sketch.dist(this.rx,
-                        this.ry, sketch.cursor[0], sketch.cursor[1]) < this.r) {
-                    this.c += 1;
-                    sketch.stroke(255);
-                    sketch.strokeWeight(4);
-                    sketch.noFill();
-                    //console.log(this.c);
-                    sketch.arc(this.rx, this.ry,
-                        2 * this.r, 2 * this.r,
-                        0, 2 * Math.PI * this.c / 40);
-                    if (this.c >= 40) {
-                        this.parent.unselect();
-                        sketch.sliding = this.slide;
-                        this.selected = true;
-                        choseAction(this.choice);
-                    }
                 } else {
-                    this.c = 0;
+                    if (!this.selected && sketch.dist(this.rx,
+                            this.ry, sketch.cursor[0], sketch.cursor[1]) < this.r) {
+
+                        this.c += 1;
+
+                        sketch.stroke(255);
+                        sketch.strokeWeight(4);
+                        sketch.noFill();
+                        //console.log(this.c);
+                        sketch.arc(this.rx, this.ry,
+                            2 * this.r, 2 * this.r,
+                            0, 2 * Math.PI * this.c / 40);
+
+                        if (this.c >= 40) {
+                            this.parent.unselect();
+                            //sketch.sliding = this.slide;
+                            this.selected = true;
+
+                            if (typeof (this.choice) !== "object") {
+                                choseAction(this.choice);
+                            }
+                        }
+                    } else {
+                        this.c = 0;
+                    }
                 }
             }
+            if (this.selected) {
+                for (let i = 0; i < this.bars.length; i++) {
+                    this.bars[i].update(this.rx, this.ry);
+                }
+            }
+        }
 
+        unselect() {
+            for (let i = 0; i < this.bars.length; i++) {
+                this.bars[i].selected = false;
+            }
         }
     }
 
     class SelectBar {
-        constructor(x, y, d, choice, parent) {
+        constructor(x, y, slide, d, choice, parent) {
             this.x = x;
             this.y = y;
-            this.d = d;
+            this.slide = slide;
+            this.d = d / 2;
+            this.w = this.d * 4;
+            this.h = this.d;
             this.choice = choice;
             this.parent = parent;
+            this.selected = false;
+
+            this.c = 0;
+
+            this.per = 0;
+            this.mul = 0.92;
+            this.selection_time = 40;
+        }
+
+        show() {
+            if (this.parent.selected && this.per > 0.1) {
+                sketch.stroke(255);
+                sketch.strokeWeight(2);
+                if (this.selected) {
+                    sketch.fill(255, 129, 0);
+                } else {
+                    sketch.fill(255);
+                }
+                sketch.rect(this.rx, this.ry - this.h / 2 * this.per, this.w, this.h * this.per);
+                sketch.fill(0);
+                sketch.stroke(0);
+                sketch.strokeWeight(4);
+                sketch.textSize(this.h/2);
+                sketch.text(this.choice, this.rx + this.w/2, this.ry);
+                if (this.slide == 0) {
+                    sketch.fill(255);
+                    sketch.stroke(255);
+                    sketch.triangle(this.rx, this.ry - this.h / 3, this.rx, this.ry + this.h / 3, this.rx - 1.7 * this.h / 3, this.ry);
+                }
+            }
+        }
+
+        update(x, y) {
+            this.x = x;
+            this.y = y;
+            this.rx = this.x + 3 * this.per * this.d / 2;
+            this.ry = this.y + this.per * this.slide - sketch.sliding;
+
+            if (!this.parent.selected) {
+                this.per *= this.mul;
+            } else {
+                if (this.per < 1) {
+                    this.per += 0.1;
+                } else {
+                    if (sketch.cursor[0] > this.rx - this.h / 4 && sketch.cursor[0] < this.rx + this.w + this.h / 4 &&
+                        sketch.cursor[1] > this.ry - 3 * this.h / 4 && sketch.cursor[1] < this.ry + 3 * this.h / 4) {
+
+                        this.c += 1;
+
+                        sketch.stroke(255);
+                        sketch.strokeWeight(4);
+
+                        sketch.noFill();
+                        //console.log(this.c);
+                        if (this.c < this.selection_time / 20) {
+                            sketch.line(this.rx + this.w + this.h / 4, this.ry,
+                                this.rx + this.w + this.h / 4, this.ry - 3 * this.h / 4 * this.c / (this.selection_time / 20));
+                        } else if (this.c < 9 * this.selection_time / 20) {
+                            sketch.line(this.rx + this.w + this.h / 4, this.ry,
+                                this.rx + this.w + this.h / 4, this.ry - 3 * this.h / 4);
+                            sketch.line(this.rx + this.w + this.h / 4, this.ry - 3 * this.h / 4,
+                                this.rx + this.w + this.h / 4 - (this.w + this.h / 2) * (this.c - this.selection_time / 20) / (8 * this.selection_time / 20), this.ry - 3 * this.h / 4);
+
+                        } else if (this.c < 11 * this.selection_time / 20) {
+                            sketch.line(this.rx + this.w + this.h / 4, this.ry,
+                                this.rx + this.w + this.h / 4, this.ry - 3 * this.h / 4);
+                            sketch.line(this.rx + this.w + this.h / 4, this.ry - 3 * this.h / 4,
+                                this.rx - this.h / 4, this.ry - 3 * this.h / 4);
+                            sketch.line(this.rx - this.h / 4, this.ry - 3 * this.h / 4,
+                                this.rx - this.h / 4, this.ry - 3 * this.h / 4 + 3 * this.h / 4 * (this.c - 9 * this.selection_time / 20) / (2 * this.selection_time / 20));
+
+                        } else if (this.c < 19 * this.selection_time / 20) {
+                            sketch.line(this.rx + this.w + this.h / 4, this.ry,
+                                this.rx + this.w + this.h / 4, this.ry - 3 * this.h / 4);
+                            sketch.line(this.rx + this.w + this.h / 4, this.ry - 3 * this.h / 4,
+                                this.rx - this.h / 4, this.ry - 3 * this.h / 4);
+                            sketch.line(this.rx - this.h / 4, this.ry - 3 * this.h / 4,
+                                this.rx - this.h / 4, this.ry + 3 * this.h / 4);
+                            sketch.line(this.rx - this.h / 4, this.ry + 3 * this.h / 4,
+                                this.rx - this.h / 4 + (this.w + this.h / 2) * (this.c - 11 * this.selection_time / 20) / (8 * this.selection_time / 20), this.ry + 3 * this.h / 4);
+
+                        } else if (this.c < this.selection_time) {
+                            sketch.line(this.rx + this.w + this.h / 4, this.ry,
+                                this.rx + this.w + this.h / 4, this.ry - 3 * this.h / 4);
+                            sketch.line(this.rx + this.w + this.h / 4, this.ry - 3 * this.h / 4,
+                                this.rx - this.h / 4, this.ry - 3 * this.h / 4);
+                            sketch.line(this.rx - this.h / 4, this.ry - 3 * this.h / 4,
+                                this.rx - this.h / 4, this.ry + 3 * this.h / 4);
+                            sketch.line(this.rx - this.h / 4, this.ry + 3 * this.h / 4,
+                                this.rx + this.w + this.h / 4, this.ry + 3 * this.h / 4);
+                            sketch.line(this.rx + this.w + this.h / 4, this.ry + 3 * this.h / 4,
+                                this.rx + this.w + this.h / 4, this.ry + 3 * this.h / 4 - 3 * this.h / 4 * (this.c - 19 * this.selection_time / 20) / (this.selection_time / 20));
+                        } else if (this.c == this.selection_time) {
+                            // this.parent.unselect();
+                            //sketch.sliding = this.slide;
+                            this.selected = !this.selected;
+                            choseAction(this.choice, this.selected);
+                        }
+                    } else {
+                        this.c = 0;
+                    }
+                }
+            }
         }
     }
 }

@@ -5,6 +5,7 @@ let pose;
 let hands;
 let face;
 let selector;
+let clock;
 
 let socket;
 let canvas;
@@ -33,12 +34,15 @@ function draw() {
         modules.forEach(m => {
             if (m.activated) {
                 m.show();
-                if (m.latched) {
-                    m.setPosition(mouseX - m.OffsetX, mouseY - m.OffsetY);
-                }
+                // if (m.latched) {
+                //     m.setPosition(mouseX - m.OffsetX, mouseY - m.OffsetY);
+                // }
             }
         });
         selection();
+        // selector.cursor = [mouseX, mouseY];
+        // selector.mx = 200;
+        // selector.my = height/2;
     }
 }
 
@@ -59,7 +63,7 @@ function selection(){
 function reshape() {
     resizeCanvas(windowWidth, windowHeight);
 
-    let clock = new p5(Clock);
+    clock = new p5(Clock);
     clock.set(width - 200, 0, 200, 200);
     modules.push(clock);
 
@@ -90,44 +94,44 @@ function reshape() {
     started = true;
 }
 
-function choseAction(opt){
-    if (opt == 0){
-        modules.forEach(m => {
-            m.activated = true;
-            m.selfCanvas.show();
-        });   
+function choseAction(opt, action){
+    if (opt == "Show Clock"){
+        if(action){
+            clock.activated = true;
+            clock.selfCanvas.show();
+        }
+        else{
+            clock.activated = false;
+            clock.selfCanvas.hide();
+        }
     }
-    else if(opt == 1){
-        modules.forEach(m => {
-            m.activated = false;
-            m.selfCanvas.hide();
-        });
-        hands.activated = true;
-        selector.activated = true;
-        selector.selfCanvas.show();
+    else if (opt == "Show Face"){
+        if(action){
+            face.activated = true;
+            face.selfCanvas.show();
+        }
+        else{
+            face.activated = false;
+            face.selfCanvas.hide();
+        }
     }
-    else if (opt == 2) {
-        modules.forEach(m => {
-            m.activated = false;
-            m.selfCanvas.hide();
-        });
-        hands.activated = true;
-        selector.activated = true;
-        selector.selfCanvas.show();
-        face.activated = true;
-        face.selfCanvas.show();
+    else if (opt == "Show Pose"){
+        if(action){
+            pose.activated = true;
+            pose.selfCanvas.show();
+        }
+        else{
+            pose.activated = false;
+            pose.selfCanvas.hide();
+        }
     }
-    else if (opt == 3) {
-        modules.forEach(m => {
-            m.activated = false;
-            m.selfCanvas.hide();
-        });
-        pose.activated = true;
-        pose.selfCanvas.show();
-        hands.activated = true;
-        hands.selfCanvas.show();
-        selector.activated = true;
-        selector.selfCanvas.show();
+    else if (opt == "Show Hands"){
+        if(action){
+            hands.selfCanvas.show();
+        }
+        else{
+            hands.selfCanvas.hide();
+        }
     }
 }
 
@@ -194,30 +198,30 @@ function keyPressed() {
     }
 }
 
-function mousePressed() {
-    let selected = false;
-    let objectSelected = false;
-    modules.forEach(m => {
-        if (m.movable && mouseX > m.x && mouseY > m.y && mouseX < m.x + m.width && mouseY < m.y + m.height) {
-            selected = true;
-            if (!objectsSelected) {
-                m.latched = true;
-                objectSelected = true;
-                m.OffsetX = mouseX - m.x;
-                m.OffsetY = mouseY - m.y;
-            } else {
-                m.latched = false;
-            }
-        }
-    });
+// function mousePressed() {
+//     let selected = false;
+//     let objectSelected = false;
+//     modules.forEach(m => {
+//         if (m.movable && mouseX > m.x && mouseY > m.y && mouseX < m.x + m.width && mouseY < m.y + m.height) {
+//             selected = true;
+//             if (!objectsSelected) {
+//                 m.latched = true;
+//                 objectSelected = true;
+//                 m.OffsetX = mouseX - m.x;
+//                 m.OffsetY = mouseY - m.y;
+//             } else {
+//                 m.latched = false;
+//             }
+//         }
+//     });
 
-    objectsSelected = objectSelected;
+//     objectsSelected = objectSelected;
 
-    if (!selected) {
-        modules.forEach(m => {
-            if (!m.movable && m.clickable) {
-                m.onClicked(mouseX, mouseY);
-            }
-        });
-    }
-}
+//     if (!selected) {
+//         modules.forEach(m => {
+//             if (!m.movable && m.clickable) {
+//                 m.onClicked(mouseX, mouseY);
+//             }
+//         });
+//     }
+// }
