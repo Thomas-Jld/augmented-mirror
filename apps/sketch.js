@@ -198,6 +198,10 @@ function keyPressed() {
     }
 }
 
+// function mousePressed(){
+//     selector.display_bubbles = !selector.display_bubbles;
+// }
+
 // function mousePressed() {
 //     let selected = false;
 //     let objectSelected = false;

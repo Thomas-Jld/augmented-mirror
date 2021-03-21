@@ -15,20 +15,37 @@ let Selector = (sketch) => {
     // sketch.rotation = 0;
     sketch.sliding = 0;
 
+    let description = `This is a Alpha version of an interractive mirror 
+                        interface integrating the user's reflection into 
+                        the informations displayed and the mirror's actions.`
+
+    let icons = ["user.svg", "info.svg", "settings.svg"];
+
     sketch.set = (p1, p2, w, h) => {
         sketch.width = w;
         sketch.height = h;
         sketch.x = p1;
         sketch.y = p2;
         sketch.selfCanvas = sketch.createCanvas(sketch.width, sketch.height).position(sketch.x, sketch.y);
+
         sketch.angleMode(RADIANS);
         sketch.textAlign(CENTER, CENTER);
-        sketch.textStyle()
-        sketch.menu = new Menu(sketch.x, sketch.y, 150, [
-            0, 
-            1,
-            ["Show Face", "Show Clock", "Show Pose", "Show Hands"],
-        ]);
+        sketch.textStyle(BOLD);
+
+        sketch.imageMode(CENTER);
+
+        sketch.menu = new Menu(
+            sketch.x,
+            sketch.y,
+            150,
+            [
+                0,
+                1,
+                ["Show Face", "Show Clock", "Show Pose", "Show Hands"],
+            ],
+            icons
+        );
+
         sketch.activated = true;
     };
 
@@ -36,16 +53,14 @@ let Selector = (sketch) => {
     sketch.show = () => {
         sketch.clear();
         sketch.push();
-        if (selector.display_bubbles) {
-            sketch.menu.show();
-            sketch.menu.update(sketch.mx, sketch.my);
-        }
+        sketch.menu.show();
+        sketch.menu.update(sketch.mx, sketch.my);
         sketch.pop();
     };
 
 
     class Menu {
-        constructor(x, y, d, choices) {
+        constructor(x, y, d, choices, icons) {
             this.x = x;
             this.y = y;
             this.d = d;
@@ -55,7 +70,7 @@ let Selector = (sketch) => {
             this.bubbles = [];
 
             for (let i = 0; i < this.choices.length; i++) {
-                this.bubbles.push(new Bubble(this.x, this.y, this.slots[i], this.d, this.choices[i], this));
+                this.bubbles.push(new Bubble(this.x, this.y, this.slots[i], this.d, this.choices[i], this, icons[i]));
             }
         }
 
@@ -84,7 +99,7 @@ let Selector = (sketch) => {
     }
 
     class Bubble {
-        constructor(x, y, slide, d, choice, parent) {
+        constructor(x, y, slide, d, choice, parent, icon) {
             this.x = x;
             this.y = y;
             // this.angle = angle;
@@ -102,6 +117,7 @@ let Selector = (sketch) => {
 
             this.slots = [0, -3 * this.d / 4, 3 * this.d / 4, 3 * this.d / 2, -3 * this.d / 2, 2 * this.d];
             this.bars = [];
+            this.icon = sketch.loadImage("components/icons/" + icon);
 
             if (typeof (this.choice) == "object") {
                 for (let i = 0; i < this.choice.length; i++) {
@@ -120,8 +136,8 @@ let Selector = (sketch) => {
             }
             if (this.per > 0.1) {
                 sketch.ellipse(this.rx, this.ry, this.r * this.per);
+                sketch.image(this.icon, this.rx, this.ry, this.r * this.per * 2/3, this.r * this.per *2/3);
             }
-            // ellipse(this.x, this.y, this.r * this.per);
             if (this.selected) {
                 for (let i = 0; i < this.bars.length; i++) {
                     this.bars[i].show();
@@ -209,16 +225,18 @@ let Selector = (sketch) => {
                 } else {
                     sketch.fill(255);
                 }
-                sketch.rect(this.rx, this.ry - this.h / 2 * this.per, this.w, this.h * this.per);
+                sketch.rect(this.rx, this.ry - this.h / 2 * this.per, this.w * this.per, this.h * this.per);
                 sketch.fill(0);
                 sketch.stroke(0);
-                sketch.strokeWeight(4);
-                sketch.textSize(this.h/2);
-                sketch.text(this.choice, this.rx + this.w/2, this.ry);
+                sketch.noStroke();
+                sketch.textSize(this.per * this.h / 2);
+                sketch.text(this.choice, this.rx + this.per * this.w / 2, this.ry);
                 if (this.slide == 0) {
                     sketch.fill(255);
                     sketch.stroke(255);
-                    sketch.triangle(this.rx, this.ry - this.h / 3, this.rx, this.ry + this.h / 3, this.rx - 1.7 * this.h / 3, this.ry);
+                    sketch.triangle(this.rx, this.ry - this.per * this.h / 3, 
+                                    this.rx, this.ry + this.per * this.h / 3, 
+                                    this.rx - 1.7 * this.per * this.h / 3, this.ry);
                 }
             }
         }
@@ -229,11 +247,14 @@ let Selector = (sketch) => {
             this.rx = this.x + 3 * this.per * this.d / 2;
             this.ry = this.y + this.per * this.slide - sketch.sliding;
 
-            if (!this.parent.selected) {
+            if (!this.parent.selected || !sketch.display_bubbles) {
                 this.per *= this.mul;
             } else {
                 if (this.per < 1) {
                     this.per += 0.1;
+                    if(this.per > 1){
+                        this.per = 1;
+                    }
                 } else {
                     if (sketch.cursor[0] > this.rx - this.h / 4 && sketch.cursor[0] < this.rx + this.w + this.h / 4 &&
                         sketch.cursor[1] > this.ry - 3 * this.h / 4 && sketch.cursor[1] < this.ry + 3 * this.h / 4) {
@@ -294,6 +315,29 @@ let Selector = (sketch) => {
                     }
                 }
             }
+        }
+    }
+
+    class InfoPanel {
+        constructor(x, y, w, h, offset, content, parent) {
+            this.x = x;
+            this.y = y;
+            this.w = w;
+            this.h = h;
+            this.offset = offset;
+            this.content = content;
+            this.parent = parent;
+            this.size = 5;
+        }
+
+        show() {
+            sketch.fill(255);
+            sketch.noStroke();
+            sketch.rect(this.x + this.offset, this.y - this.h / 2, this.x + this.offset + this.w, this.y + this.h / 2);
+            sketch.stroke(0);
+            // sketch.strokeWeight()
+            sketch.textSize(this.size);
+            sketch.text(this.content, this.x + this.offset + this.w / 2, this.y, this.w, this.h);
         }
     }
 }
