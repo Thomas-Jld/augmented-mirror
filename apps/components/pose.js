@@ -136,11 +136,11 @@ let Pose = (sketch) => {
                         }
                     }
 
-                    if (sketch.show_body_points && (sketch.show_head || this.body_pose[i][1] > 10) && (sketch.show_wrist || ![17, 18, 19, 20, 21, 22].includes(this.body_pose[i][1]))) {
-                        //sketch.fill(255);
-                        sketch.ellipse(x, y, 30);
-                        //sketch.text(part[1].toString(), x + 20, y + 20);
-                    }
+                    // if (sketch.show_body_points && (sketch.show_head || this.body_pose[i][1] > 10) && (sketch.show_wrist || ![17, 18, 19, 20, 21, 22].includes(this.body_pose[i][1]))) {
+                    //     //sketch.fill(255);
+                    //     sketch.ellipse(x, y, 30);
+                    //     //sketch.text(part[1].toString(), x + 20, y + 20);
+                    // }
                 }
             }
 

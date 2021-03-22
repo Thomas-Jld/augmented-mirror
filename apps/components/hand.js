@@ -146,10 +146,10 @@ let Hands = (sketch) => {
                         }
                     }
 
-                    if (sketch.show_hands_points) {
-                        sketch.ellipse(x, y, 10);
-                        //sketch.text(part, x + 20, y + 20);
-                    }
+                    // if (sketch.show_hands_points) {
+                    //     sketch.ellipse(x, y, 10);
+                    //     //sketch.text(part, x + 20, y + 20);
+                    // }
                 } 
             }
             
