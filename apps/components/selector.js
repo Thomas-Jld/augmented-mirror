@@ -220,14 +220,15 @@ let Selector = (sketch) => {
             if (this.parent.selected && this.per > 0.1) {
                 sketch.stroke(255);
                 sketch.strokeWeight(2);
+                sketch.fill(0);
+                sketch.rect(this.rx, this.ry - this.h / 2 * this.per, this.w * this.per, this.h * this.per);
                 if (this.selected) {
                     sketch.fill(255, 129, 0);
+                    sketch.stroke(255, 129, 0);
                 } else {
                     sketch.fill(255);
+                    sketch.stroke(255);
                 }
-                sketch.rect(this.rx, this.ry - this.h / 2 * this.per, this.w * this.per, this.h * this.per);
-                sketch.fill(0);
-                sketch.stroke(0);
                 sketch.noStroke();
                 sketch.textSize(this.per * this.h / 2);
                 sketch.text(this.choice, this.rx + this.per * this.w / 2, this.ry);
