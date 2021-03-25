@@ -22,7 +22,7 @@ let screenwidth = 392.85; //millimeters
 let screenheight = 698.4;
 
 function preload(){
-    pikachu_model = loadImage("components/models/pikachu.obj");
+    pikachu_model = loadModel("components/models/pikachu.obj");
 }
 
 function setup() {
@@ -64,6 +64,7 @@ function selection(){
         selector.mx = hands.left_hand.hand_pose_t[8][0];
         selector.my = hands.left_hand.hand_pose_t[8][1];
         selector.cursor = hands.right_hand.hand_pose_t[8];
+        
         pikachu.cursor = hands.right_hand.hand_pose_t[8] + [1];
     }
 }
