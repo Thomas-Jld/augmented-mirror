@@ -6,6 +6,7 @@ let hands;
 let face;
 let selector;
 let clock;
+let pikachu;
 
 let socket;
 let canvas;
@@ -57,6 +58,7 @@ function selection(){
         selector.mx = hands.left_hand.hand_pose_t[8][0];
         selector.my = hands.left_hand.hand_pose_t[8][1];
         selector.cursor = hands.right_hand.hand_pose_t[8];
+        pikachu.cursor = hands.right_hand.hand_pose_t[8] + [1];
     }
 }
 
@@ -90,6 +92,10 @@ function reshape() {
     selector = new p5(Selector);
     selector.set(0, 0, width, height);
     modules.push(selector);
+
+    pikachu = new p5(Pikachu);
+    pikachu.set(0, 0, width, height);
+    modules.push(pikachu);
 
     started = true;
 }
