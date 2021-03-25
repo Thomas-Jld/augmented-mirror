@@ -4,10 +4,10 @@ let Pikachu = (sketch) => {
 
     sketch.movable = false;
     sketch.latched = false;
-    sketch.activated = fasle;
+    sketch.activated = false;
     sketch.clickable = true;
 
-    sketch.model;
+    sketch.pikachu_model;
     sketch.cursor = [-100, -100, 1];
 
     sketch.set = (p1, p2, w, h) => {
@@ -17,7 +17,7 @@ let Pikachu = (sketch) => {
         sketch.y = p2;
         sketch.selfCanvas = sketch.createCanvas(sketch.width, sketch.height, WEBGL).position(sketch.x, sketch.y);
 
-        sketch.model = new Model(sketch.cursor.x, sketch.cursor.y, 1);
+        sketch.pikachu_model = new Model(sketch.cursor.x, sketch.cursor.y, 1);
 
         sketch.activated = true;
     };
@@ -26,8 +26,8 @@ let Pikachu = (sketch) => {
     sketch.show = () => {
         sketch.clear();
         sketch.push();
-        sketch.model.show();
-        sketch.model.update(sketch.cursor[0], sketch.cursor[1], sketch.cursor[2]);
+        sketch.pikachu_model.show();
+        sketch.pikachu_model.update(sketch.cursor[0], sketch.cursor[1], sketch.cursor[2]);
         sketch.pop();
     };
 

@@ -1,4 +1,4 @@
-IMNAME = mirror_release_4
+IMNAME = mirror_release_5
 
 delete:
 	sudo nvidia-docker image rm -f $(IMNAME)
@@ -25,7 +25,8 @@ stop:
 	sleep 1
 
 open:
-	DISPLAY=:0 chromium apps/index.html --start-fullscreen
+	DISPLAY=:0 chromium http://127.0.0.1:8000 --start-fullscreen --disk-cache-dir=/dev/null --disk-cache-size=1 --media-cache-size=1
 
 logs:
 	sudo docker logs --follow $(IMNAME)
+
