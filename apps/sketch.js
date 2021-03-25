@@ -7,6 +7,8 @@ let face;
 let selector;
 let clock;
 let pikachu;
+let pikachu_model;
+
 
 let socket;
 let canvas;
@@ -18,6 +20,10 @@ let yoffset = 50;
 
 let screenwidth = 392.85; //millimeters
 let screenheight = 698.4;
+
+function preload(){
+    pikachu_model = loadImage("components/models/pikachu.obj");
+}
 
 function setup() {
     canvas = createCanvas(windowWidth, windowHeight);

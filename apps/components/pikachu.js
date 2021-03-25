@@ -17,7 +17,7 @@ let Pikachu = (sketch) => {
         sketch.y = p2;
         sketch.selfCanvas = sketch.createCanvas(sketch.width, sketch.height, WEBGL).position(sketch.x, sketch.y);
 
-        sketch.pikachu_model = new Model(sketch.cursor.x, sketch.cursor.y, 1);
+        sketch.pikachu_model = new Model(sketch.cursor.x, sketch.cursor.y, 1, pikachu_model);
 
         sketch.activated = true;
     };
@@ -33,11 +33,11 @@ let Pikachu = (sketch) => {
 
 
     class Model {
-        constructor(x, y, s) {
+        constructor(x, y, s, m) {
             this.x = x;
             this.y = y;
             this.s = s;
-            this.model = sketch.loadImage("components/models/pikachu.obj");
+            this.model = m;
         }
         show() {
             sketch.push();
