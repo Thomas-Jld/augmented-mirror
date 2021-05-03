@@ -8,7 +8,7 @@ let Pikachu = (sketch) => {
     sketch.clickable = true;
 
     sketch.pikachu_model;
-    sketch.cursor = [-100, -100, 1];
+    sketch.cursor = [100, 100, 1];
 
     sketch.set = (p1, p2, w, h) => {
         sketch.width = w;
@@ -41,15 +41,16 @@ let Pikachu = (sketch) => {
         }
         show() {
             sketch.push();
-            sketch.translate(this.x, this.y, 0);
+            sketch.translate(parseInt(this.x), parseInt(this.y), 0);
             sketch.scale(this.s);
             sketch.normalMaterial(); 
             sketch.model(this.model);
             sketch.pop();
         }
-        update(x, y) {
+        update(x, y, s) {
             this.x = x;
             this.y = y;
+            this.s = s;
         }
     }
 }
