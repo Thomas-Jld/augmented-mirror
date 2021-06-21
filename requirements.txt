@@ -1,12 +1,12 @@
 numpy==1.19.3
-pyrealsense2==2.40.0.2483
+pyrealsense2==2.47.0.3313
 opencv-python==3.4.11.45
 Flask==1.1.2
 python-socketio==4.6.1
 Flask-SocketIO==4.3.2
 requests==2.25.0
 eventlet==0.29.1
-dataclasses==0.8
+dataclasses
 av==8.0.2
 scipy==1.5.4
 setuptools==41.0.0
