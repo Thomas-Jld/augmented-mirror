@@ -28,7 +28,6 @@ let Pose = (sketch) => {
         });
 
         sketch.activated = true;
-
     };
 
 
