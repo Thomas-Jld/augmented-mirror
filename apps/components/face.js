@@ -119,9 +119,9 @@ let Faces = (sketch) => {
                 }
             });
 
-            if (sketch.show_face_lines) {
-                this.show_lines(transposed);
-            }
+            // if (sketch.show_face_lines) {
+            //     this.show_lines(transposed);
+            // }
         }
 
         show_lines(transposed) {
