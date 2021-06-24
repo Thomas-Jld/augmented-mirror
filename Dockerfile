@@ -4,16 +4,11 @@ FROM nvidia/cuda:10.2-cudnn7-devel-ubuntu18.04
 
 WORKDIR /Miroir/
 
+RUN add-apt-repository -y ppa:deadsnakes/ppa
+
 RUN apt-get update && \
-  apt-get -y install python3-pip libusb-1.0-0-dev libgl1-mesa-glx nano git curl nodejs software-properties-common && \
-  pip3 install --upgrade pip 
-
-# RUN add-apt-repository -y ppa:deadsnakes/ppa
-
-# RUN apt -y install python3.7
-
-# ADD requirements2.txt .
-# RUN python3.7 -m pip install -r requirements2.txt
+  apt-get -y install python3.7-pip libusb-1.0-0-dev libgl1-mesa-glx nano git curl nodejs software-properties-common && \
+  python3.7 -m pip install --upgrade pip 
 
 ADD requirements.txt .
 
