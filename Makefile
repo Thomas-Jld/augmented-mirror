@@ -27,5 +27,8 @@ stop:
 open:
 	DISPLAY=:0 chromium http://127.0.0.1:8000 --start-fullscreen --disk-cache-dir=/dev/null --disk-cache-size=1 --media-cache-size=1
 
+server:
+	python3 -m http.server -d app/
+
 logs:
 	sudo docker logs --follow $(IMNAME)
