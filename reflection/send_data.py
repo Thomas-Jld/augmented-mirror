@@ -257,14 +257,14 @@ class HolisticProvider(threading.Thread):
         Holistic running
         -------------------------------------
         """)
+        global PAUSED
+        global CHANGED
         while 1:
-            global PAUSED
             if not PAUSED:
                 start_t = time.time()
 
                 if color is not None and depth is not None:
                     self.data = gh.find_all_poses(self.holistic, color)
-                    global CHANGED
 
                     if bool(self.data["body_pose"]):
                         CHANGED = True
@@ -272,8 +272,8 @@ class HolisticProvider(threading.Thread):
 
                         body = project(self.data["body_pose"], eyes, self.feed, depth, 4)
                         add_data("body_pose", body)
-                        add_data("right_hand_pose", project(self.data["right_hand_pose"], eyes, self.feed, depth, 2, body[19][-1]))
-                        add_data("left_hand_pose", project(self.data["left_hand_pose"], eyes, self.feed, depth, 2, body[20][-1]))
+                        add_data("right_hand_pose", project(self.data["right_hand_pose"], eyes, self.feed, depth, 2, body[15][-1]))
+                        add_data("left_hand_pose", project(self.data["left_hand_pose"], eyes, self.feed, depth, 2, body[16][-1]))
                         add_data("face_mesh", project(self.data["face_mesh"], eyes, self.feed, depth, 2, body[2][-1]))
                 
                 end_t = time.time()
@@ -294,24 +294,36 @@ class PifpafProvider(threading.Thread):
 
     def run(self):
         import get_pifpaf as gpp
-        # from get_reflection import project
+        from get_reflection import project
         print(
         """
         -------------------------------------
         Pifpaf running
         -------------------------------------
         """)
-        count = 0
-        start = time.time()
+        global PAUSED
+        global CHANGED
         while 1:
-            if color is not None:
-                gpp.find_all_poses(self.processor, color)
-                count+=1
-            now = time.time()
-            if now - start > 1:
-                print(count)
-                start = now
-                count = 0
+            if not PAUSED:
+                start_t = time.time()
+                if color is not None and depth is not None:
+                    self.data = gpp.find_all_poses(self.processor, color)
+
+                    if bool(self.data["body_pose"]):
+                        CHANGED = True
+                        eyes = self.data["body_pose"][0][2:4]
+
+                        body = project(self.data["body_pose"], eyes, self.feed, depth, 4)
+                        add_data("body_pose", body)
+                        add_data("right_hand_pose", project(self.data["right_hand_pose"], eyes, self.feed, depth, 2, body[10][-1]))
+                        add_data("left_hand_pose", project(self.data["left_hand_pose"], eyes, self.feed, depth, 2, body[11][-1]))
+                        add_data("face_mesh", project(self.data["face_mesh"], eyes, self.feed, depth, 2, body[1][-1]))
+                
+                end_t = time.time()
+                dt = max(1/FPS - (end_t - start_t), 0)
+                time.sleep(dt)
+            else:
+                time.sleep(5)
             
 
 
@@ -372,8 +384,8 @@ def connect():
         "body_mesh": [False, BodyMeshProvider], # Body mesh, requires Body pose
         "hands_pose": [False, HandsProvider], # Hands, requires Body pose
         "face_mesh": [False, FaceProvider], # Face mesh
-        "holistic_pose": [True, HolisticProvider], # Holistic, Body face and hands in one
-        "pifpaf_pose": [False, PifpafProvider], # Pifpaf, Body face and hands in one
+        "holistic_pose": [False, HolisticProvider], # Holistic, Body face and hands in one
+        "pifpaf_pose": [True, PifpafProvider], # Pifpaf, Body face and hands in one
     }
 
     # feed = CameraVideoReader()
