@@ -24,6 +24,7 @@ let Clock = ( sketch ) => {
     sketch.selfCanvas.hide();
     r = sketch.min(w, h)*0.5 - 3*ec;
     sketch.angleMode(DEGREES);
+    sketch.activated = true;
   };
 
   sketch.setPosition = (x, y) => {

@@ -207,7 +207,7 @@ let Selector = (sketch) => {
             this.h = this.d;
             this.choice = choice;
             this.parent = parent;
-            this.selected = false;
+            this.selected = true;
 
             this.c = 0;
 

@@ -24,7 +24,6 @@ let Faces = (sketch) => {
         });
 
         sketch.activated = true;
-
     };
 
 

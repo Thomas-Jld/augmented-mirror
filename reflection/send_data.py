@@ -307,7 +307,8 @@ class PifpafProvider(threading.Thread):
             if color is not None:
                 gpp.find_all_poses(self.processor, color)
                 count+=1
-            if (now := time.time()) - start > 1:
+            now = time.time()
+            if now - start > 1:
                 print(count)
                 start = now
                 count = 0
@@ -375,8 +376,8 @@ def connect():
         "pifpaf_pose": [False, PifpafProvider], # Pifpaf, Body face and hands in one
     }
 
-    feed = CameraVideoReader()
-    # feed = IntelVideoReader()
+    # feed = CameraVideoReader()
+    feed = IntelVideoReader()
 
     camThread = FrameProvider("frame", feed)
     
