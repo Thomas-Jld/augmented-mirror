@@ -20,7 +20,7 @@ let Pose = (sketch) => {
         sketch.x = p1;
         sketch.y = p2;
         sketch.selfCanvas = sketch.createCanvas(sketch.width, sketch.height).position(sketch.x, sketch.y);
-        sketch.selfCanvas.hide();
+        // sketch.selfCanvas.hide();
         
         sketch.pose = new Body("pose");
         socket.on("send_pose", function (data) {
@@ -28,7 +28,6 @@ let Pose = (sketch) => {
         });
 
         sketch.activated = true;
-
     };
 
 
@@ -117,10 +116,20 @@ let Pose = (sketch) => {
                 if (this.body_pose[i].slice(2, 4) != [-1, -1]) {
                     let x;
                     let y;
+                    let newx;
+                    let newy;
                     if (this.body_pose_t.length == this.body_pose.length){
-                        x = lerp(this.body_pose_t[i][0], width * (this.body_pose[i][2] - xoffset) / screenwidth, 0.6);
-                        y = lerp(this.body_pose_t[i][1], height * (this.body_pose[i][3] - yoffset) / screenheight, 0.6);
-    
+                        newx = width * (this.body_pose[i][2] - xoffset) / screenwidth;
+                        newy = height * (this.body_pose[i][3] - yoffset) / screenheight;
+                        if(newy > 0){
+                            x = lerp(this.body_pose_t[i][0], newx, 0.8);
+                            y = lerp(this.body_pose_t[i][1], newy, 0.8);
+                        }
+                        else{ // Assume it's an artifact and slows the update
+                            x = lerp(this.body_pose_t[i][0], newx, 0.01);
+                            y = lerp(this.body_pose_t[i][1], newy, 0.01);
+                        }
+
                         this.body_pose_t[i] = [x, y];
                     }
                     else{

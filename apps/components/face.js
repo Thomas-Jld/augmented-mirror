@@ -16,7 +16,7 @@ let Faces = (sketch) => {
         sketch.x = p1;
         sketch.y = p2;
         sketch.selfCanvas = sketch.createCanvas(sketch.width, sketch.height).position(sketch.x, sketch.y);
-        sketch.selfCanvas.hide();
+        // sketch.selfCanvas.hide();
         
         sketch.face = new Face("face");
         socket.on("send_face", function (data) {
@@ -24,7 +24,6 @@ let Faces = (sketch) => {
         });
 
         sketch.activated = true;
-
     };
 
 
