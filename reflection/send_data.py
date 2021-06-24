@@ -3,11 +3,12 @@ import threading
 import time
 import numpy as np
 
-sio = socketio.Client(engineio_logger=True)
+sio = socketio.Client(engineio_logger=False )
 
 
 """
 Works as a queue to add data in the global DATA variable
+TODO: Use a real Queue instead of this function
 """
 def add_data(name, data):
     global AVAILABLE
@@ -33,8 +34,8 @@ class IntelVideoReader(object):
         self.pipe = rs.pipeline()
         config = rs.config()
 
-        self.width = 1280
-        self.height = 720
+        self.width = 640
+        self.height = 480
 
         config.enable_stream(rs.stream.depth, self.width, self.height, rs.format.z16, 30)
         config.enable_stream(rs.stream.color, self.width, self.height, rs.format.bgr8, 30)
@@ -231,11 +232,14 @@ class FaceProvider(threading.Thread):
                 add_data("face_mesh", self.data)
             
             end_t = time.time()
-            dt = 1/FPS - (end_t - start_t) if (end_t - start_t) < 1/FPS else 0.01
+            dt = max(1/FPS - (end_t - start_t), 0)
             time.sleep(dt)
 
-
-class MultipleProvider(threading.Thread):
+"""
+Body pose from mediapipe
+TODO: Crop the image to only get the center
+"""
+class HolisticProvider(threading.Thread):
     def __init__(self, threadID, feed):
         import get_holistic as gh
 
@@ -273,10 +277,41 @@ class MultipleProvider(threading.Thread):
                         add_data("face_mesh", project(self.data["face_mesh"], eyes, self.feed, depth, 2, body[2][-1]))
                 
                 end_t = time.time()
-                dt = 1/FPS - (end_t - start_t) if (end_t - start_t) < 1/FPS else 0.01
+                dt = max(1/FPS - (end_t - start_t), 0)
                 time.sleep(dt)
             else:
                 time.sleep(5)
+
+
+class PifpafProvider(threading.Thread):
+    def __init__(self, threadID, feed):
+        import get_pifpaf as gpp
+
+        threading.Thread.__init__(self)
+        self.threadID = threadID
+        self.feed = feed
+        self.processor = gpp.init()
+
+    def run(self):
+        import get_pifpaf as gpp
+        # from get_reflection import project
+        print(
+        """
+        -------------------------------------
+        Pifpaf running
+        -------------------------------------
+        """)
+        count = 0
+        start = time.time()
+        while 1:
+            if color is not None:
+                gpp.find_all_poses(self.processor, color)
+                count+=1
+            if (now := time.time()) - start > 1:
+                print(count)
+                start = now
+                count = 0
+            
 
 
 class SendData(threading.Thread):
@@ -310,7 +345,7 @@ class SendData(threading.Thread):
                     AVAILABLE = True
                     CHANGED = False
                 end_t = time.time()
-                dt = 2/FPS - (end_t - start_t) if (end_t - start_t) < 1/(2*FPS) else 0.01
+                dt = max(1/FPS - (end_t - start_t), 0)
                 time.sleep(dt)
             else:
                 time.sleep(5)
@@ -331,28 +366,24 @@ def connect():
     -------------------------------------
     """)
 
-    functionalities = [
-        False, # Body pose, requires Face mesh
-        False, # Body mesh, requires Body pose
-        False, # Hands, requires Body pose
-        False, # Face mesh
-        True, # Holistic, Body face and hands in one
-    ]
+    functionalities = {
+        "body_pose": [False, BodyProvider], # Body pose, requires Face mesh
+        "body_mesh": [False, BodyMeshProvider], # Body mesh, requires Body pose
+        "hands_pose": [False, HandsProvider], # Hands, requires Body pose
+        "face_mesh": [False, FaceProvider], # Face mesh
+        "holistic_pose": [True, HolisticProvider], # Holistic, Body face and hands in one
+        "pifpaf_pose": [False, PifpafProvider], # Pifpaf, Body face and hands in one
+    }
 
-    # feed = CameraVideoReader()
-    feed = IntelVideoReader()
-    Thread1 = FrameProvider("frame", feed)
+    feed = CameraVideoReader()
+    # feed = IntelVideoReader()
+
+    camThread = FrameProvider("frame", feed)
     
-    if functionalities[0]:
-        Thread2 = BodyProvider("body_pose", feed)
-    if functionalities[1]:
-        Thread3 = BodyMeshProvider("body_mesh", feed)
-    if functionalities[2]:
-        Thread4 = HandsProvider("hands_pose", feed)
-    if functionalities[3]:
-        Thread5 = FaceProvider("face_mesh", feed)
-    if functionalities[4]:
-        Thread6 = MultipleProvider("multiple_poses", feed)
+    Threads = []
+    for name in functionalities:
+        if functionalities[name][0]:
+            Threads.append(functionalities[name][1](name, feed))
         
     print(
     """
@@ -361,17 +392,9 @@ def connect():
     -------------------------------------
     """)
 
-    Thread1.start()
-    if functionalities[0]:
-        Thread2.start()
-    if functionalities[1]:
-        Thread3.start()
-    if functionalities[2]:
-        Thread4.start()
-    if functionalities[3]:
-        Thread5.start()
-    if functionalities[4]:
-        Thread6.start()
+    camThread.start()
+    for thread in Threads:
+        thread.start()
 
     Messenger = SendData("server")
     Messenger.start()
@@ -391,7 +414,7 @@ if __name__ == '__main__':
     threads = []
 
     FPS = 60
-    NAP = 0.01
+    NAP = 0.001
 
     PROJECT = True
     AVAILABLE = True

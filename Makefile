@@ -1,4 +1,4 @@
-IMNAME = mirror_release_5
+IMNAME = mirror_release_pifpaf
 
 delete:
 	sudo nvidia-docker image rm -f $(IMNAME)
@@ -29,4 +29,3 @@ open:
 
 logs:
 	sudo docker logs --follow $(IMNAME)
-
