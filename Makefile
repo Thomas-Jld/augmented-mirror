@@ -14,6 +14,8 @@ run:
 	sudo nvidia-docker run -d --expose 5000 --network="host" --privileged --volume=/dev:/dev --name=$(IMNAME) $(IMNAME)
 
 launch:
+	-echo -n "0000:00:14.0" | tee /sys/bus/pci/drivers/xhci_hcd/unbind
+	-echo -n "0000:00:14.0" | tee /sys/bus/pci/drivers/xhci_hcd/bind
 	-sudo nvidia-docker rm $(IMNAME)
 	sudo nvidia-docker run --expose 5000 --network="host" --privileged --volume=/dev:/dev --name=$(IMNAME) $(IMNAME)
 	
