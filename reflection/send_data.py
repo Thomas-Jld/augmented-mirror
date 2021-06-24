@@ -384,8 +384,8 @@ def connect():
         "body_mesh": [False, BodyMeshProvider], # Body mesh, requires Body pose
         "hands_pose": [False, HandsProvider], # Hands, requires Body pose
         "face_mesh": [False, FaceProvider], # Face mesh
-        "holistic_pose": [True, HolisticProvider], # Holistic, Body face and hands in one
-        "pifpaf_pose": [False, PifpafProvider], # Pifpaf, Body face and hands in one
+        "holistic_pose": [False, HolisticProvider], # Holistic, Body face and hands in one
+        "pifpaf_pose": [True, PifpafProvider], # Pifpaf, Body face and hands in one
     }
 
     # feed = CameraVideoReader()
