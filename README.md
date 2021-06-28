@@ -18,17 +18,23 @@ installed nvidia-docker and that your computer supports cuda. <br/>
 Inside the docker container `launch_reflection.sh` will be executed and launch the recognition software.
 
 ### Manualy launching the intermediate Server
+
 In /server, use:
-```
+
+```bash
 node server.js
 ```
+
 Make sure to be in a docker container if your computer doesn't have nodeJS.
 
 ### Manualy sending position data to the server
+
 In /reflections, while being in the docker container, use:
-```
+
+```bash
 python3 send_data.py
 ```
+
 ## Openning the app
 
 Use `make open` to see the result.
@@ -36,6 +42,7 @@ Use `make open` to see the result.
 ## Ressources:
 
 ### Projects : 
+- https://github.com/openpifpaf/openpifpaf
 - https://github.com/Daniil-Osokin/lightweight-human-pose-estimation.pytorch
 - https://google.github.io/mediapipe/solutions/hands.html
 - https://google.github.io/mediapipe/solutions/holistic.html

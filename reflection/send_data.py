@@ -1,13 +1,14 @@
-import socketio
 import threading
 import time
+
 import numpy as np
+import socketio
 
 sio = socketio.Client(engineio_logger=False )
 
 
 """
-Works as a queue to add data in the global DATA variable
+* Works as a queue to add data in the global DATA variable
 TODO: Use a real Queue instead of this function
 """
 def add_data(name, data):
@@ -23,9 +24,9 @@ def add_data(name, data):
     AVAILABLE = True
 
 
-
 """
-A class that reads frames from the intel Realsense D435I Camera (color and depth frames)
+(Thread)
+* Reads frames from the intel Realsense D435I Camera (color and depth frames)
 """
 class IntelVideoReader(object):
     def __init__(self):
@@ -51,7 +52,6 @@ class IntelVideoReader(object):
         align_to = rs.stream.color
         self.align = rs.align(align_to)
 
-
     def next_frame(self):
         frameset = self.pipe.wait_for_frames()
 
@@ -67,9 +67,11 @@ class IntelVideoReader(object):
         depth_frame = np.fliplr(np.asanyarray(depth_frame.get_data()))
 
         return [color_frame, depth_frame]
-        
+        socketisocketioo
+
 """
-A class that reads frames from the webcam (color only)
+(Thread)
+* A class that reads frames from the webcam (color only)
 """
 class CameraVideoReader:
     def __init__(self):
@@ -87,10 +89,12 @@ class CameraVideoReader:
         else:
             return [None, None]
 
+
 """
-A thread that reads frames using the 2 previous classes' functions 
-and stores them into global variables. (global) depth will be none if
-the camera isn't the D435
+(Thread)
+* Reads frames using the 2 previous classes' functions 
+* and stores them into global variables. (global) depth will be none if
+* the camera isn't the D435
 """
 class FrameProvider(threading.Thread):
     def __init__(self, threadID, feed):
@@ -113,7 +117,8 @@ class FrameProvider(threading.Thread):
 
 
 """
-A thread that gets body pose from lightweight pose estimation
+(Thread)
+* Gets body pose from lightweight pose estimation
 """
 class BodyProvider(threading.Thread):
     def __init__(self, threadID, feed):
@@ -124,7 +129,7 @@ class BodyProvider(threading.Thread):
         self.feed = feed
 
     def run(self):
-        import get_body_pose as gbp # Import the code from another python file if the cwd
+        import get_body_pose as gbp  # Import the code from another python file if the cwd
         print(
         """
         -------------------------------------
@@ -136,7 +141,7 @@ class BodyProvider(threading.Thread):
             start_t = time.time() # Used to mesure the elapsed time of each loop
 
             if color is not None and depth is not None:
-                self.data = gbp.find_body_pose(self.pose, color) # Infer on image
+                self.data = gbp.find_body_pose(self.pose, color) # Infer on image, return keypoints
 
                 add_data("body_pose", self.data) # Stores the data through the availability queue
 
@@ -146,7 +151,9 @@ class BodyProvider(threading.Thread):
 
 
 """
-A thread that gets body mesh from detectron
+(Thread)
+* Gets body mesh from detectron2 (densepose)
+! Lib installation steps commented in Docker
 """
 class BodyMeshProvider(threading.Thread):
     def __init__(self, threadID, feed):
@@ -176,7 +183,11 @@ class BodyMeshProvider(threading.Thread):
             dt = 1/FPS - (end_t - start_t) if (end_t - start_t) < 1/FPS else 0.01
             time.sleep(dt)
 
-
+"""
+(Thread)
+* Hands from mediapipe
+! Only one instance from mediapipe can run
+"""
 class HandsProvider(threading.Thread):
     def __init__(self, threadID, feed):
         import get_hand_gesture as gh
@@ -205,14 +216,20 @@ class HandsProvider(threading.Thread):
             dt = 1/FPS - (end_t - start_t) if (end_t - start_t) < 1/FPS else 0.01
             time.sleep(dt)
 
-
+"""
+(Thread)
+* Face from mediapipe
+! Only one instance from mediapipe can run
+"""
 class FaceProvider(threading.Thread):
     def __init__(self, threadID, feed):
         import get_face_mesh as gf
 
         threading.Thread.__init__(self)
         self.threadID = threadID
-        self.feed = feed
+        self.feed = 
+
+
         self.faces = gf.init()
 
     def run(self):
@@ -236,8 +253,10 @@ class FaceProvider(threading.Thread):
             time.sleep(dt)
 
 """
-Body pose from mediapipe
-TODO: Crop the image to only get the center
+(Thread)
+* Body pose from mediapipe
+TODO: Crop the image to only get the center, focusing on the right person
+! Only one instance from mediapipe can run
 """
 class HolisticProvider(threading.Thread):
     def __init__(self, threadID, feed):
@@ -272,9 +291,35 @@ class HolisticProvider(threading.Thread):
 
                         body = project(self.data["body_pose"], eyes, self.feed, depth, 4)
                         add_data("body_pose", body)
-                        add_data("right_hand_pose", project(self.data["right_hand_pose"], eyes, self.feed, depth, 2, body[15][-1]))
-                        add_data("left_hand_pose", project(self.data["left_hand_pose"], eyes, self.feed, depth, 2, body[16][-1]))
-                        add_data("face_mesh", project(self.data["face_mesh"], eyes, self.feed, depth, 2, body[2][-1]))
+                        add_data("right_hand_pose", 
+                            project(
+                                self.data["right_hand_pose"], 
+                                eyes, 
+                                self.feed, 
+                                depth, 2, 
+                                body[15][-1]
+                            )
+                        )
+                        add_data("left_hand_pose", 
+                            project(
+                                self.data["left_hand_pose"], 
+                                eyes, 
+                                self.feed, 
+                                depth, 
+                                2, 
+                                body[16][-1]
+                            )
+                        )
+                        add_data("face_mesh", 
+                            project(
+                                self.data["face_mesh"], 
+                                eyes, 
+                                self.feed, 
+                                depth, 
+                                2, 
+                                body[2][-1]
+                            )
+                        )
                 
                 end_t = time.time()
                 dt = max(1/FPS - (end_t - start_t), 0)
@@ -282,7 +327,11 @@ class HolisticProvider(threading.Thread):
             else:
                 time.sleep(5)
 
-
+"""
+(Thread)
+* Body pose from pifpaf
+TODO: Select the person
+"""
 class PifpafProvider(threading.Thread):
     def __init__(self, threadID, feed):
         import get_pifpaf as gpp
@@ -315,23 +364,50 @@ class PifpafProvider(threading.Thread):
 
                         body = project(self.data["body_pose"], eyes, self.feed, depth, 4)
                         add_data("body_pose", body)
-                        add_data("right_hand_pose", project(self.data["right_hand_pose"], eyes, self.feed, depth, 2, body[10][-1]))
-                        add_data("left_hand_pose", project(self.data["left_hand_pose"], eyes, self.feed, depth, 2, body[11][-1]))
-                        add_data("face_mesh", project(self.data["face_mesh"], eyes, self.feed, depth, 2, body[1][-1]))
-                
-                end_t = time.time()
-                dt = max(1/FPS - (end_t - start_t), 0)
-                time.sleep(dt)
+                        add_data("right_hand_pose", 
+                            project(
+                                self.data["right_hand_pose"], # Data to project
+                                eyes,                         # POV for reflection
+                                self.feed,                    # Data of thze cam
+                                depth,                        # Depth map
+                                2,                            # Size of the are to sample from
+                                body[9][-1]                   # (Optionnal) Distance to use instead of the real one 
+                            )
+                        )
+                        add_data("left_hand_pose", 
+                            project(
+                                self.data["left_hand_pose"], 
+                                eyes, 
+                                self.feed, 
+                                depth, 
+                                2, 
+                                body[10][-1]
+                            )
+                        )
+                        add_data("face_mesh", 
+                            project(
+                                self.data["face_mesh"], 
+                                eyes, 
+                                self.feed, 
+                                depth, 
+                                2, 
+                                body[0][-1]
+                            )
+                        )
+
+                time.sleep(max(1/FPS - (time.time() - start_t), 0.005))
             else:
                 time.sleep(5)
             
 
-
+"""
+* Sends data to the server
+TODO: Replace this complicated global variable mess with a simple queue.
+"""
 class SendData(threading.Thread):
     def __init__(self, threadID):
         threading.Thread.__init__(self)
         self.threadID = threadID
-
 
     def run(self):
         print(
@@ -357,9 +433,7 @@ class SendData(threading.Thread):
                     sio.emit("global_data", DATA)
                     AVAILABLE = True
                     CHANGED = False
-                end_t = time.time()
-                dt = max(1/FPS - (end_t - start_t), 0)
-                time.sleep(dt)
+                time.sleep(max(1/FPS - (time.time() - start_t), 0.005))
             else:
                 time.sleep(5)
 
@@ -369,7 +443,9 @@ def pause(data: bool):
     global PAUSED
     PAUSED = data
 
-
+"""
+* Init everything on connection with the server.
+"""
 @sio.event
 def connect():
     print(

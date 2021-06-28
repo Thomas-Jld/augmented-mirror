@@ -27,7 +27,7 @@ def find_all_poses(predictor, frame):
         results = [[results[3*i], results[3*i+1], results[3*i+2]] for i in range(int(len(results)/3))]
 
     body_landmarks = []
-    for j, landmark in enumerate(results[0: 17]):
+    for j, landmark in enumerate(results[0: 23]):
         body_landmarks.append([
             0,
             j,
