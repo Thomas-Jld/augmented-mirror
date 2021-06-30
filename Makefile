@@ -1,4 +1,4 @@
-IMNAME = mirror_release_pifpaf
+IMNAME = mirror_release_superfast
 
 delete:
 	sudo nvidia-docker image rm -f $(IMNAME)
