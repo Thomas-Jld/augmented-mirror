@@ -1,4 +1,6 @@
-IMNAME = mirror_release_superfast
+USER=thomasj27
+REPO=mirror_release_superfast
+IMNAME = ${USER}/${REPO}
 
 delete:
 	sudo nvidia-docker image rm -f $(IMNAME)
@@ -14,8 +16,7 @@ run:
 	sudo nvidia-docker run -d --expose 5000 --network="host" --privileged --volume=/dev:/dev --name=$(IMNAME) $(IMNAME)
 
 launch:
-	-sudo nvidia-docker rm $(IMNAME)
-	sudo nvidia-docker run --expose 5000 --network="host" --privileged --volume=/dev:/dev --name=$(IMNAME) $(IMNAME)
+	./reflection/launch_reflection.sh
 	
 restart:
 	sudo systemctl restart docker
@@ -25,7 +26,7 @@ stop:
 	sleep 1
 
 open:
-	DISPLAY=:0 chromium http://127.0.0.1:8000 --start-fullscreen --disk-cache-dir=/dev/null --disk-cache-size=1 --media-cache-size=1
+	DISPLAY=:0 chromium http://127.0.0.1:8000 --start-fullscreen --disk-cache-dir=/dev/null --disk-cache-size=1 --media-cache-size=1 --incognito 
 
 server:
 	python3 -m http.server -d app/

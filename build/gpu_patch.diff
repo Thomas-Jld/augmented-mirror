@@ -1,0 +1,134 @@
+diff --git a/mediapipe/modules/holistic_landmark/holistic_landmark_gpu.pbtxt b/mediapipe/modules/holistic_landmark/holistic_landmark_gpu.pbtxt
+index 990b21d..738204a 100644
+--- a/mediapipe/modules/holistic_landmark/holistic_landmark_gpu.pbtxt
++++ b/mediapipe/modules/holistic_landmark/holistic_landmark_gpu.pbtxt
+@@ -47,7 +47,7 @@
+ 
+ type: "HolisticLandmarkGpu"
+ 
+-# GPU image. (GpuBuffer)
++# CPU image.
+ input_stream: "IMAGE:image"
+ 
+ # Whether to detect/predict the full set of pose landmarks (see below), or only
+@@ -73,10 +73,22 @@ output_stream: "FACE_LANDMARKS:face_landmarks"
+ output_stream: "POSE_ROI:pose_landmarks_roi"
+ output_stream: "POSE_DETECTION:pose_detection"
+ 
++node: {
++  calculator: "ColorConvertCalculator"
++  input_stream: "RGB_IN:image"
++  output_stream: "RGBA_OUT:image_rgba"
++}
++
++node: {
++  calculator: "ImageFrameToGpuBufferCalculator"
++  input_stream: "image_rgba"
++  output_stream: "image_gpu"
++}
++
+ # Predicts pose landmarks.
+ node {
+   calculator: "PoseLandmarkGpu"
+-  input_stream: "IMAGE:image"
++  input_stream: "IMAGE:image_gpu"
+   input_side_packet: "UPPER_BODY_ONLY:upper_body_only"
+   input_side_packet: "SMOOTH_LANDMARKS:smooth_landmarks"
+   output_stream: "LANDMARKS:pose_landmarks"
+@@ -87,7 +99,7 @@ node {
+ # Predicts left and right hand landmarks based on the initial pose landmarks.
+ node {
+   calculator: "HandLandmarksLeftAndRightGpu"
+-  input_stream: "IMAGE:image"
++  input_stream: "IMAGE:image_gpu"
+   input_stream: "POSE_LANDMARKS:pose_landmarks"
+   output_stream: "LEFT_HAND_LANDMARKS:left_hand_landmarks"
+   output_stream: "RIGHT_HAND_LANDMARKS:right_hand_landmarks"
+@@ -108,7 +120,7 @@ node {
+ # Predicts face landmarks based on the initial pose landmarks.
+ node {
+   calculator: "FaceLandmarksFromPoseGpu"
+-  input_stream: "IMAGE:image"
++  input_stream: "IMAGE:image_gpu"
+   input_stream: "FACE_LANDMARKS_FROM_POSE:face_landmarks_from_pose"
+   output_stream: "FACE_LANDMARKS:face_landmarks"
+ }
+diff --git a/mediapipe/python/BUILD b/mediapipe/python/BUILD
+index 3bd188d..49df43b 100644
+--- a/mediapipe/python/BUILD
++++ b/mediapipe/python/BUILD
+@@ -71,5 +71,8 @@ cc_library(
+         "//mediapipe/modules/pose_detection:pose_detection_cpu",
+         "//mediapipe/modules/pose_landmark:pose_landmark_by_roi_cpu",
+         "//mediapipe/modules/pose_landmark:pose_landmark_cpu",
++        "//mediapipe/modules/holistic_landmark:holistic_landmark_gpu",
++        "//mediapipe/gpu:image_frame_to_gpu_buffer_calculator",
++        "//mediapipe/calculators/image:color_convert_calculator",
+     ],
+ )
+diff --git a/mediapipe/python/solutions/holistic.py b/mediapipe/python/solutions/holistic.py
+index 898bb15..90a025d 100644
+--- a/mediapipe/python/solutions/holistic.py
++++ b/mediapipe/python/solutions/holistic.py
+@@ -44,7 +44,7 @@ from mediapipe.python.solutions.pose import PoseLandmark
+ from mediapipe.python.solutions.pose import UPPER_BODY_POSE_CONNECTIONS
+ # pylint: enable=unused-import
+ 
+-BINARYPB_FILE_PATH = 'mediapipe/modules/holistic_landmark/holistic_landmark_cpu.binarypb'
++BINARYPB_FILE_PATH = 'mediapipe/modules/holistic_landmark/holistic_landmark_gpu.binarypb'
+ 
+ 
+ class Holistic(SolutionBase):
+@@ -90,14 +90,14 @@ class Holistic(SolutionBase):
+             'smooth_landmarks': smooth_landmarks and not static_image_mode,
+         },
+         calculator_params={
+-            'poselandmarkcpu__ConstantSidePacketCalculator.packet': [
++            'poselandmarkgpu__ConstantSidePacketCalculator.packet': [
+                 constant_side_packet_calculator_pb2
+                 .ConstantSidePacketCalculatorOptions.ConstantSidePacket(
+                     bool_value=not static_image_mode)
+             ],
+-            'poselandmarkcpu__posedetectioncpu__TensorsToDetectionsCalculator.min_score_thresh':
++            'poselandmarkgpu__posedetectiongpu__TensorsToDetectionsCalculator.min_score_thresh':
+                 min_detection_confidence,
+-            'poselandmarkcpu__poselandmarkbyroicpu__ThresholdingCalculator.threshold':
++            'poselandmarkgpu__poselandmarkbyroigpu__ThresholdingCalculator.threshold':
+                 min_tracking_confidence,
+         },
+         outputs=[
+diff --git a/setup.py b/setup.py
+index 5acad7b..8ebebe4 100644
+--- a/setup.py
++++ b/setup.py
+@@ -223,7 +223,8 @@ class BuildBinaryGraphs(build.build):
+         'face_detection/face_detection_front_cpu',
+         'face_landmark/face_landmark_front_cpu',
+         'hand_landmark/hand_landmark_tracking_cpu',
+-        'holistic_landmark/holistic_landmark_cpu', 'objectron/objectron_cpu',
++        'holistic_landmark/holistic_landmark_gpu',
++        'objectron/objectron_cpu',
+         'pose_landmark/pose_landmark_cpu'
+     ]
+     for binary_graph in binary_graphs:
+@@ -238,7 +239,8 @@ class BuildBinaryGraphs(build.build):
+         'bazel',
+         'build',
+         '--compilation_mode=opt',
+-        '--define=MEDIAPIPE_DISABLE_GPU=1',
++        '--copt=-DMESA_EGL_NO_X11_HEADERS',
++        '--copt=-DEGL_NO_X11',
+         '--action_env=PYTHON_BIN_PATH=' + _normalize_path(sys.executable),
+         os.path.join('mediapipe/modules/', graph_path),
+     ]
+@@ -294,7 +296,8 @@ class BuildBazelExtension(build_ext.build_ext):
+         'bazel',
+         'build',
+         '--compilation_mode=opt',
+-        '--define=MEDIAPIPE_DISABLE_GPU=1',
++        '--copt=-DMESA_EGL_NO_X11_HEADERS',
++        '--copt=-DEGL_NO_X11',
+         '--action_env=PYTHON_BIN_PATH=' + _normalize_path(sys.executable),
+         str(ext.bazel_target + '.so'),
+     ]
+     
