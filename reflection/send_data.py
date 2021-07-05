@@ -249,7 +249,7 @@ class FaceProvider(threading.Thread):
                 add_data("face_mesh", self.data)
             
             end_t = time.time()
-            dt = max(1/FPS - (end_t - start_t), 0)
+            dt = max(1/FPS - (end_t - start_t), 0.005)
             time.sleep(dt)
 
 """
@@ -322,7 +322,7 @@ class HolisticProvider(threading.Thread):
                         )
                 
                 end_t = time.time()
-                dt = max(1/FPS - (end_t - start_t), 0)
+                dt = max(1/FPS - (end_t - start_t), 0.005)
                 time.sleep(dt)
             else:
                 time.sleep(5)

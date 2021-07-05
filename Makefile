@@ -1,4 +1,6 @@
-IMNAME = mirror_release_pifpaf
+USER=thomasj27
+REPO=mirror_release_6
+IMNAME = ${USER}/${REPO}
 
 delete:
 	sudo nvidia-docker image rm -f $(IMNAME)
@@ -8,6 +10,9 @@ clear:
 
 build:
 	sudo nvidia-docker build -t $(IMNAME) .
+
+push:
+	docker push ${IM_NAME}
 
 run:
 	-sudo nvidia-docker rm $(IMNAME)
@@ -25,7 +30,7 @@ stop:
 	sleep 1
 
 open:
-	DISPLAY=:0 chromium http://127.0.0.1:8000 --start-fullscreen --disk-cache-dir=/dev/null --disk-cache-size=1 --media-cache-size=1
+	DISPLAY=:0 chromium http://127.0.0.1:8000 --start-fullscreen --disk-cache-dir=/dev/null --disk-cache-size=1 --media-cache-size=1 --incognito
 
 server:
 	python3 -m http.server -d app/
