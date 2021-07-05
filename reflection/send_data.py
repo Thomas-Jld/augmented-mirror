@@ -249,7 +249,7 @@ class FaceProvider(threading.Thread):
                 add_data("face_mesh", self.data)
             
             end_t = time.time()
-            dt = max(1/FPS - (end_t - start_t), 0.005)
+            dt = max(1/FPS - (end_t - start_t), 0.001)
             time.sleep(dt)
 
 """
@@ -323,7 +323,7 @@ class HolisticProvider(threading.Thread):
                 
                 end_t = time.time()
                 print(f"Infer time: {(end_t - start_t)*1000}ms")
-                dt = max(1/FPS - (end_t - start_t), 0.005)
+                dt = max(1/FPS - (end_t - start_t), 0.001)
                 time.sleep(dt)
             else:
                 time.sleep(5)
@@ -396,7 +396,7 @@ class PifpafProvider(threading.Thread):
                             )
                         )
 
-                time.sleep(max(1/FPS - (time.time() - start_t), 0.005))
+                time.sleep(max(1/FPS - (time.time() - start_t), 0.001))
             else:
                 time.sleep(5)
             
@@ -434,7 +434,7 @@ class SendData(threading.Thread):
                     sio.emit("global_data", DATA)
                     AVAILABLE = True
                     CHANGED = False
-                time.sleep(max(1/FPS - (time.time() - start_t), 0.005))
+                time.sleep(max(1/FPS - (time.time() - start_t), 0.001))
             else:
                 time.sleep(5)
 
