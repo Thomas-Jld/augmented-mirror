@@ -11,6 +11,9 @@ clear:
 build:
 	sudo nvidia-docker build -t $(IMNAME) .
 
+push:
+	docker push ${IM_NAME}
+
 run:
 	-sudo nvidia-docker rm $(IMNAME)
 	sudo nvidia-docker run -d --expose 5000 --network="host" --privileged --volume=/dev:/dev --name=$(IMNAME) $(IMNAME)
