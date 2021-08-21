@@ -1,5 +1,5 @@
 USER=thomasj27
-REPO=mirror_release_6
+REPO=mirror_release_7
 IMNAME = ${USER}/${REPO}
 
 delete:
@@ -21,7 +21,7 @@ run:
 launch:
 	-sudo nvidia-docker rm $(IMNAME)
 	sudo nvidia-docker run --expose 5000 --network="host" --privileged --volume=/dev:/dev --name=$(IMNAME) $(IMNAME)
-	
+
 restart:
 	sudo systemctl restart docker
 
