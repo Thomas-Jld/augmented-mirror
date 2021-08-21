@@ -1,17 +1,49 @@
 import threading
 import time
+from typing import List
 
 import numpy as np
 import socketio
 
+#* Home made hand signs : https://github.com/Thomas-Jld/gesture-recognition
+import get_hand_sign as ghs
+
+
 sio = socketio.Client(engineio_logger=False )
+
+color = None
+depth = None
+DATA = {
+    "face_mesh": [],
+    "body_pose": [],
+    "left_hand_pose": [],
+    "left_hand_sign": [],  #Tuple(SIGN, probability)
+    "right_hand_pose": [],
+    "right_hand_sign": [], #Tuple(SIGN, probability)
+    "eyes": [],
+}
+eyes = []
+threads = []
+
+FPS = 60
+NAP = 0.001
+
+PROJECT = True
+AVAILABLE = True
+CHANGED = True
+PAUSED = False
+
+WIDTH = 640
+HEIGHT = 480
+WINDOW = 0.8 # Reduce to focus on the middle # ! Not implemented
+
 
 
 """
 * Works as a queue to add data in the global DATA variable
 TODO: Use a real Queue instead of this function
 """
-def add_data(name, data):
+def add_data(name: str, data: List[List]) -> None:
     global AVAILABLE
     if not AVAILABLE:
         while not AVAILABLE:
@@ -25,18 +57,25 @@ def add_data(name, data):
 
 
 """
+* Normalize the data to fit the hand sign inout data
+"""
+def normalize_data(data: List[List]) -> List[List]:
+    return [[x/WIDTH, y/HEIGHT] for _, x, y, _ in data]
+
+
+"""
 (Thread)
 * Reads frames from the intel Realsense D435I Camera (color and depth frames)
 """
 class IntelVideoReader(object):
     def __init__(self):
         import pyrealsense2 as rs
-        
+
         self.pipe = rs.pipeline()
         config = rs.config()
 
-        self.width = 640
-        self.height = 480
+        self.width = WIDTH
+        self.height = HEIGHT
 
         config.enable_stream(rs.stream.depth, self.width, self.height, rs.format.z16, 30)
         config.enable_stream(rs.stream.color, self.width, self.height, rs.format.bgr8, 30)
@@ -69,6 +108,7 @@ class IntelVideoReader(object):
         return [color_frame, depth_frame]
         socketisocketioo
 
+
 """
 (Thread)
 * A class that reads frames from the webcam (color only)
@@ -92,7 +132,7 @@ class CameraVideoReader:
 
 """
 (Thread)
-* Reads frames using the 2 previous classes' functions 
+* Reads frames using the 2 previous classes' functions
 * and stores them into global variables. (global) depth will be none if
 * the camera isn't the D435
 """
@@ -110,10 +150,10 @@ class FrameProvider(threading.Thread):
         -------------------------------------
         """)
         while 1:
-            global color 
+            global color
             global depth
             color, depth = self.feed.next_frame() #Updates global variales
-            time.sleep(1/(2*FPS)) # Runs faster to be sure to get the 
+            time.sleep(1/(2*FPS)) # Runs faster to be sure to get the
 
 
 """
@@ -183,6 +223,7 @@ class BodyMeshProvider(threading.Thread):
             dt = 1/FPS - (end_t - start_t) if (end_t - start_t) < 1/FPS else 0.01
             time.sleep(dt)
 
+
 """
 (Thread)
 * Hands from mediapipe
@@ -211,10 +252,11 @@ class HandsProvider(threading.Thread):
             if color is not None:
                 self.data = gh.find_hand_pose(self.hands, color)
                 add_data("hands_pose", self.data)
-            
+
             end_t = time.time()
             dt = 1/FPS - (end_t - start_t) if (end_t - start_t) < 1/FPS else 0.01
             time.sleep(dt)
+
 
 """
 (Thread)
@@ -227,9 +269,7 @@ class FaceProvider(threading.Thread):
 
         threading.Thread.__init__(self)
         self.threadID = threadID
-        self.feed = 
-
-
+        self.feed = feed
         self.faces = gf.init()
 
     def run(self):
@@ -245,12 +285,13 @@ class FaceProvider(threading.Thread):
 
             if color is not None:
                 self.data = gf.find_face_mesh(self.faces, color)
-                
+
                 add_data("face_mesh", self.data)
-            
+
             end_t = time.time()
-            dt = max(1/FPS - (end_t - start_t), 0.005)
+            dt = max(1/FPS - (end_t - start_t), 0.001)
             time.sleep(dt)
+
 
 """
 (Thread)
@@ -276,7 +317,6 @@ class HolisticProvider(threading.Thread):
         Holistic running
         -------------------------------------
         """)
-        global PAUSED
         global CHANGED
         while 1:
             if not PAUSED:
@@ -291,41 +331,55 @@ class HolisticProvider(threading.Thread):
 
                         body = project(self.data["body_pose"], eyes, self.feed, depth, 4)
                         add_data("body_pose", body)
-                        add_data("right_hand_pose", 
+                        add_data("right_hand_pose",
                             project(
-                                self.data["right_hand_pose"], 
-                                eyes, 
-                                self.feed, 
-                                depth, 2, 
+                                self.data["right_hand_pose"],
+                                eyes,
+                                self.feed,
+                                depth, 2,
                                 body[15][-1]
                             )
                         )
-                        add_data("left_hand_pose", 
+                        add_data("right_hand_sign",
+                            ghs.find_gesture(
+                                sign_provider,
+                                normalize_data(self.data["right_hand_pose"])
+                            )
+                        )
+                        add_data("left_hand_pose",
                             project(
-                                self.data["left_hand_pose"], 
-                                eyes, 
-                                self.feed, 
-                                depth, 
-                                2, 
+                                self.data["left_hand_pose"],
+                                eyes,
+                                self.feed,
+                                depth,
+                                2,
                                 body[16][-1]
                             )
                         )
-                        add_data("face_mesh", 
+                        add_data("left_hand_sign",
+                            ghs.find_gesture(
+                                sign_provider,
+                                normalize_data(self.data["left_hand_pose"])
+                            )
+                        )
+                        add_data("face_mesh",
                             project(
-                                self.data["face_mesh"], 
-                                eyes, 
-                                self.feed, 
-                                depth, 
-                                2, 
+                                self.data["face_mesh"],
+                                eyes,
+                                self.feed,
+                                depth,
+                                2,
                                 body[2][-1]
                             )
                         )
-                
+
                 end_t = time.time()
-                dt = max(1/FPS - (end_t - start_t), 0.005)
+                print(f"Infer time: {(end_t - start_t)*1000}ms")
+                dt = max(1/FPS - (end_t - start_t), 0.001)
                 time.sleep(dt)
             else:
                 time.sleep(5)
+
 
 """
 (Thread)
@@ -350,7 +404,6 @@ class PifpafProvider(threading.Thread):
         Pifpaf running
         -------------------------------------
         """)
-        global PAUSED
         global CHANGED
         while 1:
             if not PAUSED:
@@ -364,41 +417,53 @@ class PifpafProvider(threading.Thread):
 
                         body = project(self.data["body_pose"], eyes, self.feed, depth, 4)
                         add_data("body_pose", body)
-                        add_data("right_hand_pose", 
+                        add_data("right_hand_pose",
                             project(
                                 self.data["right_hand_pose"], # Data to project
                                 eyes,                         # POV for reflection
-                                self.feed,                    # Data of thze cam
+                                self.feed,                    # Data from the camera
                                 depth,                        # Depth map
                                 2,                            # Size of the are to sample from
-                                body[9][-1]                   # (Optionnal) Distance to use instead of the real one 
+                                body[9][-1]                   # (Optionnal) Distance to use instead of the real one
                             )
                         )
-                        add_data("left_hand_pose", 
+                        add_data("right_hand_sign",
+                            ghs.find_gesture(
+                                sign_provider,
+                                normalize_data(self.data["right_hand_pose"])
+                            )
+                        )
+                        add_data("left_hand_pose",
                             project(
-                                self.data["left_hand_pose"], 
-                                eyes, 
-                                self.feed, 
-                                depth, 
-                                2, 
+                                self.data["left_hand_pose"],
+                                eyes,
+                                self.feed,
+                                depth,
+                                2,
                                 body[10][-1]
                             )
                         )
-                        add_data("face_mesh", 
+                        add_data("left_hand_sign",
+                            ghs.find_gesture(
+                                sign_provider,
+                                normalize_data(self.data["left_hand_pose"])
+                            )
+                        )
+                        add_data("face_mesh",
                             project(
-                                self.data["face_mesh"], 
-                                eyes, 
-                                self.feed, 
-                                depth, 
-                                2, 
+                                self.data["face_mesh"],
+                                eyes,
+                                self.feed,
+                                depth,
+                                2,
                                 body[0][-1]
                             )
                         )
 
-                time.sleep(max(1/FPS - (time.time() - start_t), 0.005))
+                time.sleep(max(1/FPS - (time.time() - start_t), 0.001))
             else:
                 time.sleep(5)
-            
+
 
 """
 * Sends data to the server
@@ -417,7 +482,6 @@ class SendData(threading.Thread):
         -------------------------------------
         """)
         while 1:
-            global PAUSED
             if not PAUSED:
                 start_t = time.time()
 
@@ -433,7 +497,7 @@ class SendData(threading.Thread):
                     sio.emit("global_data", DATA)
                     AVAILABLE = True
                     CHANGED = False
-                time.sleep(max(1/FPS - (time.time() - start_t), 0.005))
+                time.sleep(max(1/FPS - (time.time() - start_t), 0.001))
             else:
                 time.sleep(5)
 
@@ -468,12 +532,12 @@ def connect():
     feed = IntelVideoReader()
 
     camThread = FrameProvider("frame", feed)
-    
+
     Threads = []
     for name in functionalities:
         if functionalities[name][0]:
             Threads.append(functionalities[name][1](name, feed))
-        
+
     print(
     """
     -------------------------------------
@@ -490,24 +554,5 @@ def connect():
 
 
 if __name__ == '__main__':
-    color = None
-    depth = None
-    DATA = {
-        "face_mesh": [],
-        "body_pose": [],
-        "left_hand_pose": [],
-        "right_hand_pose": [],
-        "eyes": [],
-    }
-    eyes = []
-    threads = []
-
-    FPS = 60
-    NAP = 0.001
-
-    PROJECT = True
-    AVAILABLE = True
-    CHANGED = True
-    PAUSED = False
-    
+    sign_provider = ghs.init()
     sio.connect('http://0.0.0.0:5000')
