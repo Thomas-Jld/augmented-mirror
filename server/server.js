@@ -5,6 +5,8 @@ let body_pose = [];
 let face_mesh = [];
 let right_hand_pose = [];
 let left_hand_pose = [];
+let right_hand_sign = [];
+let left_hand_sign = [];
 
 let origin;
 let apps = [];
@@ -29,14 +31,16 @@ io.on('connect', socket => {
     apps.push(socket);
     console.log("new app: " + socket.id)
   }
-  
+
 
   socket.emit('greetings', "Hi !");
 
   socket.on('global_data', (data) => {
     body_pose = data["body_pose"];
     right_hand_pose = data["right_hand_pose"];
+    right_hand_sign = data["right_hand_sign"];
     left_hand_pose = data["left_hand_pose"];
+    left_hand_sign = data["left_hand_pose"];
     face_mesh = data["face_mesh"];
     // console.log(data);
   });
@@ -55,6 +59,14 @@ io.on('connect', socket => {
 
   socket.on('get_left_hand', (data) => {
     socket.emit('send_left_hand', left_hand_pose);
+  });
+
+  socket.on('get_right_hand_sign', (data) => {
+    socket.emit('send_right_hand_sign', right_hand_sign);
+  });
+
+  socket.on('get_left_hand_sign', (data) => {
+    socket.emit('send_left_hand_sign', left_hand_sign);
   });
 
   socket.on('pause', (data) => {
