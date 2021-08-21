@@ -11,4 +11,4 @@ av==8.0.2
 scipy==1.5.4
 sklearn
 setuptools
-openpifpaf
+torch

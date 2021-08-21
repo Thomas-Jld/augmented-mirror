@@ -24,18 +24,18 @@ def find_all_poses(holistic, frame):
             body_landmarks.append([
                 0,
                 j,
-                int(landmark.x*frame.shape[1]), 
+                int(landmark.x*frame.shape[1]),
                 int(landmark.y*frame.shape[0]),
                 ])
-    
+
     faces_landmarks = []
 
     if results.face_landmarks:
         for j, landmark in enumerate(results.face_landmarks.landmark):
             faces_landmarks.append([
-                0, 
-                j, 
-                int(landmark.x*frame.shape[1]), 
+                0,
+                j,
+                int(landmark.x*frame.shape[1]),
                 int(landmark.y*frame.shape[0]),
             ])
 
@@ -46,10 +46,10 @@ def find_all_poses(holistic, frame):
             left_hands_landmarks.append([
                 0,
                 j,
-                int(landmark.x*frame.shape[1]), 
+                int(landmark.x*frame.shape[1]),
                 int(landmark.y*frame.shape[0]),
                 ])
-                
+
     right_hands_landmarks = []
 
     if results.right_hand_landmarks:
@@ -57,11 +57,11 @@ def find_all_poses(holistic, frame):
             right_hands_landmarks.append([
                 0,
                 j,
-                int(landmark.x*frame.shape[1]), 
+                int(landmark.x*frame.shape[1]),
                 int(landmark.y*frame.shape[0]),
                 ])
 
-    return {"face_mesh": faces_landmarks, 
-            "body_pose": body_landmarks, 
-            "right_hand_pose": left_hands_landmarks, 
+    return {"face_mesh": faces_landmarks,
+            "body_pose": body_landmarks,
+            "right_hand_pose": left_hands_landmarks,
             "left_hand_pose": right_hands_landmarks,}

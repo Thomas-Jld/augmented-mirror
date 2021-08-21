@@ -18,9 +18,9 @@ def find_all_poses(predictor, frame):
     results = [ann.json_data() for ann in pred]
 
     if(len(results) == 0):
-        return {"face_mesh": [], 
-                "body_pose": [], 
-                "right_hand_pose": [], 
+        return {"face_mesh": [],
+                "body_pose": [],
+                "right_hand_pose": [],
                 "left_hand_pose": [],}
     else:
         results = results[0]["keypoints"]
@@ -34,7 +34,7 @@ def find_all_poses(predictor, frame):
             int(landmark[0]),
             int(landmark[1]),
             ])
-    
+
     faces_landmarks = []
     for j, landmark in enumerate(results[23: 91]):
         faces_landmarks.append([
@@ -62,8 +62,8 @@ def find_all_poses(predictor, frame):
             int(landmark[1]),
             ])
 
-    return {"face_mesh": faces_landmarks, 
-            "body_pose": body_landmarks, 
-            "right_hand_pose": left_hands_landmarks, 
+    return {"face_mesh": faces_landmarks,
+            "body_pose": body_landmarks,
+            "right_hand_pose": left_hands_landmarks,
             "left_hand_pose": right_hands_landmarks,}
     # return [[[x,y,c] for x,y,c in [part for part in ann.data]] for ann in pred]
