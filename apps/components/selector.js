@@ -6,6 +6,7 @@ let Selector = (sketch) => {
     sketch.activated = false;
     sketch.clickable = false;
     sketch.display_bubbles = false;
+    sketch.to_update = false;
 
     sketch.mx = 0;
     sketch.my = 0;
@@ -15,8 +16,8 @@ let Selector = (sketch) => {
     // sketch.rotation = 0;
     sketch.sliding = 0;
 
-    let description = `This is a Alpha version of an interractive mirror 
-                        interface integrating the user's reflection into 
+    let description = `This is a Alpha version of an interractive mirror
+                        interface integrating the user's reflection into
                         the informations displayed and the mirror's actions.`
 
     let icons = ["user.svg", "info.svg", "settings.svg"];
@@ -235,8 +236,8 @@ let Selector = (sketch) => {
                 if (this.slide == 0) {
                     sketch.fill(255);
                     sketch.stroke(255);
-                    sketch.triangle(this.rx, this.ry - this.per * this.h / 3, 
-                                    this.rx, this.ry + this.per * this.h / 3, 
+                    sketch.triangle(this.rx, this.ry - this.per * this.h / 3,
+                                    this.rx, this.ry + this.per * this.h / 3,
                                     this.rx - 1.7 * this.per * this.h / 3, this.ry);
                 }
             }

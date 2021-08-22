@@ -7,6 +7,7 @@ let Pose = (sketch) => {
     sketch.latched = false;
     sketch.activated = false;
     sketch.clickable = false;
+    sketch.to_update = true;
 
     sketch.show_particules = true;
     sketch.show_body_points = true;
@@ -21,14 +22,17 @@ let Pose = (sketch) => {
         sketch.y = p2;
         sketch.selfCanvas = sketch.createCanvas(sketch.width, sketch.height).position(sketch.x, sketch.y);
         // sketch.selfCanvas.hide();
-        
+
         sketch.pose = new Body("pose");
-        socket.on("send_pose", function (data) {
-            sketch.pose.body_pose = data;
-        });
 
         sketch.activated = true;
     };
+
+    sketch.update = (data) => {
+        if(data["body_pose"] != undefined){
+            sketch.pose.body_pose = data["body_pose"]
+        }
+    }
 
 
     sketch.show = () => {
@@ -99,11 +103,6 @@ let Pose = (sketch) => {
 
             this.name = name;
 
-            setInterval(this.get_update, 20);
-        }
-
-        get_update() {
-            socket.emit('get_pose', true);
         }
 
         show() {
@@ -135,7 +134,7 @@ let Pose = (sketch) => {
                     else{
                         x = width * (this.body_pose[i][2] - xoffset) / screenwidth;
                         y = height * (this.body_pose[i][3] - yoffset) / screenheight;
-    
+
                         this.body_pose_t.push([x, y]);
                     }
 

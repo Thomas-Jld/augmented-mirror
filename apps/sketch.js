@@ -21,6 +21,8 @@ let yoffset = 50;
 let screenwidth = 392.85; //millimeters
 let screenheight = 698.4;
 
+let global_data = {};
+
 function preload(){
     pikachu_model = loadModel("components/models/pikachu.obj");
 }
@@ -28,28 +30,32 @@ function preload(){
 function setup() {
     canvas = createCanvas(windowWidth, windowHeight);
 
-    socket = io.connect('http://0.0.0.0:5000');
-
-    frameRate(30);
+    frameRate(60);
 
     setTimeout(reshape, 1000);
+
+    socket = io.connect('http://0.0.0.0:5000');
+
+    socket.emit("update", true);
+    socket.on("global_data", function (data) {
+        global_data = data;
+    });
+
 }
 
 function draw() {
     background(0);
     if (started) {
-        modules.forEach(m => {
-            if (m.activated) {
-                m.show();
-                // if (m.latched) {
-                //     m.setPosition(mouseX - m.OffsetX, mouseY - m.OffsetY);
-                // }
+        modules.forEach(module => {
+            if (module.activated) {
+                if(module.to_update && global_data != {}){
+                    module.update(global_data);
+                }
+                module.show();
             }
         });
         selection();
-        // selector.cursor = [mouseX, mouseY];
-        // selector.mx = 200;
-        // selector.my = height/2;
+        socket.emit("update", true);
     }
 }
 
@@ -64,8 +70,10 @@ function selection(){
         selector.mx = hands.left_hand.hand_pose_t[8][0];
         selector.my = hands.left_hand.hand_pose_t[8][1];
         selector.cursor = hands.right_hand.hand_pose_t[8];
-        
-        pikachu.cursor = hands.right_hand.hand_pose_t[8] + [1];
+
+    }
+    if(hands.right_hand.hand_pose_t[8] != undefined){
+        pikachu.cursor = hands.right_hand.hand_pose_t[8].copyWithin().concat([100]);
     }
 }
 

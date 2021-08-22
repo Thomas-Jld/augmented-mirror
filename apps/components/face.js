@@ -5,6 +5,7 @@ let Faces = (sketch) => {
     sketch.latched = false;
     sketch.activated = false;
     sketch.clickable = false;
+    sketch.to_update = true;
 
     sketch.show_particules = true;
     sketch.show_face_points = true;
@@ -17,15 +18,17 @@ let Faces = (sketch) => {
         sketch.y = p2;
         sketch.selfCanvas = sketch.createCanvas(sketch.width, sketch.height).position(sketch.x, sketch.y);
         // sketch.selfCanvas.hide();
-        
+
         sketch.face = new Face("face");
-        socket.on("send_face", function (data) {
-            sketch.face.face_mesh = data;
-        });
 
         sketch.activated = true;
     };
 
+    sketch.update = (data) => {
+        if(data["face_mesh"] != undefined){
+            sketch.face.face_mesh = data["face_mesh"]
+        }
+    }
 
     sketch.show = () => {
         sketch.selfCanvas.clear();
@@ -76,15 +79,9 @@ let Faces = (sketch) => {
                 ]
             ];
 
-
             this.face_mesh = [];
             this.name = name;
 
-            setInterval(this.get_update, 40);
-        }
-
-        get_update() {
-            socket.emit('get_face', true);
         }
 
         show() {
@@ -94,12 +91,11 @@ let Faces = (sketch) => {
 
             let transposed = [];
             sketch.fill(200);
+            for(let i = 0; i < this.face_mesh.length; i++){
 
-            this.face_mesh.forEach(function (part) {
-
-                if (part.slice(2, 4) != [-1, -1]) {
-                    let x = width * (part[2] - xoffset) / screenwidth;
-                    let y = height * (part[3] - yoffset) / screenheight;
+                if (this.face_mesh[i].slice(2, 4) != [-1, -1]) {
+                    let x = width * (this.face_mesh[i][2] - xoffset) / screenwidth;
+                    let y = height * (this.face_mesh[i][3] - yoffset) / screenheight;
 
                     transposed.push([x, y]);
 
@@ -117,7 +113,7 @@ let Faces = (sketch) => {
                 } else {
                     transposed.push([0, 0])
                 }
-            });
+            };
 
             if (sketch.show_face_lines) {
                 this.show_lines(transposed);
