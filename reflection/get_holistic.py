@@ -9,8 +9,12 @@ def init():
     return mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5, smooth_landmarks=False)
 
 
-def find_all_poses(holistic, frame):
+def find_all_poses(holistic, frame, window):
     image = frame.copy()
+
+    min_width, max_width = int((0.5 - window/2)*frame.shape[1]), int((0.5 + window/2)*frame.shape[1])
+    image = image[:, min_width:max_width]
+
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
     image.flags.writeable = False
@@ -24,8 +28,8 @@ def find_all_poses(holistic, frame):
             body_landmarks.append([
                 0,
                 j,
-                int(landmark.x*frame.shape[1]),
-                int(landmark.y*frame.shape[0]),
+                min_width + int(landmark.x*image.shape[1]),
+                int(landmark.y*image.shape[0]),
                 ])
 
     faces_landmarks = []
@@ -35,8 +39,8 @@ def find_all_poses(holistic, frame):
             faces_landmarks.append([
                 0,
                 j,
-                int(landmark.x*frame.shape[1]),
-                int(landmark.y*frame.shape[0]),
+                min_width + int(landmark.x*image.shape[1]),
+                int(landmark.y*image.shape[0]),
             ])
 
     left_hands_landmarks = []
@@ -46,8 +50,8 @@ def find_all_poses(holistic, frame):
             left_hands_landmarks.append([
                 0,
                 j,
-                int(landmark.x*frame.shape[1]),
-                int(landmark.y*frame.shape[0]),
+                min_width + int(landmark.x*image.shape[1]),
+                int(landmark.y*image.shape[0]),
                 ])
 
     right_hands_landmarks = []
@@ -57,8 +61,8 @@ def find_all_poses(holistic, frame):
             right_hands_landmarks.append([
                 0,
                 j,
-                int(landmark.x*frame.shape[1]),
-                int(landmark.y*frame.shape[0]),
+                min_width + int(landmark.x*image.shape[1]),
+                int(landmark.y*image.shape[0]),
                 ])
 
     return {"face_mesh": faces_landmarks,

@@ -9,15 +9,17 @@ def init():
     return mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5)
 
 
-def find_body_pose(pose, frame):
+def find_body_pose(pose, frame, window):
     image = frame.copy()
+
+    min_width, max_width = int((0.5 - window/2)*frame.shape[1]), int((0.5 + window/2)*frame.shape[1])
+    image = image[:, min_width:max_width]
+
     image = cv2.cvtColor(cv2.flip(image, 1), cv2.COLOR_BGR2RGB)
 
     image.flags.writeable = False
 
-    pose = init()
     results = pose.process(image)
-    pose.close()
 
     body_landmarks = []
 
@@ -27,8 +29,8 @@ def find_body_pose(pose, frame):
                 body_landmarks.append([
                     i,
                     j,
-                    landmark.x*frame.shape[1], 
-                    landmark.y*frame.shape[0],
+                    min_width + landmark.x*image.shape[1],
+                    landmark.y*image.shape[0],
                     ])
 
     return body_landmarks

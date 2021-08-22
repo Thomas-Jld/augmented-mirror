@@ -27,17 +27,13 @@ global_data = {
 eyes = []
 threads = []
 
-FPS = 60
-NAP = 0.001
+FPS = 45
 
-PROJECT = True
-AVAILABLE = True
-CHANGED = True
 PAUSED = False
 
 WIDTH = 640
 HEIGHT = 480
-WINDOW = 0.8 # Reduce to focus on the middle # ! Not implemented
+WINDOW = 0.5 # Reduce to focus on the middle
 
 
 """
@@ -100,8 +96,8 @@ class IntelVideoReader(object):
 class CameraVideoReader:
     def __init__(self):
         import cv2 as cv
-        self.width = 640
-        self.height = 480
+        self.width = WIDTH
+        self.height = HEIGHT
         self.cap = cv.VideoCapture(0)
         self.cap.set(3,self.width)
         self.cap.set(4,self.height)
@@ -133,9 +129,9 @@ class FrameProvider(threading.Thread):
         Frame provider running
         -------------------------------------
         """)
+        global color
+        global depth
         while 1:
-            global color
-            global depth
             color, depth = self.feed.next_frame() #Updates global variales
             time.sleep(1/(2*FPS)) # Runs faster to be sure to get the
 
@@ -167,7 +163,7 @@ class BodyProvider(threading.Thread):
             start_t = time.time() # Used to mesure the elapsed time of each loop
 
             if color is not None and depth is not None:
-                self.data = gbp.find_body_pose(self.pose, color) # Infer on image, return keypoints
+                self.data = gbp.find_body_pose(self.pose, color, WINDOW) # Infer on image, return keypoints
 
                 global_data["body_pose"] = self.data
 
@@ -250,7 +246,7 @@ class HandsProvider(threading.Thread):
             start_t = time.time()
 
             if color is not None:
-                self.data = gh.find_hand_pose(self.hands, color)
+                self.data = gh.find_hand_pose(self.hands, color, WINDOW)
 
                 if bool(self.data):
                     global_data["right_hand_pose"] = self.data[0] #Arbitrary, for testing purposes
@@ -296,7 +292,7 @@ class FaceProvider(threading.Thread):
             start_t = time.time()
 
             if color is not None:
-                self.data = gf.find_face_mesh(self.faces, color)
+                self.data = gf.find_face_mesh(self.faces, color, WINDOW)
 
                 global_data["face_mesh"] = self.data
 
@@ -344,7 +340,7 @@ class HolisticProvider(threading.Thread):
                 start_t = time.time()
 
                 if color is not None and depth is not None:
-                    self.data = gh.find_all_poses(self.holistic, color)
+                    self.data = gh.find_all_poses(self.holistic, color, WINDOW)
 
                     if bool(self.data["body_pose"]):
                         eyes = self.data["body_pose"][0][2:4]
@@ -433,7 +429,7 @@ class PifpafProvider(threading.Thread):
             if not PAUSED:
                 start_t = time.time()
                 if color is not None and depth is not None:
-                    self.data = gpp.find_all_poses(self.processor, color)
+                    self.data = gpp.find_all_poses(self.processor, color, WINDOW)
 
                     if bool(self.data["body_pose"]):
                         eyes = self.data["body_pose"][0][2:4]

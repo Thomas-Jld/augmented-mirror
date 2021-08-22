@@ -13,8 +13,13 @@ def init():
     return predictor
 
 
-def find_all_poses(predictor, frame):
-    pred, _, meta = predictor.numpy_image(frame)
+def find_all_poses(predictor, frame, window):
+    image = frame.copy()
+
+    min_width, max_width = int((0.5 - window/2)*frame.shape[1]), int((0.5 + window/2)*frame.shape[1])
+    image = image[:, min_width:max_width]
+
+    pred, _, meta = predictor.numpy_image(image)
     results = [ann.json_data() for ann in pred]
 
     if(len(results) == 0):
@@ -31,7 +36,7 @@ def find_all_poses(predictor, frame):
         body_landmarks.append([
             0,
             j,
-            int(landmark[0]),
+            min_width + int(landmark[0]),
             int(landmark[1]),
             ])
 
@@ -40,7 +45,7 @@ def find_all_poses(predictor, frame):
         faces_landmarks.append([
             0,
             j,
-            int(landmark[0]),
+            min_width + int(landmark[0]),
             int(landmark[1]),
             ])
 
@@ -49,7 +54,7 @@ def find_all_poses(predictor, frame):
         left_hands_landmarks.append([
             0,
             j,
-            int(landmark[0]),
+            min_width + int(landmark[0]),
             int(landmark[1]),
             ])
 
@@ -58,7 +63,7 @@ def find_all_poses(predictor, frame):
         right_hands_landmarks.append([
             0,
             j,
-            int(landmark[0]),
+            min_width + int(landmark[0]),
             int(landmark[1]),
             ])
 
