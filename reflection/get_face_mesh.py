@@ -1,4 +1,4 @@
-# Source : https://google.github.io/mediapipe/solutions/face_mesh.html 
+# Source : https://google.github.io/mediapipe/solutions/face_mesh.html
 
 import cv2
 import mediapipe as mp
@@ -23,12 +23,12 @@ def find_face_mesh(face, frame):
 
     if results.multi_face_landmarks:
         for i, faces in enumerate(results.multi_face_landmarks):
-            for j, face_landmarks in enumerate(faces.landmark):  
+            for j, face_landmarks in enumerate(faces.landmark):
                 faces_landmarks.append([
-                    i, 
-                    j, 
-                    face_landmarks.x*frame.shape[1], 
+                    i,
+                    j,
+                    face_landmarks.x*frame.shape[1],
                     face_landmarks.y*frame.shape[0],
                 ])
-    
+
     return faces_landmarks
