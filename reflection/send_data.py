@@ -44,7 +44,6 @@ def normalize_data(data: List[List]) -> List[List]:
 
 
 """
-(Thread)
 * Reads frames from the intel Realsense D435I Camera (color and depth frames)
 """
 class IntelVideoReader(object):
@@ -90,7 +89,6 @@ class IntelVideoReader(object):
 
 
 """
-(Thread)
 * A class that reads frames from the webcam (color only)
 """
 class CameraVideoReader:
