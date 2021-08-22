@@ -114,7 +114,7 @@ class CameraVideoReader:
 (Thread)
 * Reads frames using the 2 previous classes' functions
 * and stores them into global variables. (global) depth will be none if
-* the camera isn't the D435
+* the camera isn't the Intel D435
 """
 class FrameProvider(threading.Thread):
     def __init__(self, threadID, feed):
@@ -133,7 +133,7 @@ class FrameProvider(threading.Thread):
         global depth
         while 1:
             color, depth = self.feed.next_frame() #Updates global variales
-            time.sleep(1/(2*FPS)) # Runs faster to be sure to get the
+            time.sleep(1/(2*FPS)) # Runs faster to be sure to get the current frame
 
 
 """
@@ -172,8 +172,8 @@ class BodyProvider(threading.Thread):
                 data_queue.put(global_data)
 
             end_t = time.time()
-            dt = 1/FPS - (end_t - start_t) if (end_t - start_t) < 1/FPS else 0.01
-            time.sleep(dt) # Sleeps for 1/FPS (e.g: 33ms if FPS=60) if the code is fast enough, else 10 ms
+            dt = max(1/FPS - (end_t - start_t), 0.001)
+            time.sleep(dt) # Sleeps for 1/FPS (e.g: 33ms if FPS=60) if the code is fast enough, else 1 ms
 
 
 """
@@ -211,7 +211,7 @@ class BodyMeshProvider(threading.Thread):
                 data_queue.put(global_data)
 
             end_t = time.time()
-            dt = 1/FPS - (end_t - start_t) if (end_t - start_t) < 1/FPS else 0.01
+            dt = max(1/FPS - (end_t - start_t), 0.001)
             time.sleep(dt)
 
 
@@ -260,7 +260,7 @@ class HandsProvider(threading.Thread):
                     data_queue.put(global_data)
 
             end_t = time.time()
-            dt = 1/FPS - (end_t - start_t) if (end_t - start_t) < 1/FPS else 0.01
+            dt = max(1/FPS - (end_t - start_t), 0.001)
             time.sleep(dt)
 
 
