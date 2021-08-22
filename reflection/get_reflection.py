@@ -1,16 +1,19 @@
 import numpy as np
 import pyrealsense2 as rs
 import math
+from typing import List
 
 theta = math.radians(13.8)
 
 def get_depth(point: list, depth_frame, r: int) -> float:
-    x = int(point[0])
-    y = int(point[1])
-    x = x if x >= 0 else 0
-    x = x if x < len(depth_frame[0]) else len(depth_frame[0])
-    y = y if y >= 0 else 0
-    y = y if y < len(depth_frame) else len(depth_frame)
+    x = min(max(int(point[0]), 0), len(depth_frame[0]))
+    y = min(max(int(point[1]), 0), len(depth_frame))
+    # x = int(point[0])
+    # y = int(point[1])
+    # x = x if x >= 0 else 0
+    # x = x if x < len(depth_frame[0]) else len(depth_frame[0])
+    # y = y if y >= 0 else 0
+    # y = y if y < len(depth_frame) else len(depth_frame)
 
     try:
         return np.float64(np.min(depth_frame[max(y - r, 0) : min(y + r, len(depth_frame)), max(x - r, 0) : min(x + r, len(depth_frame[0]))]))
@@ -25,12 +28,12 @@ def map_location(point: list, eyes: list, video_provider, depth_frame, ref, r: i
     db = get_depth(point, depth_frame, r) if ref == 0 else ref # Depth of the point
 
     xa, ya, za = rs.rs2_deproject_pixel_to_point(
-        video_provider.depth_intrinsics, 
-        eyes , 
+        video_provider.depth_intrinsics,
+        eyes ,
         da)
     xb, yb, zb = rs.rs2_deproject_pixel_to_point(
-        video_provider.color_intrinsics, 
-        point, 
+        video_provider.color_intrinsics,
+        point,
         db)
 
     ya = ya*math.cos(theta) + za*math.sin(theta)
@@ -47,7 +50,7 @@ def map_location(point: list, eyes: list, video_provider, depth_frame, ref, r: i
 
     return [-1, -1]
 
-def project(points: list, eyes: list, video_provider, depth_frame, r, ref = 0):
+def project(points: List[List], eyes: list, video_provider, depth_frame, r, ref = 0) -> List[List]:
     projected = []
     for i, point in enumerate(points):
         if bool(point[2:4]):
