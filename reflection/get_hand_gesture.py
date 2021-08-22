@@ -6,18 +6,20 @@ import mediapipe as mp
 
 def init():
     mp_hands = mp.solutions.hands
-    return mp_hands.Hands(min_detection_confidence=0.5, min_tracking_confidence=0.4)
+    return mp_hands.Hands(min_detection_confidence=0.5, min_tracking_confidence=0.6)
 
 
-def find_hand_pose(hands, frame):
+def find_hand_pose(hands, frame, window):
     image = frame.copy()
+
+    min_width, max_width = int((0.5 - window/2)*frame.shape[1]), int((0.5 + window/2)*frame.shape[1])
+    image = image[:, min_width:max_width]
+
     image = cv2.cvtColor(cv2.flip(image, 1), cv2.COLOR_BGR2RGB)
 
     image.flags.writeable = False
 
-    hands = init()
     results = hands.process(image)
-    hands.close()
 
     hands_landmarks = []
 
@@ -28,8 +30,8 @@ def find_hand_pose(hands, frame):
                 hands_landmarks[-1].append([
                     i,
                     j,
-                    landmark.x*frame.shape[0],
-                    landmark.y*frame.shape[1],
+                    (landmark.x - .5)*image.shape[1],
+                    landmark.y*image.shape[0],
                     ])
 
     return hands_landmarks

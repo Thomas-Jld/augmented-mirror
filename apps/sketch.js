@@ -22,6 +22,7 @@ let screenwidth = 392.85; //millimeters
 let screenheight = 698.4;
 
 let global_data = {};
+let available = false;
 
 function preload(){
     pikachu_model = loadModel("components/models/pikachu.obj");
@@ -30,7 +31,7 @@ function preload(){
 function setup() {
     canvas = createCanvas(windowWidth, windowHeight);
 
-    frameRate(60);
+    frameRate(40);
 
     setTimeout(reshape, 1000);
 
@@ -39,6 +40,7 @@ function setup() {
     socket.emit("update", true);
     socket.on("global_data", function (data) {
         global_data = data;
+        available = true
     });
 
 }
@@ -55,7 +57,10 @@ function draw() {
             }
         });
         selection();
-        socket.emit("update", true);
+        if(available){
+            socket.emit("update", true);
+            available = false;
+        }
     }
 }
 
