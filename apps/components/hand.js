@@ -10,6 +10,7 @@ let Hands = (sketch) => {
     sketch.latched = false;
     sketch.activated = false;
     sketch.clickable = false;
+    sketch.to_update = true;
 
     sketch.show_particules = false;
     sketch.show_hands_points = true;
@@ -29,24 +30,18 @@ let Hands = (sketch) => {
         sketch.right_hand = new Hand("get_right_hand");
         sketch.left_hand = new Hand("get_left_hand");
 
-        setInterval(() => {
-            socket.emit("get_right_hand", true);
-        }, 20);
-        socket.on("send_right_hand", function (data) {
-            sketch.right_hand_data = data;
-        });
-
-        setInterval(() => {
-            socket.emit("get_left_hand", true);
-        }, 20);
-        socket.on("send_left_hand", function (data) {
-            sketch.left_hand_data = data;
-        });
-
         sketch.colorMode(HSB);
         sketch.activated = true;
     };
 
+    sketch.update = (data) => {
+        if(data["right_hand_pose"] != undefined){
+            sketch.right_hand_data = data["right_hand_pose"]
+        }
+        if(data["left_hand_pose"] != undefined){
+            sketch.left_hand_data = data["left_hand_pose"]
+        }
+    }
 
     sketch.show = () => {
         sketch.selfCanvas.clear();
@@ -113,7 +108,7 @@ let Hands = (sketch) => {
             ];
 
             this.hand_pose = [];
-            this.hand_pose_t = []; //After projection 
+            this.hand_pose_t = []; //After projection
             this.hand_name = hand_name;
         }
 
@@ -132,9 +127,9 @@ let Hands = (sketch) => {
                     if (this.hand_pose_t.length == this.hand_pose.length){
                         newx = width * (this.hand_pose[i][2] - xoffset) / screenwidth;
                         newy = height * (this.hand_pose[i][3] - yoffset) / screenheight;
-                        if(newy > 0 || this.hand_pose_t[i][1] < 10){
-                            x = lerp(this.hand_pose_t[i][0], newx, 0.75);
-                            y = lerp(this.hand_pose_t[i][1], newy, 0.75);
+                        if(newy > 0){
+                            x = lerp(this.hand_pose_t[i][0], newx, 0.8);
+                            y = lerp(this.hand_pose_t[i][1], newy, 0.8);
                         }
                         else{ // Assume it's an artifact and slows the update
                             x = lerp(this.hand_pose_t[i][0], newx, 0.01);
@@ -160,9 +155,9 @@ let Hands = (sketch) => {
                     //     sketch.ellipse(x, y, 10);
                     //     //sketch.text(part, x + 20, y + 20);
                     // }
-                } 
+                }
             }
-            
+
             if (sketch.show_hands_lines && this.hand_pose_t != []) {
                 this.show_lines();
             }

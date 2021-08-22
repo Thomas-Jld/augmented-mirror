@@ -1,6 +1,6 @@
 let HeartBubble = (sketch) => {
   sketch.name = "heart";
-  
+
   let Balloon;
   let Balls = [];
 
@@ -8,6 +8,7 @@ let HeartBubble = (sketch) => {
   sketch.latched = false;
   sketch.activated = false;
   sketch.clickable = true;
+  sketch.to_update = false;
 
   sketch.set = (p1, p2, w, h) => {
     sketch.width = w;

@@ -12,6 +12,7 @@ let Multiplications = (sketch) => {
   sketch.latched = false;
   sketch.activated = false;
   sketch.clickable = false;
+  sketch.to_update = false;
 
   sketch.set = (p1, p2, w, h) => {
     sketch.width = w;
