@@ -2,7 +2,10 @@ from typing import List
 
 import torch
 import torch.nn as nn
+import os
 
+dir_path = os.path.dirname(os.path.realpath(__file__))
+model_path = os.path.join(dir_path, 'models/handsign.pt')
 
 SIGNS = {
     "0": "OK",
@@ -51,7 +54,7 @@ class signclassifier(nn.Module):
 def init(device: str = "cuda"):
     model = signclassifier().to(device).eval()
     try:
-        model.load_state_dict(torch.load("models/handsign.pt"))
+        model.load_state_dict(torch.load(model_path))
     except:
         print("No model saved")
         return
