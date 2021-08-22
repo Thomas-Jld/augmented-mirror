@@ -1,25 +1,27 @@
 import threading
 import time
+from queue import Queue
 from typing import List
 
+import eventlet
 import numpy as np
 import socketio
 
-#* Home made hand signs : https://github.com/Thomas-Jld/gesture-recognition
-import get_hand_sign as ghs
 
-
-sio = socketio.Client(engineio_logger=False )
+sio = socketio.Server(logger=False, cors_allowed_origins='*')
+app = socketio.WSGIApp(sio)
 
 color = None
 depth = None
-DATA = {
+
+data_queue = Queue(1)
+global_data = {
     "face_mesh": [],
     "body_pose": [],
     "left_hand_pose": [],
-    "left_hand_sign": [],  #Tuple(SIGN, probability)
+    "left_hand_sign": [],  #[SIGN, probability]
     "right_hand_pose": [],
-    "right_hand_sign": [], #Tuple(SIGN, probability)
+    "right_hand_sign": [], #[SIGN, probability]
     "eyes": [],
 }
 eyes = []
@@ -38,29 +40,11 @@ HEIGHT = 480
 WINDOW = 0.8 # Reduce to focus on the middle # ! Not implemented
 
 
-
-"""
-* Works as a queue to add data in the global DATA variable
-TODO: Use a real Queue instead of this function
-"""
-def add_data(name: str, data: List[List]) -> None:
-    global AVAILABLE
-    if not AVAILABLE:
-        while not AVAILABLE:
-            time.sleep(NAP)
-    else:
-        AVAILABLE = False
-
-    DATA[name] = data
-
-    AVAILABLE = True
-
-
 """
 * Normalize the data to fit the hand sign inout data
 """
 def normalize_data(data: List[List]) -> List[List]:
-    return [[x/WIDTH, y/HEIGHT] for _, x, y, _ in data]
+    return [[x/WIDTH, y/HEIGHT] for _, _, x, y in data]
 
 
 """
@@ -177,13 +161,19 @@ class BodyProvider(threading.Thread):
         -------------------------------------
         """)
         self.pose = gbp.init()
+
+        global global_data
         while 1:
             start_t = time.time() # Used to mesure the elapsed time of each loop
 
             if color is not None and depth is not None:
                 self.data = gbp.find_body_pose(self.pose, color) # Infer on image, return keypoints
 
-                add_data("body_pose", self.data) # Stores the data through the availability queue
+                global_data["body_pose"] = self.data
+
+                if not data_queue.empty():
+                    data_queue.get()
+                data_queue.put(global_data)
 
             end_t = time.time()
             dt = 1/FPS - (end_t - start_t) if (end_t - start_t) < 1/FPS else 0.01
@@ -211,13 +201,18 @@ class BodyMeshProvider(threading.Thread):
         -------------------------------------
         """)
 
+        global global_data
         while 1:
             start_t = time.time()
 
             if color is not None:
                 self.data = gm.infere_on_image(color)
 
-                add_data("body_mesh", self.data)
+                global_data["body_mesh"] = self.data
+
+                if not data_queue.empty():
+                    data_queue.get()
+                data_queue.put(global_data)
 
             end_t = time.time()
             dt = 1/FPS - (end_t - start_t) if (end_t - start_t) < 1/FPS else 0.01
@@ -232,26 +227,41 @@ class BodyMeshProvider(threading.Thread):
 class HandsProvider(threading.Thread):
     def __init__(self, threadID, feed):
         import get_hand_gesture as gh
+        import get_hand_sign as ghs
 
         threading.Thread.__init__(self)
         self.threadID = threadID
         self.feed = feed
         self.hands = gh.init()
+        self.sign_provider = ghs.init()
 
     def run(self):
         import get_hand_gesture as gh
+        import get_hand_sign as ghs
         print(
         """
         -------------------------------------
         Hands provider running
         -------------------------------------
         """)
+
+        global global_data
         while 1:
             start_t = time.time()
 
             if color is not None:
                 self.data = gh.find_hand_pose(self.hands, color)
-                add_data("hands_pose", self.data)
+
+                if bool(self.data):
+                    global_data["right_hand_pose"] = self.data[0] #Arbitrary, for testing purposes
+                    global_data["right_hand_sign"] = ghs.find_gesture(
+                        self.sign_provider,
+                        normalize_data(self.data[0])
+                    )
+
+                    if not data_queue.empty():
+                        data_queue.get()
+                    data_queue.put(global_data)
 
             end_t = time.time()
             dt = 1/FPS - (end_t - start_t) if (end_t - start_t) < 1/FPS else 0.01
@@ -280,13 +290,19 @@ class FaceProvider(threading.Thread):
         Face mesh running
         -------------------------------------
         """)
+
+        global global_data
         while 1:
             start_t = time.time()
 
             if color is not None:
                 self.data = gf.find_face_mesh(self.faces, color)
 
-                add_data("face_mesh", self.data)
+                global_data["face_mesh"] = self.data
+
+                if not data_queue.empty():
+                    data_queue.get()
+                data_queue.put(global_data)
 
             end_t = time.time()
             dt = max(1/FPS - (end_t - start_t), 0.001)
@@ -302,14 +318,18 @@ TODO: Crop the image to only get the center, focusing on the right person
 class HolisticProvider(threading.Thread):
     def __init__(self, threadID, feed):
         import get_holistic as gh
+        import get_hand_sign as ghs
 
         threading.Thread.__init__(self)
         self.threadID = threadID
         self.feed = feed
         self.holistic = gh.init()
+        self.sign_provider = ghs.init()
 
     def run(self):
         import get_holistic as gh
+        #* Home made hand signs : https://github.com/Thomas-Jld/gesture-recognition
+        import get_hand_sign as ghs
         from get_reflection import project
         print(
         """
@@ -317,7 +337,8 @@ class HolisticProvider(threading.Thread):
         Holistic running
         -------------------------------------
         """)
-        global CHANGED
+
+        global global_data
         while 1:
             if not PAUSED:
                 start_t = time.time()
@@ -326,28 +347,25 @@ class HolisticProvider(threading.Thread):
                     self.data = gh.find_all_poses(self.holistic, color)
 
                     if bool(self.data["body_pose"]):
-                        CHANGED = True
                         eyes = self.data["body_pose"][0][2:4]
 
                         body = project(self.data["body_pose"], eyes, self.feed, depth, 4)
-                        add_data("body_pose", body)
-                        add_data("right_hand_pose",
-                            project(
+                        global_data["body_pose"] = body
+
+                        global_data["right_hand_pose"] = project(
                                 self.data["right_hand_pose"],
                                 eyes,
                                 self.feed,
                                 depth, 2,
                                 body[15][-1]
                             )
-                        )
-                        add_data("right_hand_sign",
-                            ghs.find_gesture(
-                                sign_provider,
+
+                        global_data["right_hand_sign"] = ghs.find_gesture(
+                                self.sign_provider,
                                 normalize_data(self.data["right_hand_pose"])
                             )
-                        )
-                        add_data("left_hand_pose",
-                            project(
+
+                        global_data["left_hand_pose"] = project(
                                 self.data["left_hand_pose"],
                                 eyes,
                                 self.feed,
@@ -355,15 +373,13 @@ class HolisticProvider(threading.Thread):
                                 2,
                                 body[16][-1]
                             )
-                        )
-                        add_data("left_hand_sign",
-                            ghs.find_gesture(
-                                sign_provider,
+
+                        global_data["left_hand_sign"] = ghs.find_gesture(
+                                self.sign_provider,
                                 normalize_data(self.data["left_hand_pose"])
                             )
-                        )
-                        add_data("face_mesh",
-                            project(
+
+                        global_data["face_mesh"] = project(
                                 self.data["face_mesh"],
                                 eyes,
                                 self.feed,
@@ -371,7 +387,10 @@ class HolisticProvider(threading.Thread):
                                 2,
                                 body[2][-1]
                             )
-                        )
+
+                        if not data_queue.empty():
+                            data_queue.get()
+                        data_queue.put(global_data)
 
                 end_t = time.time()
                 print(f"Infer time: {(end_t - start_t)*1000}ms")
@@ -389,14 +408,18 @@ TODO: Select the person
 class PifpafProvider(threading.Thread):
     def __init__(self, threadID, feed):
         import get_pifpaf as gpp
+        #* Home made hand signs : https://github.com/Thomas-Jld/gesture-recognition
+        import get_hand_sign as ghs
 
         threading.Thread.__init__(self)
         self.threadID = threadID
         self.feed = feed
         self.processor = gpp.init()
+        self.sign_provider = ghs.init()
 
     def run(self):
         import get_pifpaf as gpp
+        import get_hand_sign as ghs
         from get_reflection import project
         print(
         """
@@ -404,7 +427,8 @@ class PifpafProvider(threading.Thread):
         Pifpaf running
         -------------------------------------
         """)
-        global CHANGED
+
+        global global_data
         while 1:
             if not PAUSED:
                 start_t = time.time()
@@ -412,13 +436,12 @@ class PifpafProvider(threading.Thread):
                     self.data = gpp.find_all_poses(self.processor, color)
 
                     if bool(self.data["body_pose"]):
-                        CHANGED = True
                         eyes = self.data["body_pose"][0][2:4]
 
                         body = project(self.data["body_pose"], eyes, self.feed, depth, 4)
-                        add_data("body_pose", body)
-                        add_data("right_hand_pose",
-                            project(
+                        global_data["body_pose"] = body
+
+                        global_data["right_hand_pose"] = project(
                                 self.data["right_hand_pose"], # Data to project
                                 eyes,                         # POV for reflection
                                 self.feed,                    # Data from the camera
@@ -426,15 +449,13 @@ class PifpafProvider(threading.Thread):
                                 2,                            # Size of the are to sample from
                                 body[9][-1]                   # (Optionnal) Distance to use instead of the real one
                             )
-                        )
-                        add_data("right_hand_sign",
-                            ghs.find_gesture(
-                                sign_provider,
+
+                        global_data["right_hand_sign"] = ghs.find_gesture(
+                                self.sign_provider,
                                 normalize_data(self.data["right_hand_pose"])
                             )
-                        )
-                        add_data("left_hand_pose",
-                            project(
+
+                        global_data["left_hand_pose"] = project(
                                 self.data["left_hand_pose"],
                                 eyes,
                                 self.feed,
@@ -442,15 +463,13 @@ class PifpafProvider(threading.Thread):
                                 2,
                                 body[10][-1]
                             )
-                        )
-                        add_data("left_hand_sign",
-                            ghs.find_gesture(
-                                sign_provider,
+
+                        global_data["left_hand_sign"] = ghs.find_gesture(
+                                self.sign_provider,
                                 normalize_data(self.data["left_hand_pose"])
                             )
-                        )
-                        add_data("face_mesh",
-                            project(
+
+                        global_data["face_mesh"] = project(
                                 self.data["face_mesh"],
                                 eyes,
                                 self.feed,
@@ -458,7 +477,10 @@ class PifpafProvider(threading.Thread):
                                 2,
                                 body[0][-1]
                             )
-                        )
+
+                        if not data_queue.empty():
+                            data_queue.get()
+                        data_queue.put(global_data)
 
                 time.sleep(max(1/FPS - (time.time() - start_t), 0.001))
             else:
@@ -466,40 +488,12 @@ class PifpafProvider(threading.Thread):
 
 
 """
-* Sends data to the server
-TODO: Replace this complicated global variable mess with a simple queue.
+* Sends data to the client when requested
 """
-class SendData(threading.Thread):
-    def __init__(self, threadID):
-        threading.Thread.__init__(self)
-        self.threadID = threadID
-
-    def run(self):
-        print(
-        """
-        -------------------------------------
-        Data sender running
-        -------------------------------------
-        """)
-        while 1:
-            if not PAUSED:
-                start_t = time.time()
-
-                global CHANGED
-                if CHANGED:
-                    global AVAILABLE
-                    if not AVAILABLE:
-                        while not AVAILABLE:
-                            time.sleep(NAP)
-                    else:
-                        AVAILABLE = False
-
-                    sio.emit("global_data", DATA)
-                    AVAILABLE = True
-                    CHANGED = False
-                time.sleep(max(1/FPS - (time.time() - start_t), 0.001))
-            else:
-                time.sleep(5)
+@sio.on('update')
+def update(*args):
+    data = data_queue.get()
+    sio.emit("global_data", global_data)
 
 
 @sio.on('pause')
@@ -508,28 +502,21 @@ def pause(data: bool):
     PAUSED = data
 
 """
-* Init everything on connection with the server.
+* Init everything when starting the program
 """
-@sio.event
-def connect():
-    print(
-    """
-    -------------------------------------
-    Connected to the server
-    -------------------------------------
-    """)
+if __name__ == '__main__':
 
     functionalities = {
         "body_pose": [False, BodyProvider], # Body pose, requires Face mesh
         "body_mesh": [False, BodyMeshProvider], # Body mesh, requires Body pose
-        "hands_pose": [False, HandsProvider], # Hands, requires Body pose
+        "hands_pose": [True, HandsProvider], # Hands, requires Body pose
         "face_mesh": [False, FaceProvider], # Face mesh
-        "holistic_pose": [True, HolisticProvider], # Holistic, Body face and hands in one
+        "holistic_pose": [False, HolisticProvider], # Holistic, Body face and hands in one
         "pifpaf_pose": [False, PifpafProvider], # Pifpaf, Body face and hands in one
     }
 
-    # feed = CameraVideoReader()
-    feed = IntelVideoReader()
+    feed = CameraVideoReader()
+    # feed = IntelVideoReader()
 
     camThread = FrameProvider("frame", feed)
 
@@ -549,10 +536,10 @@ def connect():
     for thread in Threads:
         thread.start()
 
-    Messenger = SendData("server")
-    Messenger.start()
-
-
-if __name__ == '__main__':
-    sign_provider = ghs.init()
-    sio.connect('http://0.0.0.0:5000')
+    print(
+    """
+    -------------------------------------
+    Starting server
+    -------------------------------------
+    """)
+    eventlet.wsgi.server(eventlet.listen(('', 5000)), app)
