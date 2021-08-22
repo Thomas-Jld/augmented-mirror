@@ -23,11 +23,12 @@ def find_hand_pose(hands, frame):
 
     if results.multi_hand_landmarks:
         for i, hands in enumerate(results.multi_hand_landmarks):
+            hands_landmarks.append([])
             for j, landmark in enumerate(hands.landmark):
-                hands_landmarks.append([
+                hands_landmarks[-1].append([
                     i,
                     j,
-                    landmark.x*frame.shape[0], 
+                    landmark.x*frame.shape[0],
                     landmark.y*frame.shape[1],
                     ])
 
