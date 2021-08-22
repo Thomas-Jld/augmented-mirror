@@ -48,8 +48,8 @@ class signclassifier(nn.Module):
         return z
 
 
-def init(device: str = True):
-    model = signclassifier().device(device).eval()
+def init(device: str = "cuda"):
+    model = signclassifier().to(device).eval()
     try:
         model.load_state_dict(torch.load("models/handsign.pt"))
     except:
@@ -57,7 +57,7 @@ def init(device: str = True):
         return
     return model
 
-def find_gesture(model, data: List[List]) -> List[str, float]:
+def find_gesture(model, data: List[List]) -> List:
     data = torch.tensor(data).unsqueeze(0).cuda()
     out = model(data)
     return [SIGNS[str(torch.argmax(out.squeeze(0)).item())], torch.max(out.squeeze(0)).item()]
