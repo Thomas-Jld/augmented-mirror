@@ -7,7 +7,13 @@ ENV DEBIAN_FRONTEND=noninteractive
 WORKDIR /Miroir/
 
 RUN apt-get update && \
-  apt-get -y install python3-pip libusb-1.0-0-dev libgl1-mesa-glx nano git curl nodejs python3-apt
+  apt-get -y install python3-pip python3.7 libusb-1.0-0-dev libgl1-mesa-glx nano git curl
+
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 1
+RUN python3.7 -m pip install --upgrade pip
+RUN python3.7 -m pip install sklearn setuptools
+ADD requirements.txt .
+RUN python3.7 -m pip install -r requirements.txt
 
 # RUN apt-get -y install python3.7
 # RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 1
@@ -70,19 +76,16 @@ RUN DEBIAN_FRONTEND="noninteractive" apt-get -y install libprotoc-dev
 RUN export
 RUN ln -s /usr/bin/python3 /usr/bin/python
 
-RUN pip3 install --upgrade setuptools
-RUN pip3 install wheel
-RUN pip3 install future
-RUN pip3 install six==1.14.0
-RUN pip3 install tensorflow==1.14.0
-RUN pip3 install tf_slim
+#RUN git clone https://github.com/Thomas-Jld/detectron2 reflection/detectron2
+#RUN curl https://dl.fbaipublicfiles.com/densepose/densepose_rcnn_R_50_FPN_s1x/165712039/model_final_162be9.pkl --output reflection/models/model_final_162be9.pkl
+#RUN	curl https://download.01.org/opencv/openvino_training_extensions/models/human_pose_estimation/checkpoint_iter_370000.pth --output reflection/pose-estimation/checkpoint_iter_370000.pth
 
 # ENV ANDROID_NDK_HOME="/home"
 # RUN export
 # RUN chmod +x setup_android_sdk_and_ndk.sh
 # RUN ./setup_android_sdk_and_ndk.sh
 
-RUN python3 setup.py gen_protos
+#RUN python3 -m pip install -e detectron2
 
 RUN add-apt-repository ppa:ubuntu-toolchain-r/test
 RUN apt-get update
