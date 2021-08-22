@@ -16,7 +16,7 @@ def get_depth(point: list, depth_frame, r: int) -> float:
     # y = y if y < len(depth_frame) else len(depth_frame)
 
     try:
-        return np.float64(np.min(depth_frame[max(y - r, 0) : min(y + r, len(depth_frame)), max(x - r, 0) : min(x + r, len(depth_frame[0]))]))
+        return np.float64(np.mean(depth_frame[max(y - r, 0) : min(y + r, len(depth_frame)), max(x - r, 0) : min(x + r, len(depth_frame[0]))]))
     except:
         return np.float64(depth_frame[x, y])
 
