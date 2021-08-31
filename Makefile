@@ -16,11 +16,11 @@ push:
 
 run:
 	-sudo nvidia-docker rm $(REPO)
-	sudo nvidia-docker run -d --expose 5000 --network="host" --privileged --volume=/dev:/dev --name=$(REPO) $(IMNAME)
+	sudo nvidia-docker run -d --expose 5000 -e PYTHONUNBUFFERED=1 --network="host" --privileged --volume=/dev:/dev --name=$(REPO) $(IMNAME)
 
 launch:
 	-sudo nvidia-docker rm $(REPO)
-	sudo nvidia-docker run --expose 5000 --network="host" --privileged --volume=/dev:/dev --name=$(REPO) $(IMNAME)
+	sudo nvidia-docker run --expose 5000 -e PYTHONUNBUFFERED=1 --network="host" --privileged --volume=/dev:/dev --name=$(REPO) $(IMNAME)
 
 restart:
 	sudo systemctl restart docker
@@ -37,3 +37,13 @@ server:
 
 logs:
 	sudo docker logs --follow $(REPO)
+
+service_stop:
+	sudo systemctl stop mirror.service
+	systemctl --user stop mirrorfront.service
+	systemctl --user stop mirrorstartchrome.service
+
+service_start:
+	sudo systemctl start mirror.service
+	systemctl --user start mirrorfront.service
+	systemctl --user start mirrorstartchrome.service
