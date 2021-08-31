@@ -308,7 +308,6 @@ class FaceProvider(threading.Thread):
 """
 (Thread)
 * Body pose from mediapipe
-TODO: Crop the image to only get the center, focusing on the right person
 ! Only one instance from mediapipe can run
 """
 class HolisticProvider(threading.Thread):
@@ -356,10 +355,11 @@ class HolisticProvider(threading.Thread):
                                 body[15][-1]
                             )
 
-                        global_data["right_hand_sign"] = ghs.find_gesture(
-                                self.sign_provider,
-                                normalize_data(self.data["right_hand_pose"])
-                            )
+                        if len(self.data["right_hand_pose"]) > 0:
+                            global_data["right_hand_sign"] = ghs.find_gesture(
+                                    self.sign_provider,
+                                    normalize_data(self.data["right_hand_pose"])
+                                )
 
                         global_data["left_hand_pose"] = project(
                                 self.data["left_hand_pose"],
@@ -370,10 +370,11 @@ class HolisticProvider(threading.Thread):
                                 body[16][-1]
                             )
 
-                        global_data["left_hand_sign"] = ghs.find_gesture(
-                                self.sign_provider,
-                                normalize_data(self.data["left_hand_pose"])
-                            )
+                        if len(self.data["left_hand_pose"]) > 0:
+                            global_data["left_hand_sign"] = ghs.find_gesture(
+                                    self.sign_provider,
+                                    normalize_data(self.data["left_hand_pose"])
+                                )
 
                         global_data["face_mesh"] = project(
                                 self.data["face_mesh"],
@@ -389,7 +390,7 @@ class HolisticProvider(threading.Thread):
                         data_queue.put(global_data)
 
                 end_t = time.time()
-                print(f"Infer time: {(end_t - start_t)*1000}ms")
+                # print(f"Infer time: {(end_t - start_t)*1000}ms")
                 dt = max(1/FPS - (end_t - start_t), 0.001)
                 time.sleep(dt)
             else:
@@ -446,10 +447,11 @@ class PifpafProvider(threading.Thread):
                                 body[9][-1]                   # (Optionnal) Distance to use instead of the real one
                             )
 
-                        global_data["right_hand_sign"] = ghs.find_gesture(
-                                self.sign_provider,
-                                normalize_data(self.data["right_hand_pose"])
-                            )
+                        if len(self.data["right_hand_pose"]) > 0:
+                            global_data["right_hand_sign"] = ghs.find_gesture(
+                                    self.sign_provider,
+                                    normalize_data(self.data["right_hand_pose"])
+                                )
 
                         global_data["left_hand_pose"] = project(
                                 self.data["left_hand_pose"],
@@ -460,10 +462,11 @@ class PifpafProvider(threading.Thread):
                                 body[10][-1]
                             )
 
-                        global_data["left_hand_sign"] = ghs.find_gesture(
-                                self.sign_provider,
-                                normalize_data(self.data["left_hand_pose"])
-                            )
+                        if len(self.data["left_hand_pose"]) > 0:
+                            global_data["left_hand_sign"] = ghs.find_gesture(
+                                    self.sign_provider,
+                                    normalize_data(self.data["left_hand_pose"])
+                                )
 
                         global_data["face_mesh"] = project(
                                 self.data["face_mesh"],
@@ -484,18 +487,36 @@ class PifpafProvider(threading.Thread):
 
 
 """
-* Sends data to the client when requested
+* Sends data to the client
 """
-@sio.on('update')
-def update(*args):
-    data = data_queue.get()
-    sio.emit("global_data", global_data)
+class SendData(threading.Thread):
+    def __init__(self, threadID):
+        threading.Thread.__init__(self)
+        self.threadID = threadID
+
+    def run(self):
+        print(
+        """
+        -------------------------------------
+        Data sender running
+        -------------------------------------
+        """)
+        while 1:
+            if not PAUSED:
+                start_t = time.time()
+                sio.emit("global_data", global_data)
+                end_t = time.time()
+                dt = max(1/FPS - (end_t - start_t), 0)
+                time.sleep(dt)
+            else:
+                time.sleep(5)
 
 
 @sio.on('pause')
 def pause(data: bool):
     global PAUSED
     PAUSED = data
+
 
 """
 * Init everything when starting the program
@@ -505,14 +526,14 @@ if __name__ == '__main__':
     functionalities = {
         "body_pose": [False, BodyProvider], # Body pose, requires Face mesh
         "body_mesh": [False, BodyMeshProvider], # Body mesh, requires Body pose
-        "hands_pose": [True, HandsProvider], # Hands, requires Body pose
+        "hands_pose": [False, HandsProvider], # Hands, requires Body pose
         "face_mesh": [False, FaceProvider], # Face mesh
-        "holistic_pose": [False, HolisticProvider], # Holistic, Body face and hands in one
+        "holistic_pose": [True, HolisticProvider], # Holistic, Body face and hands in one
         "pifpaf_pose": [False, PifpafProvider], # Pifpaf, Body face and hands in one
     }
 
-    feed = CameraVideoReader()
-    # feed = IntelVideoReader()
+    # feed = CameraVideoReader()
+    feed = IntelVideoReader()
 
     camThread = FrameProvider("frame", feed)
 
@@ -531,6 +552,9 @@ if __name__ == '__main__':
     camThread.start()
     for thread in Threads:
         thread.start()
+
+    Messenger = SendData("server")
+    Messenger.start()
 
     print(
     """
