@@ -85,7 +85,6 @@ class IntelVideoReader(object):
         depth_frame = np.fliplr(np.asanyarray(depth_frame.get_data()))
 
         return [color_frame, depth_frame]
-        socketisocketioo
 
 
 """
@@ -503,14 +502,14 @@ if __name__ == '__main__':
     functionalities = {
         "body_pose": [False, BodyProvider], # Body pose, requires Face mesh
         "body_mesh": [False, BodyMeshProvider], # Body mesh, requires Body pose
-        "hands_pose": [True, HandsProvider], # Hands, requires Body pose
+        "hands_pose": [False, HandsProvider], # Hands, requires Body pose
         "face_mesh": [False, FaceProvider], # Face mesh
-        "holistic_pose": [False, HolisticProvider], # Holistic, Body face and hands in one
+        "holistic_pose": [True, HolisticProvider], # Holistic, Body face and hands in one
         "pifpaf_pose": [False, PifpafProvider], # Pifpaf, Body face and hands in one
     }
 
-    feed = CameraVideoReader()
-    # feed = IntelVideoReader()
+    # feed = CameraVideoReader()
+    feed = IntelVideoReader()
 
     camThread = FrameProvider("frame", feed)
 
