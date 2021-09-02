@@ -353,10 +353,11 @@ class HolisticProvider(threading.Thread):
                                 body[15][-1]
                             )
 
-                        global_data["right_hand_sign"] = ghs.find_gesture(
-                                self.sign_provider,
-                                normalize_data(self.data["right_hand_pose"])
-                            )
+                        if len(self.data["right_hand_pose"]) > 0:
+                            global_data["right_hand_sign"] = ghs.find_gesture(
+                                    self.sign_provider,
+                                    normalize_data(self.data["right_hand_pose"])
+                                )
 
                         global_data["left_hand_pose"] = project(
                                 self.data["left_hand_pose"],
@@ -367,10 +368,11 @@ class HolisticProvider(threading.Thread):
                                 body[16][-1]
                             )
 
-                        global_data["left_hand_sign"] = ghs.find_gesture(
-                                self.sign_provider,
-                                normalize_data(self.data["left_hand_pose"])
-                            )
+                        if len(self.data["left_hand_pose"]) > 0:
+                            global_data["left_hand_sign"] = ghs.find_gesture(
+                                    self.sign_provider,
+                                    normalize_data(self.data["left_hand_pose"])
+                                )
 
                         global_data["face_mesh"] = project(
                                 self.data["face_mesh"],
@@ -386,7 +388,7 @@ class HolisticProvider(threading.Thread):
                         data_queue.put(global_data)
 
                 end_t = time.time()
-                print(f"Infer time: {(end_t - start_t)*1000}ms")
+                # print(f"Infer time: {(end_t - start_t)*1000}ms")
                 dt = max(1/FPS - (end_t - start_t), 0.001)
                 time.sleep(dt)
             else:
@@ -443,10 +445,11 @@ class PifpafProvider(threading.Thread):
                                 body[9][-1]                   # (Optionnal) Distance to use instead of the real one
                             )
 
-                        global_data["right_hand_sign"] = ghs.find_gesture(
-                                self.sign_provider,
-                                normalize_data(self.data["right_hand_pose"])
-                            )
+                        if len(self.data["right_hand_pose"]) > 0:
+                            global_data["right_hand_sign"] = ghs.find_gesture(
+                                    self.sign_provider,
+                                    normalize_data(self.data["right_hand_pose"])
+                                )
 
                         global_data["left_hand_pose"] = project(
                                 self.data["left_hand_pose"],
@@ -457,10 +460,11 @@ class PifpafProvider(threading.Thread):
                                 body[10][-1]
                             )
 
-                        global_data["left_hand_sign"] = ghs.find_gesture(
-                                self.sign_provider,
-                                normalize_data(self.data["left_hand_pose"])
-                            )
+                        if len(self.data["left_hand_pose"]) > 0:
+                            global_data["left_hand_sign"] = ghs.find_gesture(
+                                    self.sign_provider,
+                                    normalize_data(self.data["left_hand_pose"])
+                                )
 
                         global_data["face_mesh"] = project(
                                 self.data["face_mesh"],
