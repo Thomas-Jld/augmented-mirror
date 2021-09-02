@@ -69,9 +69,6 @@ class IntelVideoReader(object):
 
         align_to = rs.stream.color
         self.align = rs.align(align_to)
-        self.dec_filter = rs.decimation_filter ()   # Decimation - reduces depth frame density
-        self.spat_filter = rs.spatial_filter()          # Spatial    - edge-preserving spatial smoothing
-        self.temp_filter = rs.temporal_filter()
 
     def next_frame(self):
         frameset = self.pipe.wait_for_frames()
@@ -83,10 +80,6 @@ class IntelVideoReader(object):
 
         self.depth_intrinsics = depth_frame.profile.as_video_stream_profile().intrinsics
         self.color_intrinsics = color_frame.profile.as_video_stream_profile().intrinsics
-
-        depth_frame = self.dec_filter.process(depth_frame)
-        depth_frame = self.spat_filter.process(depth_frame)
-        depth_frame = self.temp_filter.process(depth_frame)
 
         color_frame = np.fliplr(np.asanyarray(color_frame.get_data()))
         depth_frame = np.fliplr(np.asanyarray(depth_frame.get_data()))
