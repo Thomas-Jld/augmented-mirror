@@ -38,10 +38,16 @@ function setup() {
     socket = io.connect('http://0.0.0.0:5000');
 
     // socket.emit("update", true);
-    socket.on("global_data", function (data) {
+    socket.on("update", (data) => {
         global_data = data;
-        available = true
+        // console.log("recieved");
+        // alert('received from server');
     });
+
+    // socket.on("*",function(event,data) {
+    //     console.log(event);
+    //     console.log(data);
+    // });
 
 }
 

@@ -26,6 +26,7 @@ global_data = {
 }
 eyes = []
 threads = []
+client = ""
 
 FPS = 45
 
@@ -258,7 +259,6 @@ class HandsProvider(threading.Thread):
                     if not data_queue.empty():
                         data_queue.get()
                     data_queue.put(global_data)
-
             end_t = time.time()
             dt = max(1/FPS - (end_t - start_t), 0.001)
             time.sleep(dt)
@@ -504,19 +504,25 @@ class SendData(threading.Thread):
         while 1:
             if not PAUSED:
                 start_t = time.time()
-                sio.emit("global_data", global_data)
+                data = data_queue.get()
+                sio.emit("update", data)
                 end_t = time.time()
                 dt = max(1/FPS - (end_t - start_t), 0)
                 time.sleep(dt)
             else:
                 time.sleep(5)
 
-
 @sio.on('pause')
 def pause(data: bool):
     global PAUSED
     PAUSED = data
 
+
+@sio.event
+def connect(sid, environ):
+    global client
+    print('connect ', sid)
+    client = sid
 
 """
 * Init everything when starting the program
