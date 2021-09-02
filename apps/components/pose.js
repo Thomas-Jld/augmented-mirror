@@ -121,8 +121,8 @@ let Pose = (sketch) => {
                         newx = width * (this.body_pose[i][2] - xoffset) / screenwidth;
                         newy = height * (this.body_pose[i][3] - yoffset) / screenheight;
                         if(newy > 0 || this.body_pose_t[i][1] < 10){
-                            x = lerp(this.body_pose_t[i][0], newx, 0.75);
-                            y = lerp(this.body_pose_t[i][1], newy, 0.75);
+                            x = lerp(this.body_pose_t[i][0], newx, 0.7);
+                            y = lerp(this.body_pose_t[i][1], newy, 0.7);
                         }
                         else{ // Assume it's an artifact and slows the update
                             x = lerp(this.body_pose_t[i][0], newx, 0.01);
