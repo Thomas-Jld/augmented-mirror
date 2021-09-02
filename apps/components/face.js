@@ -80,6 +80,7 @@ let Faces = (sketch) => {
             ];
 
             this.face_mesh = [];
+            this.face_mesh_t = [];
             this.name = name;
 
         }
@@ -89,15 +90,35 @@ let Faces = (sketch) => {
                 return
             }
 
-            let transposed = [];
             sketch.fill(200);
             for(let i = 0; i < this.face_mesh.length; i++){
 
                 if (this.face_mesh[i].slice(2, 4) != [-1, -1]) {
-                    let x = width * (this.face_mesh[i][2] - xoffset) / screenwidth;
-                    let y = height * (this.face_mesh[i][3] - yoffset) / screenheight;
+                    let x;
+                    let y;
+                    let newx;
+                    let newy;
 
-                    transposed.push([x, y]);
+                    if (this.face_mesh_t.length == this.face_mesh.length){
+                        newx = width * (this.face_mesh[i][2] - xoffset) / screenwidth;
+                        newy = height * (this.face_mesh[i][3] - yoffset) / screenheight;
+                        if(newy > 0){
+                            x = lerp(this.face_mesh_t[i][0], newx, 0.6);
+                            y = lerp(this.face_mesh_t[i][1], newy, 0.6);
+                        }
+                        else{ // Assume it's an artifact and slows the update
+                            x = lerp(this.face_mesh_t[i][0], newx, 0.01);
+                            y = lerp(this.face_mesh_t[i][1], newy, 0.01);
+                        }
+
+                        this.face_mesh_t[i] = [x, y];
+                    }
+                    else{
+                        x = width * (this.face_mesh[i][2] - xoffset) / screenwidth;
+                        y = height * (this.face_mesh[i][3] - yoffset) / screenheight;
+
+                        this.face_mesh_t.push([x, y]);
+                    }
 
                     if (sketch.show_particules) {
                         if (frameCount % 5 == 0) {
@@ -110,24 +131,22 @@ let Faces = (sketch) => {
                         sketch.ellipse(x, y, 4);
                         //sketch.text(part[1].toString(), x + 20, y + 20);
                     }
-                } else {
-                    transposed.push([0, 0])
                 }
             };
 
             if (sketch.show_face_lines) {
-                this.show_lines(transposed);
+                this.show_lines();
             }
         }
 
-        show_lines(transposed) {
+        show_lines() {
             sketch.stroke(255);
             sketch.strokeWeight(2);
             this.junctions.forEach(parts => {
                 for (let i = 0; i < parts.length - 1; i++) {
                     try {
-                        if (transposed[parts[i]][1] > 0 && transposed[parts[i+1]][1] > 0) {
-                            sketch.line(transposed[parts[i]][0], transposed[parts[i]][1], transposed[parts[i+1]][0], transposed[parts[i+1]][1]);
+                        if (this.face_mesh_t[parts[i]][1] > 0 && this.face_mesh_t[parts[i+1]][1] > 0) {
+                            sketch.line(this.face_mesh_t[parts[i]][0], this.face_mesh_t[parts[i]][1], this.face_mesh_t[parts[i+1]][0], this.face_mesh_t[parts[i+1]][1]);
                         }
                     } catch (e) {
                         //console.log(e);
