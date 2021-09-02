@@ -56,8 +56,8 @@ class IntelVideoReader(object):
         self.width = WIDTH
         self.height = HEIGHT
 
-        config.enable_stream(rs.stream.depth, self.width, self.height, rs.format.z16, 30)
-        config.enable_stream(rs.stream.color, self.width, self.height, rs.format.bgr8, 30)
+        config.enable_stream(rs.stream.depth, self.width, self.height, rs.format.z16, 60)
+        config.enable_stream(rs.stream.color, self.width, self.height, rs.format.bgr8, 60)
 
         profile = self.pipe.start(config)
 
@@ -69,6 +69,9 @@ class IntelVideoReader(object):
 
         align_to = rs.stream.color
         self.align = rs.align(align_to)
+        self.dec_filter = rs.decimation_filter ()   # Decimation - reduces depth frame density
+        self.spat_filter = rs.spatial_filter()          # Spatial    - edge-preserving spatial smoothing
+        self.temp_filter = rs.temporal_filter()
 
     def next_frame(self):
         frameset = self.pipe.wait_for_frames()
@@ -80,6 +83,10 @@ class IntelVideoReader(object):
 
         self.depth_intrinsics = depth_frame.profile.as_video_stream_profile().intrinsics
         self.color_intrinsics = color_frame.profile.as_video_stream_profile().intrinsics
+
+        depth_frame = self.dec_filter.process(depth_frame)
+        depth_frame = self.spat_filter.process(depth_frame)
+        depth_frame = self.temp_filter.process(depth_frame)
 
         color_frame = np.fliplr(np.asanyarray(color_frame.get_data()))
         depth_frame = np.fliplr(np.asanyarray(depth_frame.get_data()))
@@ -323,7 +330,7 @@ class HolisticProvider(threading.Thread):
         import get_holistic as gh
         #* Home made hand signs : https://github.com/Thomas-Jld/gesture-recognition
         import get_hand_sign as ghs
-        from get_reflection import project
+        import get_reflection as gr
         print(
         """
         -------------------------------------
@@ -342,10 +349,10 @@ class HolisticProvider(threading.Thread):
                     if bool(self.data["body_pose"]):
                         eyes = self.data["body_pose"][0][2:4]
 
-                        body = project(self.data["body_pose"], eyes, self.feed, depth, 4)
+                        body = gr.project(self.data["body_pose"], eyes, self.feed, depth, 4)
                         global_data["body_pose"] = body
 
-                        global_data["right_hand_pose"] = project(
+                        global_data["right_hand_pose"] = gr.project(
                                 self.data["right_hand_pose"],
                                 eyes,
                                 self.feed,
@@ -359,7 +366,7 @@ class HolisticProvider(threading.Thread):
                                     normalize_data(self.data["right_hand_pose"])
                                 )
 
-                        global_data["left_hand_pose"] = project(
+                        global_data["left_hand_pose"] = gr.project(
                                 self.data["left_hand_pose"],
                                 eyes,
                                 self.feed,
@@ -374,7 +381,7 @@ class HolisticProvider(threading.Thread):
                                     normalize_data(self.data["left_hand_pose"])
                                 )
 
-                        global_data["face_mesh"] = project(
+                        global_data["face_mesh"] = gr.project(
                                 self.data["face_mesh"],
                                 eyes,
                                 self.feed,
