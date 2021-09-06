@@ -37,18 +37,11 @@ function setup() {
 
     socket = io.connect('http://0.0.0.0:5000');
 
-    // socket.emit("update", true);
-    socket.on("update", (data) => {
+    socket.emit("update", true);
+    socket.on("global_data", (data) => {
         global_data = data;
-        // console.log("recieved");
-        // alert('received from server');
+        available = true;
     });
-
-    // socket.on("*",function(event,data) {
-    //     console.log(event);
-    //     console.log(data);
-    // });
-
 }
 
 function draw() {
@@ -63,10 +56,10 @@ function draw() {
             }
         });
         selection();
-        // if(available){
-        //     socket.emit("update", true);
-        //     available = false;
-        // }
+        if(available){
+            socket.emit("update", true);
+            available = false;
+        }
     }
 }
 

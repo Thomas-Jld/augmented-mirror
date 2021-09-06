@@ -251,10 +251,10 @@ class HandsProvider(threading.Thread):
 
                 if bool(self.data):
                     global_data["right_hand_pose"] = self.data[0] #Arbitrary, for testing purposes
-                    global_data["right_hand_sign"] = ghs.find_gesture(
-                        self.sign_provider,
-                        normalize_data(self.data[0])
-                    )
+                    # global_data["right_hand_sign"] = ghs.find_gesture(
+                    #     self.sign_provider,
+                    #     normalize_data(self.data[0])
+                    # )
 
                     if not data_queue.empty():
                         data_queue.get()
@@ -487,30 +487,12 @@ class PifpafProvider(threading.Thread):
 
 
 """
-* Sends data to the client
+* Sends data to the client upon request
 """
-class SendData(threading.Thread):
-    def __init__(self, threadID):
-        threading.Thread.__init__(self)
-        self.threadID = threadID
-
-    def run(self):
-        print(
-        """
-        -------------------------------------
-        Data sender running
-        -------------------------------------
-        """)
-        while 1:
-            if not PAUSED:
-                start_t = time.time()
-                data = data_queue.get()
-                sio.emit("update", data)
-                end_t = time.time()
-                dt = max(1/FPS - (end_t - start_t), 0)
-                time.sleep(dt)
-            else:
-                time.sleep(5)
+@sio.on("update")
+def update(*args) -> None:
+    data = data_queue.get()
+    sio.emit("global_data", global_data)
 
 @sio.on('pause')
 def pause(data: bool):
@@ -559,8 +541,8 @@ if __name__ == '__main__':
     for thread in Threads:
         thread.start()
 
-    Messenger = SendData("server")
-    Messenger.start()
+    # Messenger = SendData("server")
+    # Messenger.start()
 
     print(
     """
