@@ -137,13 +137,13 @@ let Selector = (sketch) => {
             } else if (typeof (this.choice) == "string") {
                 this.bars.push(
                     new InfoPanel(
-                        x = this.rx, 
-                        y = this.ry, 
-                        w = this.d*2, 
-                        h = this.d*2, 
-                        offset = this.d/2, 
-                        content = this.choice, 
-                        parent = this
+                        this.rx,     // x
+                        this.ry,     // y
+                        this.d*2,    // w
+                        this.d*2,    // h
+                        this.d/2,    // offset
+                        this.choice, //content
+                        this         //parent
                     )
                 );
             }
