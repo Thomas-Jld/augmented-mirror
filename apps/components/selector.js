@@ -367,7 +367,7 @@ let Selector = (sketch) => {
                 this.y + this.per * (this.h / 2)
             );
 
-            sketch.stroke(0);
+            sketch.stroke(255);
             // sketch.strokeWeight()
             sketch.text(
                 this.content, 
