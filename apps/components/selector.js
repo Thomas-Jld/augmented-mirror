@@ -351,7 +351,7 @@ let Selector = (sketch) => {
             this.offset = offset;
             this.content = content;
             this.parent = parent;
-            this.size = 40;
+            this.size = 30;
 
             this.per = 0; // To animate the display when showing / hidding
             this.mul = 0.92;
@@ -369,6 +369,7 @@ let Selector = (sketch) => {
             );
 
             sketch.stroke(255);
+            sketch.fill(255);
             sketch.strokeWeight(2);
             sketch.textSize(this.size);
             sketch.text(
@@ -383,19 +384,19 @@ let Selector = (sketch) => {
         update(x, y) {
             this.x = x;
             this.y = y;
-            this.rx = this.x + this.per * this.offset;
-            this.ry = this.y;
+            // this.rx = this.x + this.per * this.offset;
+            // this.ry = this.y;
 
-            if (!this.parent.selected || !sketch.display_bubbles) {
-                this.per *= this.mul;
-            } else {
-                if (this.per < 1) {
-                    this.per += 0.1;
-                    if(this.per > 1){
-                        this.per = 1;
-                    }
-                }
-            }
+            // if (!this.parent.selected || !sketch.display_bubbles) {
+            //     this.per *= this.mul;
+            // } else {
+            //     if (this.per < 1) {
+            //         this.per += 0.1;
+            //         if(this.per > 1){
+            //             this.per = 1;
+            //         }
+            //     }
+            // }
         }
     }
 }
