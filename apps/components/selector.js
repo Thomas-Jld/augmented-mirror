@@ -351,7 +351,7 @@ let Selector = (sketch) => {
             this.offset = offset;
             this.content = content;
             this.parent = parent;
-            this.size = 4;
+            this.size = 40;
 
             this.per = 0; // To animate the display when showing / hidding
             this.mul = 0.92;
