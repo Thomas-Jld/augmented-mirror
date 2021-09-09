@@ -139,9 +139,9 @@ let Selector = (sketch) => {
                     new InfoPanel(
                         this.rx,     // x
                         this.ry,     // y
-                        this.d,    // w
-                        this.d,    // h
-                        this.d/2,    // offset
+                        this.d * 2,    // w
+                        this.d * 2,    // h
+                        this.d * 0.5,    // offset
                         this.choice, //content
                         this         //parent
                     )
@@ -376,8 +376,8 @@ let Selector = (sketch) => {
                 this.content, 
                 this.x + this.offset + this.w * 0.05, 
                 this.y - 0.45 * this.h, 
-                this.x + this.offset + this.w * 0.95,
-                this.y + 0.45 * this.h
+                this.w * 0.9,
+                this.h * 0.9
             );
         }
 
