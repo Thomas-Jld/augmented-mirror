@@ -16,9 +16,7 @@ let Selector = (sketch) => {
     // sketch.rotation = 0;
     sketch.sliding = 0;
 
-    let description = `This is the alpha version of an interractive mirror
-                        interface integrating the user's reflection into
-                        the informations displayed and the mirror's behavior.`
+    let description = `This is the alpha version of an interractive mirror, an interface integrating the user's reflection into the informations displayed and the mirror's behavior.`
 
     let icons = ["info.svg", "disco.svg", "settings.svg"];
 
@@ -351,7 +349,7 @@ let Selector = (sketch) => {
             this.offset = offset;
             this.content = content;
             this.parent = parent;
-            this.size = 30;
+            this.size = 25;
 
             this.per = 0; // To animate the display when showing / hidding
             this.mul = 0.92;
