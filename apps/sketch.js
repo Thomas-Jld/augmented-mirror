@@ -158,6 +158,22 @@ function choseAction(opt, action){
             hands.selfCanvas.hide();
         }
     }
+    else if (opt == "Dance n°1"){
+        if(action){
+            // Launch dance
+        }
+        else{
+            // Stop dance
+        }
+    }
+    else if (opt == "Dance n°2"){
+        if(action){
+            // Launch dance
+        }
+        else{
+            // Stop dance
+        }
+    }
 }
 
 function keyPressed() {

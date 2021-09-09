@@ -20,7 +20,7 @@ let Selector = (sketch) => {
                         interface integrating the user's reflection into
                         the informations displayed and the mirror's actions.`
 
-    let icons = ["user.svg", "info.svg", "settings.svg"];
+    let icons = ["info.svg", "disco.svg", "settings.svg"];
 
     sketch.set = (p1, p2, w, h) => {
         sketch.width = w;
@@ -40,8 +40,8 @@ let Selector = (sketch) => {
             sketch.y,
             150,
             [
-                0,
-                1,
+                description,
+                ["Dance n°1", "Dance n°2"],
                 ["Show Face", "Show Clock", "Show Pose", "Show Hands"],
             ],
             icons
@@ -122,8 +122,30 @@ let Selector = (sketch) => {
 
             if (typeof (this.choice) == "object") {
                 for (let i = 0; i < this.choice.length; i++) {
-                    this.bars.push(new SelectBar(this.rx, this.ry, this.slots[i], this.d, this.choice[i], this));
+                    this.bars.push(
+                        new SelectBar(
+                            this.rx, 
+                            this.ry, 
+                            this.slots[i],
+                            this.d, 
+                            this.choice[i], 
+                            this
+                        )
+                    );
                 }
+
+            } else if (typeof (this.choice) == "string") {
+                this.bars.push(
+                    new InfoPanel(
+                        x = this.rx, 
+                        y = this.ry, 
+                        w = this.d*2, 
+                        h = this.d*2, 
+                        offset = this.d/2, 
+                        content = this.choice, 
+                        parent = this
+                    )
+                );
             }
         }
 
@@ -329,17 +351,49 @@ let Selector = (sketch) => {
             this.offset = offset;
             this.content = content;
             this.parent = parent;
-            this.size = 5;
+
+            this.per = 0; // To animate the display when showing / hidding
+            this.mul = 0.92;
         }
 
         show() {
-            sketch.fill(255);
-            sketch.noStroke();
-            sketch.rect(this.x + this.offset, this.y - this.h / 2, this.x + this.offset + this.w, this.y + this.h / 2);
+            sketch.stroke(255);
+            sketch.strokeWeight(4);
+            sketch.noFill();
+            sketch.rect(
+                this.x + this.per * (this.offset), 
+                this.y - this.per * (this.h / 2), 
+                this.x + this.per * (this.offset + this.w), 
+                this.y + this.per * (this.h / 2)
+            );
+
             sketch.stroke(0);
             // sketch.strokeWeight()
-            sketch.textSize(this.size);
-            sketch.text(this.content, this.x + this.offset + this.w / 2, this.y, this.w, this.h);
+            sketch.text(
+                this.content, 
+                this.x + this.offset + this.w * 0.05, 
+                this.y - 0.45 * this.h, 
+                this.x + this.offset + this.w * 0.95,
+                this.y + 0.45 * this.h
+            );
+        }
+
+        update(x, y) {
+            this.x = x;
+            this.y = y;
+            this.rx = this.x + this.per * this.offset;
+            this.ry = this.y;
+
+            if (!this.parent.selected || !sketch.display_bubbles) {
+                this.per *= this.mul;
+            } else {
+                if (this.per < 1) {
+                    this.per += 0.1;
+                    if(this.per > 1){
+                        this.per = 1;
+                    }
+                }
+            }
         }
     }
 }
