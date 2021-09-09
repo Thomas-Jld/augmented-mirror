@@ -362,10 +362,10 @@ let Selector = (sketch) => {
             sketch.strokeWeight(4);
             sketch.noFill();
             sketch.rect(
-                this.x + this.per * (this.offset), 
-                this.y - this.per * (this.h / 2), 
-                this.x + this.per * (this.offset + this.w), 
-                this.y + this.per * (this.h / 2)
+                this.x + this.offset, 
+                this.y - this.h / 2, 
+                this.x + this.offset + this.w, 
+                this.y + this.h / 2
             );
 
             sketch.stroke(255);
@@ -374,10 +374,10 @@ let Selector = (sketch) => {
             sketch.textSize(this.size);
             sketch.text(
                 this.content, 
-                this.x + this.per * (this.offset + this.w * 0.05), 
-                this.y - this.per * (0.45 * this.h), 
-                this.x + this.per * (this.offset + this.w * 0.95),
-                this.y + this.per * (0.45 * this.h)
+                this.x + this.offset + this.w * 0.05, 
+                this.y - 0.45 * this.h, 
+                this.w * 0.9,
+                this.h * 0.9
             );
         }
 
