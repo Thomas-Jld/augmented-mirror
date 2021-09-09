@@ -41,7 +41,7 @@ let Selector = (sketch) => {
             150,
             [
                 description,
-                ["Dance n°1", "Dance n°2"],
+                ["Dance n°2", "Dance n°1"],
                 ["Show Face", "Show Clock", "Show Pose", "Show Hands"],
             ],
             icons
@@ -139,8 +139,8 @@ let Selector = (sketch) => {
                     new InfoPanel(
                         this.rx,     // x
                         this.ry,     // y
-                        this.d*2,    // w
-                        this.d*2,    // h
+                        1.5 * this.d,    // w
+                        1.5 * this.d,    // h
                         this.d/2,    // offset
                         this.choice, //content
                         this         //parent
