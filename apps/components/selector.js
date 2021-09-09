@@ -364,8 +364,8 @@ let Selector = (sketch) => {
             sketch.rect(
                 this.x + this.offset, 
                 this.y - this.h / 2, 
-                this.x + this.offset + this.w, 
-                this.y + this.h / 2
+                this.w, 
+                this.h
             );
 
             sketch.stroke(255);
