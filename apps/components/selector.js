@@ -351,6 +351,7 @@ let Selector = (sketch) => {
             this.offset = offset;
             this.content = content;
             this.parent = parent;
+            this.size = 4;
 
             this.per = 0; // To animate the display when showing / hidding
             this.mul = 0.92;
@@ -368,13 +369,14 @@ let Selector = (sketch) => {
             );
 
             sketch.stroke(255);
-            // sketch.strokeWeight()
+            sketch.strokeWeight(2);
+            sketch.textSize(this.size);
             sketch.text(
                 this.content, 
-                this.x + this.offset + this.w * 0.05, 
-                this.y - 0.45 * this.h, 
-                this.x + this.offset + this.w * 0.95,
-                this.y + 0.45 * this.h
+                this.x + this.per * (this.offset + this.w * 0.05), 
+                this.y - this.per * (0.45 * this.h), 
+                this.x + this.per * (this.offset + this.w * 0.95),
+                this.y + this.per * (0.45 * this.h)
             );
         }
 
