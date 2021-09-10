@@ -151,7 +151,7 @@ let Pose = (sketch) => {
                     // }
                 }
             }
-
+            global_data["body_pose_t"] = this.body_pose_t;
             if (sketch.show_body_lines) {
                 this.show_lines(this.body_pose_t);
             }

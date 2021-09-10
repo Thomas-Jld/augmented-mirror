@@ -15,14 +15,14 @@ let Dance = (sketch) => {
         sketch.selfCanvas = sketch.createCanvas(sketch.width, sketch.height).position(sketch.x, sketch.y);
         // sketch.selfCanvas.hide();
 
-        sketch.dance = new DanceLesson("test");
+        sketch.dance = new DanceLesson("dance01");
 
         sketch.colorMode(HSB);
     };
 
-    sketch.update = (body_pose) => {
-        if (body_pose != undefined) {
-            sketch.dance.body_pose = body_pose; // In pixels
+    sketch.update = (global_data) => {
+        if (global_data != undefined && "body_pose_t" in global_data) {
+            sketch.dance.body_pose = global_data["body_pose_t"]; // In pixels
         }
         sketch.dance.update();
     }
@@ -46,7 +46,7 @@ let Dance = (sketch) => {
             this.init = false;
             this.offset = [0, 0];
             this.ratio = 1;
-            this.size = this.moves[size]; // Original video size
+            this.size = this.moves["size"]; // Original video size
 
             this.diff = 0; // The lower, the closer the moves are
             this.limit = 400; // if this.diff < this.limit, it goes on
