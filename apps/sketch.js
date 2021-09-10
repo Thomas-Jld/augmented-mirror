@@ -8,7 +8,7 @@ let selector;
 let clock;
 let pikachu;
 let pikachu_model;
-
+let dance;
 
 let socket;
 let canvas;
@@ -116,6 +116,10 @@ function reshape() {
     pikachu.set(0, 0, width, height);
     modules.push(pikachu);
 
+    dance = new p5(Dance);
+    dance.set(0, 0, width, height);
+    modules.push(dance);
+
     started = true;
 }
 
@@ -160,10 +164,10 @@ function choseAction(opt, action){
     }
     else if (opt == "Dance n°1"){
         if(action){
-            // Launch dance
+            dance.activated = true;
         }
         else{
-            // Stop dance
+            dance.activated = false;
         }
     }
     else if (opt == "Dance n°2"){
