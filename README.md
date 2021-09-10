@@ -9,6 +9,7 @@ pose and features of the user on a mirror matching his viewpoint.
 
 - Nvidia-Docker
 - A nvidia GPU with drivers installed
+- Chromium web browser
 
 ## Using the Docker container
 
@@ -17,17 +18,7 @@ To execute the container, use `make run`. Make sure that you've already
 installed nvidia-docker and that your computer supports cuda. <br/> 
 Inside the docker container `launch_reflection.sh` will be executed and launch the recognition software.
 
-### Manualy launching the intermediate Server
-
-In /server, use:
-
-```bash
-node server.js
-```
-
-Make sure to be in a docker container if your computer doesn't have nodeJS.
-
-### Manualy sending position data to the server
+### (Optional) Manualy sending position data to the server
 
 In /reflections, while being in the docker container, use:
 
@@ -37,18 +28,15 @@ python3 send_data.py
 
 ## Openning the app
 
+You have to use a simple local http server to host the index.html and all the files. For exemple, use `python3 -m http.server` in the apps/ folder.
+
 Use `make open` to see the result.
 
 ## Ressources:
 
-### Projects : 
 - https://github.com/openpifpaf/openpifpaf
-- https://github.com/Daniil-Osokin/lightweight-human-pose-estimation.pytorch
-- https://google.github.io/mediapipe/solutions/hands.html
 - https://google.github.io/mediapipe/solutions/holistic.html
-- https://github.com/facebookresearch/detectron2/tree/master/projects/DensePose
-
-### Libraries:
+- https://google.github.io/mediapipe/solutions/hands.html
 - https://github.com/IntelRealSense/librealsense/
 - https://github.com/socketio/socket.io
 - https://p5js.org/
