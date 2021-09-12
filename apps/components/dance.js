@@ -107,7 +107,7 @@ let Dance = (sketch) => {
                     ];
                 } else {
                     if (this.moves_index in this.moves) {
-                        let distances = [];index
+                        let distances = [];
                         for (let i = 0; i < this.body_pose.length; i++) {
                             distances.push(
                                 sketch.dist(
