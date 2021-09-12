@@ -151,7 +151,10 @@ let Pose = (sketch) => {
                     // }
                 }
             }
-            global_data["body_pose_t"] = this.body_pose_t;
+            if (this.body_pose_t.length > 0) {
+                console.log(this.body_pose_t);
+                global_data["body_pose_t"] = this.body_pose_t;
+            }
             if (sketch.show_body_lines) {
                 this.show_lines(this.body_pose_t);
             }

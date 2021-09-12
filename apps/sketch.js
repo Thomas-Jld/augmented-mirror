@@ -124,122 +124,128 @@ function reshape() {
 }
 
 function choseAction(opt, action){
-    if (opt == "Show Clock"){
-        if(action){
-            clock.activated = true;
-            clock.selfCanvas.show();
-        }
-        else{
-            clock.activated = false;
-            clock.selfCanvas.hide();
-        }
-    }
-    else if (opt == "Show Face"){
-        if(action){
-            face.activated = true;
-            face.selfCanvas.show();
-        }
-        else{
-            face.activated = false;
-            face.selfCanvas.hide();
-        }
-    }
-    else if (opt == "Show Pose"){
-        if(action){
-            pose.activated = true;
-            pose.selfCanvas.show();
-        }
-        else{
-            pose.activated = false;
-            pose.selfCanvas.hide();
-        }
-    }
-    else if (opt == "Show Hands"){
-        if(action){
-            hands.selfCanvas.show();
-        }
-        else{
-            hands.selfCanvas.hide();
-        }
-    }
-    else if (opt == "Dance n°1"){
-        if(action){
-            dance.activated = true;
-        }
-        else{
-            dance.activated = false;
-        }
-    }
-    else if (opt == "Dance n°2"){
-        if(action){
-            // Launch dance
-        }
-        else{
-            // Stop dance
-        }
+    switch (opt){
+        case "Show Clock":
+            if(action){
+                clock.activated = true;
+                clock.selfCanvas.show();
+            }
+            else{
+                clock.activated = false;
+                clock.selfCanvas.hide();
+            }
+            break;
+
+        case "Show Face":
+            if(action){
+                face.activated = true;
+                face.selfCanvas.show();
+            }
+            else{
+                face.activated = false;
+                face.selfCanvas.hide();
+            }
+            break;
+        
+        case "Show Pose":
+            if(action){
+                pose.activated = true;
+                pose.selfCanvas.show();
+            }
+            else{
+                pose.activated = false;
+                pose.selfCanvas.hide();
+            }
+            break;
+        
+        case "Show Hands":
+            if (action) hands.selfCanvas.show();
+            else hands.selfCanvas.hide();
+            break;
+        
+        case  "Dance n°1":
+            if(action){
+                dance.activated = true;
+            }
+            else{
+                dance.activated = false;
+            }
+            break;
+        
+        case "Dance n°2":
+            if(action){
+                // Launch dance
+            }
+            else{
+                // Stop dance
+            }
+            break;
+        
     }
 }
 
-function keyPressed() {
-    if (key == "c") {
-        modules.forEach(m => {
-            m.clearSketch();
-        });
-    }
-
-    if (key == "p") {
-        modules.forEach(m => {
-            m.activated = false;
-            m.selfCanvas.hide();
-        });
-        pose.activated = true;
-        pose.selfCanvas.show();
-    }
-
-    if (key == "h") {
-        modules.forEach(m => {
-            m.activated = false;
-            m.selfCanvas.hide();
-        });
-        hands.activated = true;
-        hands.selfCanvas.show();
-    }
-
-    if (key == "f") {
-        modules.forEach(m => {
-            m.activated = false;
-            m.selfCanvas.hide();
-        });
-        face.activated = true;
-        face.selfCanvas.show();
-    }
-
-    if (key == "b") {
-        modules.forEach(m => {
-            m.activated = false;
-            m.selfCanvas.hide();
-        });
-        pose.activated = true;
-        pose.selfCanvas.show();
-        hands.activated = true;
-        hands.selfCanvas.show();
-    }
-
-    if (key == "s") {
-        modules.forEach(m => {
-            m.activated = false;
-            m.selfCanvas.hide();
-        });
-        hands.activated = true;
-        selector.activated = true;
-        selector.selfCanvas.show();
-    }
-
-    if (key == "a") {
-        modules.forEach(m => {
-            m.activated = true;
-            m.selfCanvas.show();
-        });
+function keyPressed() {200
+    switch(hey){
+        case "c":
+            modules.forEach(m => {
+                m.clearSketch();
+            });
+            break;
+        
+        case "p":
+            modules.forEach(m => {
+                m.activated = false;
+                m.selfCanvas.hide();
+            });
+            pose.activated = true;
+            pose.selfCanvas.show();
+            break;
+    
+        case "h":
+            modules.forEach(m => {
+                m.activated = false;
+                m.selfCanvas.hide();
+            });
+            hands.activated = true;
+            hands.selfCanvas.show();
+            break;
+    
+        case "f":
+            modules.forEach(m => {
+                m.activated = false;
+                m.selfCanvas.hide();
+            });
+            face.activated = true;
+            face.selfCanvas.show();
+            break;
+    
+        case "b":
+            modules.forEach(m => {
+                m.activated = false;
+                m.selfCanvas.hide();
+            });
+            pose.activated = true;
+            pose.selfCanvas.show();
+            hands.activated = true;
+            hands.selfCanvas.show();
+            break;
+    
+        case "s":
+            modules.forEach(m => {
+                m.activated = false;
+                m.selfCanvas.hide();
+            });
+            hands.activated = true;
+            selector.activated = true;
+            selector.selfCanvas.show();
+            break;
+    
+        case "a":
+            modules.forEach(m => {
+                m.activated = true;
+                m.selfCanvas.show();
+            });
+            break;
     }
 }
 
