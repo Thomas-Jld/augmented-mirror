@@ -75,9 +75,9 @@ let Dance = (sketch) => {
             sketch.strokeWeight(2);
             sketch.textSize(30);
             sketch.text(
-                this.diff, 
+                Math.floor(this.diff), 
                 20,
-                20
+                80
             );
         }
 
@@ -87,7 +87,7 @@ let Dance = (sketch) => {
                     this.init = true;
 
                     let mirror_nose_reference = this.body_pose[0]; // Current nose postion of the user
-                    let mirror_left_hip_reference = this.body_pose[23]; // Current left hip postion of the user
+                    let mirror_left_hip_reference = this.body_pose[24]; // Current left hip postion of the user
                     let video_nose_reference = this.moves[Object.keys(this.moves)[0]][0].slice(1, 3); // Position in pixels of the first nose of this.moves
                     let video_left_hip_reference = this.moves[Object.keys(this.moves)[0]][23].slice(1, 3); // Position in pixels of the first left_hip of this.moves
 
