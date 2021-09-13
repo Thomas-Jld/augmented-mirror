@@ -69,6 +69,16 @@ let Dance = (sketch) => {
                 this.size[0],
                 this.size[1]
                 );
+
+            sketch.stroke(255);
+            sketch.fill(255);
+            sketch.strokeWeight(2);
+            sketch.textSize(30);
+            sketch.text(
+                this.diff, 
+                20,
+                20
+            );
         }
 
         update() {
