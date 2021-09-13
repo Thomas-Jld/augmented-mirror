@@ -84,6 +84,10 @@ function selection(){
 function reshape() {
     resizeCanvas(windowWidth, windowHeight);
 
+    dance = new p5(Dance);
+    dance.set(0, 0, width, height);
+    modules.push(dance);
+
     clock = new p5(Clock);
     clock.set(width - 200, 0, 200, 200);
     modules.push(clock);
@@ -115,10 +119,6 @@ function reshape() {
     pikachu = new p5(Pikachu);
     pikachu.set(0, 0, width, height);
     modules.push(pikachu);
-
-    dance = new p5(Dance);
-    dance.set(0, 0, width, height);
-    modules.push(dance);
 
     started = true;
 }

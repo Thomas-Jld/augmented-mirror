@@ -15,7 +15,7 @@ let Dance = (sketch) => {
         sketch.selfCanvas = sketch.createCanvas(sketch.width, sketch.height).position(sketch.x, sketch.y);
         // sketch.selfCanvas.hide();
 
-        sketch.dance = new DanceLesson("dance01");
+        sketch.dance = new DanceLesson("dance02");
 
         sketch.colorMode(HSB);
     };
@@ -53,7 +53,7 @@ let Dance = (sketch) => {
             this.moves_index = 0;
 
             this.diff = 0; // The lower, the closer the moves are
-            this.limit = 400; // if this.diff < this.limit, it goes on
+            this.limit = 100; // if this.diff < this.limit, it goes on
         }
 
         show() {
