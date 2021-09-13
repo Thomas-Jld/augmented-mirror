@@ -102,8 +102,8 @@ let Dance = (sketch) => {
                     ];
 
                     this.offset = [
-                        mirror_nose_reference[0] - video_nose_reference[0] * ratio,
-                        mirror_nose_reference[1] - video_nose_reference[1] * ratio
+                        mirror_nose_reference[0] - video_nose_reference[0] * this.ratio,
+                        mirror_nose_reference[1] - video_nose_reference[1] * this.ratio
                     ];
                 } else {
                     if (this.moves_index in this.moves) {

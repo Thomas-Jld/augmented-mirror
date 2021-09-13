@@ -185,7 +185,7 @@ function choseAction(opt, action){
 }
 
 function keyPressed() {200
-    switch(hey){
+    switch(key){
         case "c":
             modules.forEach(m => {
                 m.clearSketch();
@@ -248,35 +248,3 @@ function keyPressed() {200
             break;
     }
 }
-
-// function mousePressed(){
-//     selector.display_bubbles = !selector.display_bubbles;
-// }
-
-// function mousePressed() {
-//     let selected = false;
-//     let objectSelected = false;
-//     modules.forEach(m => {
-//         if (m.movable && mouseX > m.x && mouseY > m.y && mouseX < m.x + m.width && mouseY < m.y + m.height) {
-//             selected = true;
-//             if (!objectsSelected) {
-//                 m.latched = true;
-//                 objectSelected = true;
-//                 m.OffsetX = mouseX - m.x;
-//                 m.OffsetY = mouseY - m.y;
-//             } else {
-//                 m.latched = false;
-//             }
-//         }
-//     });
-
-//     objectsSelected = objectSelected;
-
-//     if (!selected) {
-//         modules.forEach(m => {
-//             if (!m.movable && m.clickable) {
-//                 m.onClicked(mouseX, mouseY);
-//             }
-//         });
-//     }
-// }
