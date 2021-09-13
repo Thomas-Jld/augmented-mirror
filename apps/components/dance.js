@@ -111,10 +111,10 @@ let Dance = (sketch) => {
                         for (let i = 0; i < this.body_pose.length; i++) {
                             distances.push(
                                 sketch.dist(
-                                    this.moves[this.moves_index][1], //Video x
-                                    this.moves[this.moves_index][2], //Video y
-                                    this.body_pose[2], //Mirror x 
-                                    this.body_pose[3], //Mirror y
+                                    this.moves[this.moves_index][i][1], //Video x
+                                    this.moves[this.moves_index][i][2], //Video y
+                                    this.body_pose[i][2], //Mirror x 
+                                    this.body_pose[i][3], //Mirror y
                                 )
                             );
                         }
