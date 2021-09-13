@@ -76,8 +76,8 @@ let Dance = (sketch) => {
                 if (!this.init) {
                     this.init = true;
 
-                    let mirror_nose_reference = this.body_pose[0].slice(2, 4); // Current nose postion of the user
-                    let mirror_left_hip_reference = this.body_pose[23].slice(2, 4); // Current left hip postion of the user
+                    let mirror_nose_reference = this.body_pose[0]; // Current nose postion of the user
+                    let mirror_left_hip_reference = this.body_pose[23]; // Current left hip postion of the user
                     let video_nose_reference = this.moves[Object.keys(this.moves)[0]][0].slice(1, 3); // Position in pixels of the first nose of this.moves
                     let video_left_hip_reference = this.moves[Object.keys(this.moves)[0]][23].slice(1, 3); // Position in pixels of the first left_hip of this.moves
 
@@ -113,8 +113,8 @@ let Dance = (sketch) => {
                                 sketch.dist(
                                     this.moves[this.moves_index][i][1], //Video x
                                     this.moves[this.moves_index][i][2], //Video y
-                                    this.body_pose[i][2], //Mirror x 
-                                    this.body_pose[i][3], //Mirror y
+                                    this.body_pose[i][0], //Mirror x 
+                                    this.body_pose[i][1], //Mirror y
                                 )
                             );
                         }
