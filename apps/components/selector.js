@@ -16,7 +16,7 @@ let Selector = (sketch) => {
     // sketch.rotation = 0;
     sketch.sliding = 0;
 
-    let description = `This is the alpha version of an interractive mirror, an interface integrating the user's reflection into the informations displayed and the mirror's behavior.`
+    let description = `This is the alpha version of an interractive mirror, an interface integrating the user's reflection into the information displayed and the mirror's behavior.`
 
     let icons = ["info.svg", "disco.svg", "settings.svg"];
 
@@ -122,9 +122,9 @@ let Selector = (sketch) => {
                 for (let i = 0; i < this.choice.length; i++) {
                     this.bars.push(
                         new SelectBar(
-                            this.rx, 
-                            this.ry, 
-                            this.slots[i],
+                            this.rx,    // x
+                            this.ry,    // y
+                            this.slots[i],  // y offset
                             this.d, 
                             this.choice[i], 
                             this
@@ -139,7 +139,7 @@ let Selector = (sketch) => {
                         this.ry,     // y
                         this.d * 2,    // w
                         this.d * 2,    // h
-                        this.d * 0.5,    // offset
+                        this.d * 0.5,    // xoffset
                         this.choice, //content
                         this         //parent
                     )
@@ -219,10 +219,10 @@ let Selector = (sketch) => {
     }
 
     class SelectBar {
-        constructor(x, y, slide, d, choice, parent) {
+        constructor(x, y, yoffset, d, choice, parent) {
             this.x = x;
             this.y = y;
-            this.slide = slide;
+            this.yoffset = yoffset;
             this.d = d / 2;
             this.w = this.d * 4;
             this.h = this.d;
@@ -253,7 +253,7 @@ let Selector = (sketch) => {
                 sketch.noStroke();
                 sketch.textSize(this.per * this.h / 2);
                 sketch.text(this.choice, this.rx + this.per * this.w / 2, this.ry);
-                if (this.slide == 0) {
+                if (this.yoffset == 0) {
                     sketch.fill(255);
                     sketch.stroke(255);
                     sketch.triangle(this.rx, this.ry - this.per * this.h / 3,
@@ -267,7 +267,7 @@ let Selector = (sketch) => {
             this.x = x;
             this.y = y;
             this.rx = this.x + 3 * this.per * this.d / 2;
-            this.ry = this.y + this.per * this.slide - sketch.sliding;
+            this.ry = this.y + this.per * this.yoffset - sketch.sliding;
 
             if (!this.parent.selected || !sketch.display_bubbles) {
                 this.per *= this.mul;

@@ -53,7 +53,7 @@ let Dance = (sketch) => {
             this.moves_index = 0;
 
             this.diff = 0; // The lower, the closer the moves are
-            this.limit = 100; // if this.diff < this.limit, it goes on
+            this.limit = 400; // if this.diff < this.limit, it goes on
         }
 
         show() {

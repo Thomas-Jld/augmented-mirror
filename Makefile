@@ -14,6 +14,10 @@ build:
 push:
 	docker push ${IM_NAME}
 
+pull:
+	git pull
+	-git lfs fetch --all	
+
 run:
 	-sudo nvidia-docker rm $(REPO)
 	sudo nvidia-docker run -d --expose 5000 -e PYTHONUNBUFFERED=1 --network="host" --privileged --volume=/dev:/dev --name=$(REPO) $(IMNAME)

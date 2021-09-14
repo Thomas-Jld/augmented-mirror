@@ -34,7 +34,7 @@ PAUSED = False
 
 WIDTH = 640
 HEIGHT = 480
-WINDOW = 0.5 # Reduce to focus on the middle
+WINDOW = 0.7 # Reduce to focus on the middle
 
 
 """
