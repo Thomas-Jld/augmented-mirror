@@ -166,6 +166,8 @@ function choseAction(opt, action){
         case  "Dance n°1":
             if(action){
                 dance.activated = false;
+                dance.selfCanvas.clear();
+                dance.dance.reset();
             }
             else{
                 dance.activated = true;

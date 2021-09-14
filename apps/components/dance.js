@@ -56,6 +56,15 @@ let Dance = (sketch) => {
             this.diff = 0; // The lower, the closer the moves are
             this.limit = 100; // if this.diff < this.limit, it goes on
         }
+        
+        reset() {
+            this.moves_index = 0;
+            this.diff = 0;
+            this.offset = [0, 0];
+            this.ratio = 1;
+            this.size = [];
+            this.init = false;
+        }
 
         show() {
             if (this.init && this.moves_index > this.video_index) {
