@@ -22,7 +22,7 @@ let screenwidth = 392.85; //millimeters
 let screenheight = 698.4;
 
 let global_data = {};
-let available = true;
+// let available = true;
 
 function preload(){
     pikachu_model = loadModel("components/models/pikachu.obj");
@@ -40,7 +40,7 @@ function setup() {
     socket.emit("update", true);
     socket.on("global_data", (data) => {
         global_data = data;
-        available = true;
+        // available = true;
     });
 }
 
@@ -56,10 +56,10 @@ function draw() {
             }
         });
         selection();
-        if(available){
-            socket.emit("update", true);
-            available = false;
-        }
+        socket.emit("update", true);
+        // if(available){
+        //     available = false;
+        // }
     }
 }
 
