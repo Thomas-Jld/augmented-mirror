@@ -179,45 +179,6 @@ class BodyProvider(threading.Thread):
 
 """
 (Thread)
-* Gets body mesh from detectron2 (densepose)
-! Lib installation steps commented in Docker
-"""
-class BodyMeshProvider(threading.Thread):
-    def __init__(self, threadID, feed):
-        import get_body_mesh as gm
-        threading.Thread.__init__(self)
-        self.threadID = threadID
-        gm.init_densepose()
-
-    def run(self):
-        import get_body_mesh as gm
-        print(
-        """
-        -------------------------------------
-        Mesh provider running
-        -------------------------------------
-        """)
-
-        global global_data
-        while 1:
-            start_t = time.time()
-
-            if color is not None:
-                self.data = gm.infere_on_image(color)
-
-                global_data["body_mesh"] = self.data
-
-                if not data_queue.empty():
-                    data_queue.get()
-                data_queue.put(global_data)
-
-            end_t = time.time()
-            dt = max(1/FPS - (end_t - start_t), 0.001)
-            time.sleep(dt)
-
-
-"""
-(Thread)
 * Hands from mediapipe
 ! Only one instance from mediapipe can run
 """
