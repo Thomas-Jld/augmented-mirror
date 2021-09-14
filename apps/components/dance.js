@@ -41,6 +41,7 @@ let Dance = (sketch) => {
             this.offset = [0, 0];
             this.ratio = 1;
             this.size = [];
+            this.length = 1000; // Arbitrary
 
             this.video = sketch.loadImage("components/videos/" + file_name + ".gif");
             this.video.pause();
@@ -50,6 +51,7 @@ let Dance = (sketch) => {
                 "components/movements/" + file_name + ".json",// Structure : moves["index"] = [[kpts_index, x, y], ...]
                 (moves) => {
                     sketch.dance.size = moves["size"]; // Original video size
+                    sketch.dance.length = moves["length"]; // Original video size
                 }); 
             this.moves_index = 0;
 
@@ -92,6 +94,10 @@ let Dance = (sketch) => {
         }
 
         update() {
+            if(this.moves_index >= this.length){
+                this.reset();
+                return;
+            }
             if (this.body_pose.length > 0) {
                 if (!this.init) {
                     this.init = true;
