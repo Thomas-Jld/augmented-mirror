@@ -35,6 +35,7 @@ let Dance = (sketch) => {
     class DanceLesson {
         constructor(file_name) {
             this.body_pose = [];
+            this.indexes_to_study = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26]
 
             this.init = false;
             this.offset = [0, 0];
@@ -121,8 +122,8 @@ let Dance = (sketch) => {
                         for (let i = 0; i < this.body_pose.length; i++) {
                             distances.push(
                                 sketch.dist(
-                                    this.moves[this.moves_index][i][1], //Video x
-                                    this.moves[this.moves_index][i][2], //Video y
+                                    this.offset[0] + this.moves[this.moves_index][i][1] * this.ratio, //Video x
+                                    this.offset[1] + this.moves[this.moves_index][i][2] * this.ratio, //Video y
                                     this.body_pose[i][0], //Mirror x 
                                     this.body_pose[i][1], //Mirror y
                                 )

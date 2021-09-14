@@ -6,8 +6,8 @@ let hands;
 let face;
 let selector;
 let clock;
-let pikachu;
-let pikachu_model;
+// let pikachu;
+// let pikachu_model;
 let dance;
 
 let socket;
@@ -24,9 +24,9 @@ let screenheight = 698.4;
 let global_data = {};
 // let available = true;
 
-function preload(){
-    pikachu_model = loadModel("components/models/pikachu.obj");
-}
+// function preload(){
+//     pikachu_model = loadModel("components/models/pikachu.obj");
+// }
 
 function setup() {
     canvas = createCanvas(windowWidth, windowHeight);
@@ -76,15 +76,15 @@ function selection(){
         selector.cursor = hands.right_hand.hand_pose_t[8];
 
     }
-    if(hands.right_hand.hand_pose_t[8] != undefined){
-        pikachu.cursor = hands.right_hand.hand_pose_t[8].copyWithin().concat([100]);
-    }
+    // if(hands.right_hand.hand_pose_t[8] != undefined){
+    //     pikachu.cursor = hands.right_hand.hand_pose_t[8].copyWithin().concat([100]);
+    // }
 }
 
 function reshape() {
     resizeCanvas(windowWidth, windowHeight);
 
-    dance = new p5(Dance);
+    dance = new p5(Dance); // Draw first to not draw the rest over it.
     dance.set(0, 0, width, height);
     modules.push(dance);
 
@@ -116,9 +116,9 @@ function reshape() {
     selector.set(0, 0, width, height);
     modules.push(selector);
 
-    pikachu = new p5(Pikachu);
-    pikachu.set(0, 0, width, height);
-    modules.push(pikachu);
+    // pikachu = new p5(Pikachu);
+    // pikachu.set(0, 0, width, height);
+    // modules.push(pikachu);
 
     started = true;
 }
@@ -165,10 +165,10 @@ function choseAction(opt, action){
         
         case  "Dance n°1":
             if(action){
-                dance.activated = true;
+                dance.activated = false;
             }
             else{
-                dance.activated = false;
+                dance.activated = true;
             }
             break;
         
