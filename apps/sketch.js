@@ -64,8 +64,14 @@ function draw() {
 }
 
 function selection(){
-    if (hands.left_hand.hand_pose_t[8] !== undefined && hands.left_hand.hand_pose_t[5] !== undefined && hands.right_hand.hand_pose_t[8] !== undefined) {
-        if (hands.left_hand.hand_pose_t[8][0] - hands.left_hand.hand_pose_t[5][0] > 80){
+    if (hands.left_hand.hand_pose_t[8] !== undefined && 
+        hands.left_hand.hand_pose_t[5] !== undefined && 
+        hands.right_hand.hand_pose_t[8] !== undefined) {
+        if (
+            hands.left_hand.hand_pose_t[8][0] - hands.left_hand.hand_pose_t[5][0] > 80 && 
+            dance.dance.init !== undefined && 
+            dance.dance.init === true
+            ){
             selector.display_bubbles = true;
         }
         else{
@@ -149,11 +155,13 @@ function choseAction(opt, action){
         
         case "Show Pose":
             if(action){
-                pose.activated = true;
+                // pose.activated = true;
+                pose.show_body_lines = true;
                 pose.selfCanvas.show();
             }
             else{
-                pose.activated = false;
+                // pose.activated = false;
+                pose.show_body_lines = false;
                 pose.selfCanvas.hide();
             }
             break;

@@ -64,7 +64,6 @@ let Dance = (sketch) => {
             this.diff = 0;
             this.offset = [0, 0];
             this.ratio = 1;
-            this.size = [];
             this.init = false;
         }
 
@@ -91,13 +90,13 @@ let Dance = (sketch) => {
                 20,
                 80
             );
-            sketch.fill(0, 255, 0);
             sketch.noStroke();
+            sketch.fill('rgb( 255, 0, 0)');
             sketch.rect(
                 sketch.width - 80,
-                sketch.height - 50,
+                sketch.height - 50 - this.diff*3,
                 30,
-                sketch.height - 50 - this.diff*3
+                this.diff * 3
             );
         }
 
