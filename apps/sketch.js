@@ -15,8 +15,8 @@ let canvas;
 
 let started = false;
 
-let xoffset = -235; // millimeters
-let yoffset = 50;
+let xoffset = -260; // millimeters
+let yoffset = 70;
 
 let screenwidth = 392.85; //millimeters
 let screenheight = 698.4;
@@ -68,9 +68,9 @@ function selection(){
         hands.left_hand.hand_pose_t[5] !== undefined && 
         hands.right_hand.hand_pose_t[8] !== undefined) {
         if (
-            hands.left_hand.hand_pose_t[8][0] - hands.left_hand.hand_pose_t[5][0] > 80 && 
-            dance.dance.init !== undefined && 
-            dance.dance.init === true
+            hands.left_hand.hand_pose_t[8][0] - hands.left_hand.hand_pose_t[5][0] > 80 && (
+            dance.dance.init === undefined || 
+            !dance.dance.init)
             ){
             selector.display_bubbles = true;
         }
