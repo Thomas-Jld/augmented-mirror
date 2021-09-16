@@ -56,7 +56,7 @@ let Dance = (sketch) => {
             this.moves_index = 0;
 
             this.diff = 0; // The lower, the closer the moves are
-            this.limit = 100; // if this.diff < this.limit, it goes on
+            this.limit = 150; // if this.diff < this.limit, it goes on
         }
         
         reset() {
@@ -90,6 +90,14 @@ let Dance = (sketch) => {
                 Math.floor(this.diff), 
                 20,
                 80
+            );
+            sketch.fill(0, 255, 0);
+            sketch.noStroke();
+            sketch.rect(
+                sketch.width - 80,
+                sketch.height - 50,
+                30,
+                sketch.height - 50 - this.diff*3
             );
         }
 
