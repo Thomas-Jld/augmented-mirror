@@ -61,6 +61,7 @@ let Dance = (sketch) => {
         
         reset() {
             this.moves_index = 0;
+            this.video_index = 0;
             this.diff = 0;
             this.offset = [0, 0];
             this.ratio = 1;
