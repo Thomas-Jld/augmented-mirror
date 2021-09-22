@@ -26,6 +26,7 @@ global_data = {
 }
 eyes = []
 threads = []
+client = ""
 
 FPS = 45
 
@@ -33,7 +34,7 @@ PAUSED = False
 
 WIDTH = 640
 HEIGHT = 480
-WINDOW = 0.5 # Reduce to focus on the middle
+WINDOW = 0.7 # Reduce to focus on the middle
 
 
 """
@@ -44,6 +45,7 @@ def normalize_data(data: List[List]) -> List[List]:
 
 
 """
+(Thread)
 * Reads frames from the intel Realsense D435I Camera (color and depth frames)
 """
 class IntelVideoReader(object):
@@ -56,8 +58,8 @@ class IntelVideoReader(object):
         self.width = WIDTH
         self.height = HEIGHT
 
-        config.enable_stream(rs.stream.depth, self.width, self.height, rs.format.z16, 60)
-        config.enable_stream(rs.stream.color, self.width, self.height, rs.format.bgr8, 60)
+        config.enable_stream(rs.stream.depth, self.width, self.height, rs.format.z16, 30)
+        config.enable_stream(rs.stream.color, self.width, self.height, rs.format.bgr8, 30)
 
         profile = self.pipe.start(config)
 
@@ -85,9 +87,11 @@ class IntelVideoReader(object):
         depth_frame = np.fliplr(np.asanyarray(depth_frame.get_data()))
 
         return [color_frame, depth_frame]
+        socketisocketioo
 
 
 """
+(Thread)
 * A class that reads frames from the webcam (color only)
 """
 class CameraVideoReader:
@@ -175,45 +179,6 @@ class BodyProvider(threading.Thread):
 
 """
 (Thread)
-* Gets body mesh from detectron2 (densepose)
-! Lib installation steps commented in Docker
-"""
-class BodyMeshProvider(threading.Thread):
-    def __init__(self, threadID, feed):
-        import get_body_mesh as gm
-        threading.Thread.__init__(self)
-        self.threadID = threadID
-        gm.init_densepose()
-
-    def run(self):
-        import get_body_mesh as gm
-        print(
-        """
-        -------------------------------------
-        Mesh provider running
-        -------------------------------------
-        """)
-
-        global global_data
-        while 1:
-            start_t = time.time()
-
-            if color is not None:
-                self.data = gm.infere_on_image(color)
-
-                global_data["body_mesh"] = self.data
-
-                if not data_queue.empty():
-                    data_queue.get()
-                data_queue.put(global_data)
-
-            end_t = time.time()
-            dt = max(1/FPS - (end_t - start_t), 0.001)
-            time.sleep(dt)
-
-
-"""
-(Thread)
 * Hands from mediapipe
 ! Only one instance from mediapipe can run
 """
@@ -247,15 +212,14 @@ class HandsProvider(threading.Thread):
 
                 if bool(self.data):
                     global_data["right_hand_pose"] = self.data[0] #Arbitrary, for testing purposes
-                    global_data["right_hand_sign"] = ghs.find_gesture(
-                        self.sign_provider,
-                        normalize_data(self.data[0])
-                    )
+                    # global_data["right_hand_sign"] = ghs.find_gesture(
+                    #     self.sign_provider,
+                    #     normalize_data(self.data[0])
+                    # )
 
                     if not data_queue.empty():
                         data_queue.get()
                     data_queue.put(global_data)
-
             end_t = time.time()
             dt = max(1/FPS - (end_t - start_t), 0.001)
             time.sleep(dt)
@@ -305,7 +269,6 @@ class FaceProvider(threading.Thread):
 """
 (Thread)
 * Body pose from mediapipe
-TODO: Crop the image to only get the center, focusing on the right person
 ! Only one instance from mediapipe can run
 """
 class HolisticProvider(threading.Thread):
@@ -323,7 +286,7 @@ class HolisticProvider(threading.Thread):
         import get_holistic as gh
         #* Home made hand signs : https://github.com/Thomas-Jld/gesture-recognition
         import get_hand_sign as ghs
-        import get_reflection as gr
+        from get_reflection import project
         print(
         """
         -------------------------------------
@@ -342,10 +305,10 @@ class HolisticProvider(threading.Thread):
                     if bool(self.data["body_pose"]):
                         eyes = self.data["body_pose"][0][2:4]
 
-                        body = gr.project(self.data["body_pose"], eyes, self.feed, depth, 4)
+                        body = project(self.data["body_pose"], eyes, self.feed, depth, 4)
                         global_data["body_pose"] = body
 
-                        global_data["right_hand_pose"] = gr.project(
+                        global_data["right_hand_pose"] = project(
                                 self.data["right_hand_pose"],
                                 eyes,
                                 self.feed,
@@ -359,7 +322,7 @@ class HolisticProvider(threading.Thread):
                                     normalize_data(self.data["right_hand_pose"])
                                 )
 
-                        global_data["left_hand_pose"] = gr.project(
+                        global_data["left_hand_pose"] = project(
                                 self.data["left_hand_pose"],
                                 eyes,
                                 self.feed,
@@ -374,7 +337,7 @@ class HolisticProvider(threading.Thread):
                                     normalize_data(self.data["left_hand_pose"])
                                 )
 
-                        global_data["face_mesh"] = gr.project(
+                        global_data["face_mesh"] = project(
                                 self.data["face_mesh"],
                                 eyes,
                                 self.feed,
@@ -485,18 +448,24 @@ class PifpafProvider(threading.Thread):
 
 
 """
-* Sends data to the client when requested
+* Sends data to the client upon request
 """
-@sio.on('update')
-def update(*args):
+@sio.on("update")
+def update(*args) -> None:
     data = data_queue.get()
     sio.emit("global_data", global_data)
-
 
 @sio.on('pause')
 def pause(data: bool):
     global PAUSED
     PAUSED = data
+
+
+@sio.event
+def connect(sid, environ):
+    global client
+    print('connect ', sid)
+    client = sid
 
 """
 * Init everything when starting the program
@@ -532,6 +501,9 @@ if __name__ == '__main__':
     camThread.start()
     for thread in Threads:
         thread.start()
+
+    # Messenger = SendData("server")
+    # Messenger.start()
 
     print(
     """

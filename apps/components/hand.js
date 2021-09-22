@@ -127,9 +127,9 @@ let Hands = (sketch) => {
                     if (this.hand_pose_t.length == this.hand_pose.length){
                         newx = width * (this.hand_pose[i][2] - xoffset) / screenwidth;
                         newy = height * (this.hand_pose[i][3] - yoffset) / screenheight;
-                        if(newy > 0){
-                            x = lerp(this.hand_pose_t[i][0], newx, 0.7);
-                            y = lerp(this.hand_pose_t[i][1], newy, 0.7);
+                        if(newy > 0 || this.hand_pose_t[i][1] < 0){
+                            x = lerp(this.hand_pose_t[i][0], newx, 0.8);
+                            y = lerp(this.hand_pose_t[i][1], newy, 0.8);
                         }
                         else{ // Assume it's an artifact and slows the update
                             x = lerp(this.hand_pose_t[i][0], newx, 0.01);

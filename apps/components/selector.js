@@ -16,11 +16,9 @@ let Selector = (sketch) => {
     // sketch.rotation = 0;
     sketch.sliding = 0;
 
-    let description = `This is a Alpha version of an interractive mirror
-                        interface integrating the user's reflection into
-                        the informations displayed and the mirror's actions.`
+    let description = `This is the alpha version of an interractive mirror, an interface integrating the user's reflection into the information displayed and the mirror's behavior.`
 
-    let icons = ["user.svg", "info.svg", "settings.svg"];
+    let icons = ["info.svg", "disco.svg", "settings.svg"];
 
     sketch.set = (p1, p2, w, h) => {
         sketch.width = w;
@@ -40,8 +38,8 @@ let Selector = (sketch) => {
             sketch.y,
             150,
             [
-                0,
-                1,
+                description,
+                ["Dance n°2", "Dance n°1"],
                 ["Show Face", "Show Clock", "Show Pose", "Show Hands"],
             ],
             icons
@@ -122,8 +120,30 @@ let Selector = (sketch) => {
 
             if (typeof (this.choice) == "object") {
                 for (let i = 0; i < this.choice.length; i++) {
-                    this.bars.push(new SelectBar(this.rx, this.ry, this.slots[i], this.d, this.choice[i], this));
+                    this.bars.push(
+                        new SelectBar(
+                            this.rx,    // x
+                            this.ry,    // y
+                            this.slots[i],  // y offset
+                            this.d, 
+                            this.choice[i], 
+                            this
+                        )
+                    );
                 }
+
+            } else if (typeof (this.choice) == "string") {
+                this.bars.push(
+                    new InfoPanel(
+                        this.rx,     // x
+                        this.ry,     // y
+                        this.d * 2,    // w
+                        this.d * 2,    // h
+                        this.d * 0.5,    // xoffset
+                        this.choice, //content
+                        this         //parent
+                    )
+                );
             }
         }
 
@@ -199,10 +219,10 @@ let Selector = (sketch) => {
     }
 
     class SelectBar {
-        constructor(x, y, slide, d, choice, parent) {
+        constructor(x, y, yoffset, d, choice, parent) {
             this.x = x;
             this.y = y;
-            this.slide = slide;
+            this.yoffset = yoffset;
             this.d = d / 2;
             this.w = this.d * 4;
             this.h = this.d;
@@ -233,7 +253,7 @@ let Selector = (sketch) => {
                 sketch.noStroke();
                 sketch.textSize(this.per * this.h / 2);
                 sketch.text(this.choice, this.rx + this.per * this.w / 2, this.ry);
-                if (this.slide == 0) {
+                if (this.yoffset == 0) {
                     sketch.fill(255);
                     sketch.stroke(255);
                     sketch.triangle(this.rx, this.ry - this.per * this.h / 3,
@@ -247,7 +267,7 @@ let Selector = (sketch) => {
             this.x = x;
             this.y = y;
             this.rx = this.x + 3 * this.per * this.d / 2;
-            this.ry = this.y + this.per * this.slide - sketch.sliding;
+            this.ry = this.y + this.per * this.yoffset - sketch.sliding;
 
             if (!this.parent.selected || !sketch.display_bubbles) {
                 this.per *= this.mul;
@@ -329,17 +349,52 @@ let Selector = (sketch) => {
             this.offset = offset;
             this.content = content;
             this.parent = parent;
-            this.size = 5;
+            this.size = 25;
+
+            this.per = 0; // To animate the display when showing / hidding
+            this.mul = 0.92;
         }
 
         show() {
+            sketch.stroke(255);
+            sketch.strokeWeight(4);
+            sketch.noFill();
+            sketch.rect(
+                this.x + this.offset, 
+                this.y - this.h / 2, 
+                this.w, 
+                this.h
+            );
+
+            sketch.stroke(255);
             sketch.fill(255);
-            sketch.noStroke();
-            sketch.rect(this.x + this.offset, this.y - this.h / 2, this.x + this.offset + this.w, this.y + this.h / 2);
-            sketch.stroke(0);
-            // sketch.strokeWeight()
+            sketch.strokeWeight(2);
             sketch.textSize(this.size);
-            sketch.text(this.content, this.x + this.offset + this.w / 2, this.y, this.w, this.h);
+            sketch.text(
+                this.content, 
+                this.x + this.offset + this.w * 0.05, 
+                this.y - 0.45 * this.h, 
+                this.w * 0.9,
+                this.h * 0.9
+            );
+        }
+
+        update(x, y) {
+            this.x = x;
+            this.y = y;
+            // this.rx = this.x + this.per * this.offset;
+            // this.ry = this.y;
+
+            // if (!this.parent.selected || !sketch.display_bubbles) {
+            //     this.per *= this.mul;
+            // } else {
+            //     if (this.per < 1) {
+            //         this.per += 0.1;
+            //         if(this.per > 1){
+            //             this.per = 1;
+            //         }
+            //     }
+            // }
         }
     }
 }
