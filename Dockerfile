@@ -1,30 +1,7 @@
-# FROM nvidia/cuda:10.2-cudnn7-devel-ubuntu18.04
 FROM nvidia/cudagl:10.2-devel-ubuntu18.04
 
 #CMD nvidia-smi
 ENV DEBIAN_FRONTEND=noninteractive
-
-WORKDIR /Miroir/
-
-RUN apt-get update && \
-  apt-get -y install python3-pip python3.7 libusb-1.0-0-dev libgl1-mesa-glx nano git curl
-
-RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 1
-RUN python3.7 -m pip install --upgrade pip
-RUN python3.7 -m pip install sklearn setuptools
-ADD requirements.txt .
-RUN python3.7 -m pip install -r requirements.txt
-
-# RUN apt-get -y install python3.7
-# RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 1
-
-RUN python3 -m pip install --upgrade pip
-RUN python3 -m pip install gdown
-
-WORKDIR /Miroir/build
-
-# RUN apt-get -y install g++ unzip zip openjdk-11-jdk 
-
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         build-essential \
@@ -33,9 +10,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         ffmpeg \
         wget \
         unzip \
-        python3-dev \    
+        python3.7 \
+        python3.7-dev \    
+        python3-pip \
         python3-opencv \
-        # python3-pip \
         python3-apt \
         libopencv-core-dev \
         libopencv-highgui-dev \
@@ -49,6 +27,23 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+WORKDIR /Miroir/
+
+RUN apt-get update && apt-get -y install libusb-1.0-0-dev libgl1-mesa-glx nano git curl
+
+# Installing python requirements
+
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 1
+RUN python3 -m pip install --upgrade pip
+RUN python3 -m pip install setuptools
+RUN python3 -m pip install sklearn
+ADD requirements.txt .
+RUN python3 -m pip install -r requirements.txt
+RUN python3 -m pip install gdown
+
+# Installing bazel and tools
+
+WORKDIR /Miroir/build
 
 ARG BAZEL_VERSION=4.1.0
 RUN mkdir /bazel && \
@@ -58,34 +53,35 @@ azel-${BAZEL_VERSION}-installer-linux-x86_64.sh" && \
     chmod +x /bazel/installer.sh && \
     /bazel/installer.sh  && \
     rm -f /bazel/installer.sh
-    
-# RUN gdown --id 1AfEjEcUwAb70QFfwiaje2d0QkNYYZv3x --output bazel-4.1.0-installer-linux-x86_64.sh
-# RUN chmod +x bazel-4.1.0-installer-linux-x86_64.sh
-# RUN ./bazel-4.1.0-installer-linux-x86_64.sh
-
 
 RUN apt-get update
 RUN apt-get -o Dpkg::Options::="--force-confmiss" install --reinstall netbase
 RUN apt-get -y install protobuf-compiler
+
+# Setting up the building folder
+
 RUN gdown --id 1Z9w1j_0m90XA7rA6XwIIi2JQPmMM3TMv --output mediapipe-0.8.3.1.zip
 RUN unzip mediapipe-0.8.3.1.zip
 WORKDIR /Miroir/build/mediapipe-0.8.3.1
 RUN python3 -m pip install -r requirements.txt
 
+# Quick fixes
+
 RUN DEBIAN_FRONTEND="noninteractive" apt-get -y install libprotoc-dev
 RUN export
 RUN ln -s /usr/bin/python3 /usr/bin/python
 
-#RUN git clone https://github.com/Thomas-Jld/detectron2 reflection/detectron2
-#RUN curl https://dl.fbaipublicfiles.com/densepose/densepose_rcnn_R_50_FPN_s1x/165712039/model_final_162be9.pkl --output reflection/models/model_final_162be9.pkl
-#RUN	curl https://download.01.org/opencv/openvino_training_extensions/models/human_pose_estimation/checkpoint_iter_370000.pth --output reflection/pose-estimation/checkpoint_iter_370000.pth
+# Fixing python
 
-# ENV ANDROID_NDK_HOME="/home"
-# RUN export
-# RUN chmod +x setup_android_sdk_and_ndk.sh
-# RUN ./setup_android_sdk_and_ndk.sh
+WORKDIR /usr/lib/python3/dist-packages/gi
+RUN ln -s _gi.cpython-36m-x86_64-linux-gnu.so _gi.cpython-37m-x86_64-linux-gnu.so
 
-#RUN python3 -m pip install -e detectron2
+WORKDIR /usr/lib/python3/dist-packages
+RUN ln -s apt_pkg.cpython-36m-x86_64-linux-gnu.so apt_pkg.so
+
+# Building mediapipe
+
+WORKDIR /Miroir/build/mediapipe-0.8.3.1
 
 RUN add-apt-repository ppa:ubuntu-toolchain-r/test
 RUN apt-get update
@@ -96,26 +92,15 @@ RUN ln -s /usr/bin/gcc-8 /usr/bin/gcc
 RUN add-apt-repository ppa:kisak/kisak-mesa
 RUN apt-get update
 RUN apt-get -y install mesa-utils
-# RUN pip3 install mediapipe
+RUN python3 setup.py gen_protos
 RUN python3 setup.py install
 
-WORKDIR /Miroir/build
+WORKDIR /Miroir
 
-COPY ./test.py .
+# Copying and launching the backend
 
-# RUN python3 -m pip install sklearn setuptools
-# ADD requirements.txt .
-# RUN python3 -m pip install -r requirements.txt
+COPY . .
 
+WORKDIR /Miroir/reflection/
 
-# COPY . .
-
-# #RUN git clone https://github.com/Thomas-Jld/detectron2 reflection/detectron2
-# #RUN curl https://dl.fbaipublicfiles.com/densepose/densepose_rcnn_R_50_FPN_s1x/165712039/model_final_162be9.pkl --output reflection/models/model_final_162be9.pkl 
-# #RUN	curl https://download.01.org/opencv/openvino_training_extensions/models/human_pose_estimation/checkpoint_iter_370000.pth --output reflection/pose-estimation/checkpoint_iter_370000.pth
-
-# WORKDIR /Miroir/reflection/
-
-# #RUN python3 -m pip install -e detectron2 
-
-# CMD ./launch_reflection.sh
+CMD ./launch_reflection.sh
