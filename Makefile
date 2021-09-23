@@ -12,7 +12,7 @@ build:
 	sudo nvidia-docker build -t $(IMNAME) .
 
 push:
-	docker push ${IM_NAME}
+	sudo nvidia-docker push ${IMNAME}
 
 pull:
 	git pull
@@ -20,14 +20,11 @@ pull:
 
 run:
 	-sudo nvidia-docker rm $(REPO)
-	sudo nvidia-docker run -d --expose 5000 -e PYTHONUNBUFFERED=1 --network="host" --privileged --volume=/dev:/dev -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY -e QT_X11_NO_MITSHM=1 --name=$(REPO) $(IMNAME)
+	sudo nvidia-docker run -d --expose 5000 -e PYTHONUNBUFFERED=1 --network="host" --privileged --volume=/dev:/dev -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=:0 -e QT_X11_NO_MITSHM=1 --name=$(REPO) $(IMNAME)
 
 launch:
 	-sudo nvidia-docker rm $(REPO)
-	sudo nvidia-docker run --expose 5000 -e PYTHONUNBUFFERED=1 --network="host" --privileged --volume=/dev:/dev -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY -e QT_X11_NO_MITSHM=1 --name=$(REPO) $(IMNAME)
-
-launch:
-	DISPLAY=:0 ./reflection/launch_reflection.sh
+	sudo nvidia-docker run --expose 5000 -e PYTHONUNBUFFERED=1 --network="host" --privileged --volume=/dev:/dev -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=:0 -e QT_X11_NO_MITSHM=1 --name=$(REPO) $(IMNAME)
 
 restart:
 	sudo systemctl restart docker

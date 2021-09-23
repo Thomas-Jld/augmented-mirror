@@ -95,6 +95,19 @@ RUN apt-get -y install mesa-utils
 RUN python3 setup.py gen_protos
 RUN python3 setup.py install
 
+RUN apt-get update \
+  && apt-get install -y -qq --no-install-recommends \
+  libglvnd0 \
+    libgl1 \
+    libglx0 \
+    libegl1 \
+    libxext6 \
+    libx11-6 \
+  && rm -rf /var/lib/apt/lists/*
+
+ENV NVIDIA_VISIBLE_DEVICES all
+ENV NVIDIA_DRIVER_CAPABILITIES graphics,utility,compute 
+
 WORKDIR /Miroir
 
 # Copying and launching the backend
@@ -103,4 +116,4 @@ COPY . .
 
 WORKDIR /Miroir/reflection/
 
-CMD ./launch_reflection.sh
+CMD DISPLAY=:0 python3 send_data.py

@@ -72,6 +72,12 @@ class IntelVideoReader(object):
         align_to = rs.stream.color
         self.align = rs.align(align_to)
 
+        self.depth_to_disparity =  rs.disparity_transform(True)
+        self.disparity_to_depth = rs.disparity_transform(False)
+        self.dec_filter = rs.decimation_filter()
+        self.temp_filter = rs.temporal_filter()
+        self.spat_filter = rs.spatial_filter()
+
     def next_frame(self):
         frameset = self.pipe.wait_for_frames()
 
@@ -82,6 +88,13 @@ class IntelVideoReader(object):
 
         self.depth_intrinsics = depth_frame.profile.as_video_stream_profile().intrinsics
         self.color_intrinsics = color_frame.profile.as_video_stream_profile().intrinsics
+
+        depth_frame = self.depth_to_disparity.process(depth_frame)
+        depth_frame = self.dec_filter.process(depth_frame)
+        depth_frame = self.temp_filter.process(depth_frame)
+        depth_frame = self.spat_filter.process(depth_frame)
+        depth_frame = self.disparity_to_depth.process(depth_frame)
+        depth_frame = depth_frame.as_depth_frame()
 
         color_frame = np.fliplr(np.asanyarray(color_frame.get_data()))
         depth_frame = np.fliplr(np.asanyarray(depth_frame.get_data()))
@@ -474,7 +487,6 @@ if __name__ == '__main__':
 
     functionalities = {
         "body_pose": [False, BodyProvider], # Body pose, requires Face mesh
-        "body_mesh": [False, BodyMeshProvider], # Body mesh, requires Body pose
         "hands_pose": [False, HandsProvider], # Hands, requires Body pose
         "face_mesh": [False, FaceProvider], # Face mesh
         "holistic_pose": [True, HolisticProvider], # Holistic, Body face and hands in one
