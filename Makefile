@@ -54,3 +54,6 @@ service_start:
 	sudo systemctl start mirror.service
 	systemctl --user start mirrorfront.service
 	systemctl --user start mirrorstartchrome.service
+
+waiting:
+	DISPLAY=:0 chromium apps/waiting/index.html --start-fullscreen --incognito
