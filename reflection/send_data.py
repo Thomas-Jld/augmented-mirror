@@ -540,7 +540,7 @@ class DisplayResult:
 
     def run(self):
         while 1:
-            image = np.zeros((WIDTH, HEIGHT, 3), dtype=np.uint8)
+            image = np.zeros((WIDTH, HEIGHT, 1), dtype=np.uint8)
             data = data_queue.get()
             image = self.body.draw(image, data)
             cv2.namedWindow(self.window_name, cv2.WND_PROP_FULLSCREEN)
@@ -724,6 +724,7 @@ if __name__ == "__main__":
         """
         )
         eventlet.wsgi.server(eventlet.listen(("", 5000)), app)
+
     elif MODE == "DISPLAY":
         print(
             """
