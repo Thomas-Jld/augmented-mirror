@@ -1,5 +1,3 @@
-import cv2 as cv2
-
 import threading
 import time
 from queue import Queue
@@ -8,7 +6,7 @@ from typing import List
 import eventlet
 import numpy as np
 import socketio
-
+from cv2 import cv2
 
 sio = socketio.Server(logger=False, cors_allowed_origins="*")
 app = socketio.WSGIApp(sio)
@@ -334,8 +332,8 @@ class FaceProvider(threading.Thread):
 
 class HolisticProvider(threading.Thread):
     def __init__(self, threadID, feed):
-        import get_holistic as gh
         import get_hand_sign as ghs
+        import get_holistic as gh
 
         threading.Thread.__init__(self)
         self.threadID = threadID
@@ -344,10 +342,9 @@ class HolisticProvider(threading.Thread):
         self.sign_provider = ghs.init()
 
     def run(self):
-        import get_holistic as gh
-
         # * Home made hand signs : https://github.com/Thomas-Jld/gesture-recognition
         import get_hand_sign as ghs
+        import get_holistic as gh
         from get_reflection import project
 
         print(
@@ -538,8 +535,6 @@ class DisplayResult:
         self.body = DrawPose()
 
     def run(self):
-        import cv2 as cv2
-
         while 1:
             image = np.zeros((WIDTH, HEIGHT, 3), dtype=np.uint8)
             image = self.body.draw(image)
@@ -562,10 +557,9 @@ TODO: Select the person
 
 class PifpafProvider(threading.Thread):
     def __init__(self, threadID, feed):
-        import get_pifpaf as gpp
-
         # * Home made hand signs : https://github.com/Thomas-Jld/gesture-recognition
         import get_hand_sign as ghs
+        import get_pifpaf as gpp
 
         threading.Thread.__init__(self)
         self.threadID = threadID
@@ -574,8 +568,8 @@ class PifpafProvider(threading.Thread):
         self.sign_provider = ghs.init()
 
     def run(self):
-        import get_pifpaf as gpp
         import get_hand_sign as ghs
+        import get_pifpaf as gpp
         from get_reflection import project
 
         print(
