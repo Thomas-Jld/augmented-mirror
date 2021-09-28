@@ -501,7 +501,11 @@ class DrawPose:
         self.show_head = False
         self.show_wrist = True
 
-    def draw(self, image):
+    def draw(self, image, data):
+        self.body_pose = data["body_pose"]
+        if len(self.body_pose) == 0:
+            return image
+
         for i in range(len(self.body_pose)):
             if self.body_pose[2:4] != [-1, -1]:
                 if len(self.body_pose_t) == len(self.body_pose):
@@ -537,7 +541,8 @@ class DisplayResult:
     def run(self):
         while 1:
             image = np.zeros((WIDTH, HEIGHT, 3), dtype=np.uint8)
-            image = self.body.draw(image)
+            data = data_queue.get()
+            image = self.body.draw(image, data)
             cv2.namedWindow(self.window_name, cv2.WND_PROP_FULLSCREEN)
             cv2.setWindowProperty(
                 self.window_name, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN
@@ -720,5 +725,12 @@ if __name__ == "__main__":
         )
         eventlet.wsgi.server(eventlet.listen(("", 5000)), app)
     elif MODE == "DISPLAY":
+        print(
+            """
+        -------------------------------------
+        Displaying
+        -------------------------------------
+        """
+        )
         display = DisplayResult()
         display.run()
