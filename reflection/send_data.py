@@ -49,6 +49,9 @@ OFFSET_Y = 70
 WINDOW = 0.7  # Reduce to focus on the middle
 MODE = "STREAM"  # "STREAM" or "DISPLAY"
 
+DEBUG_TIME = False
+DEBUG_DATA = False
+
 
 def normalize_data(data: List[List]) -> List[List]:
     """Normalize the data to fit the hand sign inout data"""
@@ -60,7 +63,7 @@ def lerp(P1, P2, f):
     return P1 + (P2 - P1) * f
 
 
-class IntelVideoReader(object):
+class IntelVideoReader:
     """
     (Thread)
     * Reads frames from the intel Realsense D435I Camera (color and depth frames)
@@ -134,11 +137,8 @@ class CameraVideoReader:
     def next_frame(self):
         """Collects color frames"""
 
-        ret, frame = self.cap.read()
-        if ret:
-            return [frame, None]
-        else:
-            return [None, None]
+        _, frame = self.cap.read()
+        return [frame, None]
 
 
 class FrameProvider(threading.Thread):
@@ -233,6 +233,7 @@ class HandsProvider(threading.Thread):
 
     def run(self):
         import get_hand_gesture as gh
+
         # import get_hand_sign as ghs
 
         print(
@@ -292,14 +293,13 @@ class FaceProvider(threading.Thread):
         """
         )
 
-        global global_data
         while 1:
             start_t = time.time()
 
             if color is not None:
-                self.data = gf.find_face_mesh(self.faces, color, WINDOW)
+                data = gf.find_face_mesh(self.faces, color, WINDOW)
 
-                global_data["face_mesh"] = self.data
+                global_data["face_mesh"] = data
 
                 if not data_queue.empty():
                     data_queue.get()
@@ -348,25 +348,29 @@ class HolisticProvider(threading.Thread):
                 if color is not None and depth is not None:
                     data = gh.find_all_poses(self.holistic, color, WINDOW)
 
+                    if DEBUG_TIME:
+                        flag_1 = time.time()
+                        print(f"Inference: {(flag_1 - start_t)*1000} ms")
+
                     if bool(data["body_pose"]):
                         eyes = data["body_pose"][0][2:4]
 
                         body = project(
-                            points = data["body_pose"],
-                            eyes_position = eyes,
-                            video_provider = self.feed,
-                            depth_frame = depth,
-                            depth_radius = 4
+                            points=data["body_pose"],
+                            eyes_position=eyes,
+                            video_provider=self.feed,
+                            depth_frame=depth,
+                            depth_radius=4,
                         )
                         global_data["body_pose"] = body
 
                         global_data["right_hand_pose"] = project(
-                            points = data["right_hand_pose"],
-                            eyes_position = eyes,
-                            video_provider = self.feed,
-                            depth_frame = depth,
-                            depth_radius = 2,
-                            ref = body[15][-1],
+                            points=data["right_hand_pose"],
+                            eyes_position=eyes,
+                            video_provider=self.feed,
+                            depth_frame=depth,
+                            depth_radius=2,
+                            ref=body[15][-1],
                         )
 
                         if len(data["right_hand_pose"]) > 0:
@@ -376,12 +380,12 @@ class HolisticProvider(threading.Thread):
                             )
 
                         global_data["left_hand_pose"] = project(
-                            points = data["left_hand_pose"],
-                            eyes_position = eyes,
-                            video_provider = self.feed,
-                            depth_frame = depth,
-                            depth_radius = 2,
-                            ref = body[16][-1],
+                            points=data["left_hand_pose"],
+                            eyes_position=eyes,
+                            video_provider=self.feed,
+                            depth_frame=depth,
+                            depth_radius=2,
+                            ref=body[16][-1],
                         )
 
                         if len(data["left_hand_pose"]) > 0:
@@ -391,20 +395,31 @@ class HolisticProvider(threading.Thread):
                             )
 
                         global_data["face_mesh"] = project(
-                            points = data["face_mesh"],
-                            eyes_position = eyes,
-                            video_provider = self.feed,
-                            depth_frame = depth,
-                            depth_radius = 2,
-                            ref = body[2][-1],
+                            points=data["face_mesh"],
+                            eyes_position=eyes,
+                            video_provider=self.feed,
+                            depth_frame=depth,
+                            depth_radius=2,
+                            ref=body[2][-1],
                         )
+
+                        if DEBUG_TIME:
+                            flag_2 = time.time()
+                            print(f"Projection: {(flag_2 - flag_1)*1000} ms")
 
                         if not data_queue.empty():
                             data_queue.get()
                         data_queue.put(global_data)
 
+                        if DEBUG_TIME:
+                            print(f"Adding to queue: {(time.time() - flag_2)*1000} ms")
+
                 end_t = time.time()
-                # print(f"Infer time: {(end_t - start_t)*1000}ms")
+
+                if DEBUG_TIME:
+                    print(f"Infer time: {(end_t - start_t)*1000}ms")
+                    print(f"FPS: {int(1/(end_t - start_t))}")
+
                 dt = max(1 / FPS - (end_t - start_t), 0.001)
                 time.sleep(dt)
             else:
@@ -412,7 +427,8 @@ class HolisticProvider(threading.Thread):
 
 
 class DrawPose:
-    """ Use Body parametters to draw the body on a provided image """
+    """Use Body parametters to draw the body on a provided image"""
+
     def __init__(self):
 
         self.body_junctions = BODY_LINKS
@@ -429,11 +445,9 @@ class DrawPose:
         self.show_wrist = True
 
     def draw(self, image, data):
-        """ Draws the body on an opencv image """
-        self.body_pose = data["body_pose"]
-        # print(self.body_pose)
+        """Draws the body on an opencv image"""
 
-        # image = cv2.line(image, [200, 200], [200, 600], self.color, self.thickness)
+        self.body_pose = data["body_pose"]
 
         if len(self.body_pose) == 0:
             return image
@@ -441,12 +455,8 @@ class DrawPose:
         for i, pose in enumerate(self.body_pose):
             if self.body_pose[2:4] != [-1, -1]:
                 if len(self.body_pose_t) == len(self.body_pose):
-                    newx = (
-                        RESOLUTION_X * (pose[2] - OFFSET_X) / DIMENSION_X
-                    )
-                    newy = (
-                        RESOLUTION_Y * (pose[3] - OFFSET_Y) / DIMENSION_Y
-                    )
+                    newx = RESOLUTION_X * (pose[2] - OFFSET_X) / DIMENSION_X
+                    newy = RESOLUTION_Y * (pose[3] - OFFSET_Y) / DIMENSION_Y
                     if newy > 0:
                         x = lerp(self.body_pose_t[i][0], newx, 0.8)
                         y = lerp(self.body_pose_t[i][1], newy, 0.8)
@@ -462,30 +472,38 @@ class DrawPose:
 
         for parts in self.body_junctions:
             for pair in parts:
-                try:
-                    # if self.body_pose_t[pair[0]][1] > 0 and self.body_pose_t[pair[1]][1] > 0 and (self.show_head or (pair[1] > 10 and pair[0] > 10)): # and (self.show_wrist or ([17, 18, 19, 20] not in pair[0]) and [17, 18, 19, 20, 21, 22].includes(pair[1])))
-                    # print(self.body_pose_t[pair[1]])
-                    # print(self.body_pose_t[pair[0]])
+                # if (
+                #     self.body_pose_t[pair[0]][1] > 0
+                #     and self.body_pose_t[pair[1]][1] > 0
+                #     and (self.show_head or (pair[1] > 10 and pair[0] > 10))
+                #     and (
+                #         self.show_wrist
+                #         or ([17, 18, 19, 20] not in pair[0])
+                #         and [17, 18, 19, 20, 21, 22] not in (pair[1])
+                #     )
+                # ):
+                #     print(self.body_pose_t[pair[1]])
+                #     print(self.body_pose_t[pair[0]])
 
-                    # image = cv2.line(image, [int(200.0055), 200], [200, 600], self.color, self.thickness)
-                    image = cv2.line(
-                        image,
-                        self.body_pose_t[pair[0]],
-                        self.body_pose_t[pair[1]],
-                        self.color,
-                        self.thickness,
-                    )
-                except:
-                    pass
+                image = cv2.line(
+                    image,
+                    self.body_pose_t[pair[0]],
+                    self.body_pose_t[pair[1]],
+                    self.color,
+                    self.thickness,
+                )
         return image
 
 
 class DisplayResult:
+    """Displays the mirrored information on an opencv window"""
+
     def __init__(self):
         self.window_name = "draw"
         self.body = DrawPose()
 
     def run(self):
+        """Updates the image with the informations"""
         while 1:
             image = np.zeros((RESOLUTION_Y, RESOLUTION_X, 3), dtype=np.uint8)
             data = data_queue.get()
@@ -598,7 +616,7 @@ class PifpafProvider(threading.Thread):
 
 
 @sio.on("update")
-def update(*args) -> None:
+def update(*_) -> None:
     """
     * Sends data to the client upon request
     """
@@ -614,9 +632,7 @@ def connect(*args):
     client = args[0]
 
 
-"""
-* Init everything when starting the program
-"""
+# * Init everything when starting the program
 if __name__ == "__main__":
 
     functionalities = {
@@ -636,7 +652,7 @@ if __name__ == "__main__":
     camThread = FrameProvider("frame", video_feed)
 
     Threads = []
-    for name in functionalities:
+    for name in functionalities.items():
         if functionalities[name][0]:
             Threads.append(functionalities[name][1](name, video_feed))
 
