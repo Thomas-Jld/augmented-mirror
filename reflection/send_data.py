@@ -34,7 +34,7 @@ FPS = 45
 
 PAUSED = False
 
-WIDTH = 848  # Camera image shape
+WIDTH = 640  # Camera image shape
 HEIGHT = 480
 
 RESOLUTION_X = 1080  # Screen resolution in pixel
@@ -75,17 +75,32 @@ class IntelVideoReader:
         self.pipe = rs.pipeline()
         config = rs.config()
 
+        # ctx = rs.context()
+        # devices = ctx.query_devices()
+        # for dev in devices:
+        #     dev.hardware_reset()
+
         self.width = WIDTH
         self.height = HEIGHT
 
         config.enable_stream(
-            rs.stream.depth, self.width, self.height, rs.format.z16, 60
+            rs.stream.depth, self.width, self.height, rs.format.z16, 30
         )
         config.enable_stream(
-            rs.stream.color, self.width, self.height, rs.format.bgr8, 60
+            rs.stream.color, self.width, self.height, rs.format.bgr8, 30
         )
 
-        self.pipe.start(config)
+        profile = self.pipe.start(config)
+
+        depth_sensor = profile.get_device().first_depth_sensor()
+        self.depth_scale = depth_sensor.get_depth_scale()
+
+        clipping_distance_in_meters = 3
+        clipping_distance = clipping_distance_in_meters / self.depth_scale
+
+        # device = profile.get_device()
+        # depth_sensor = device.first_depth_sensor()
+        # device.hardware_reset()
 
         align_to = rs.stream.color
         self.align = rs.align(align_to)
@@ -346,13 +361,15 @@ class HolisticProvider(threading.Thread):
                 start_t = time.time()
 
                 if color is not None and depth is not None:
+                    # print(f'color: ' + :color)
                     data = gh.find_all_poses(self.holistic, color, WINDOW)
-
-                    if DEBUG_TIME:
-                        flag_1 = time.time()
-                        print(f"Inference: {(flag_1 - start_t)*1000} ms")
+                    if DEBUG_DATA:
+                        print(data)
 
                     if bool(data["body_pose"]):
+                        if DEBUG_TIME:
+                            flag_1 = time.time()
+                            print(f"Inference: {(flag_1 - start_t)*1000} ms")
                         eyes = data["body_pose"][0][2:4]
 
                         body = project(
@@ -647,14 +664,14 @@ if __name__ == "__main__":
     }
 
     # feed = CameraVideoReader()
-    video_feed = IntelVideoReader()
+    feed = IntelVideoReader()
 
-    camThread = FrameProvider("frame", video_feed)
+    camThread = FrameProvider("frame", feed)
 
     Threads = []
-    for name in functionalities.items():
+    for name in functionalities.keys():
         if functionalities[name][0]:
-            Threads.append(functionalities[name][1](name, video_feed))
+            Threads.append(functionalities[name][1](name, feed))
 
     print(
         """
