@@ -1,5 +1,7 @@
 # Source : https://google.github.io/mediapipe/solutions/pose.html
 
+import time
+
 import cv2
 import mediapipe as mp
 
@@ -10,6 +12,8 @@ def init():
 
 
 def find_all_poses(holistic, frame, window):
+    # start = time.time()
+
     image = frame.copy()
 
     min_width, max_width = int((0.5 - window/2)*frame.shape[1]), int((0.5 + window/2)*frame.shape[1])
@@ -17,9 +21,15 @@ def find_all_poses(holistic, frame, window):
 
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
+    # e1 = time.time()
+    # print(f"    Convert image: {(e1 - start)*1000} ms")
+
     image.flags.writeable = False
 
     results = holistic.process(image)
+
+    # e2 = time.time()
+    # print(f"    Infer image: {(e2 - e1)*1000} ms")
 
     body_landmarks = []
 
@@ -64,6 +74,9 @@ def find_all_poses(holistic, frame, window):
                 min_width + int(landmark.x*image.shape[1]),
                 int(landmark.y*image.shape[0]),
                 ])
+
+    # e3 = time.time()
+    # print(f"    Convert data: {(e3 - e2)*1000} ms")
 
     return {"face_mesh": faces_landmarks,
             "body_pose": body_landmarks,

@@ -5,7 +5,8 @@ from typing import List
 
 theta = math.radians(13.8)
 
-def get_depth(point: list, depth_frame, r: int) -> float:
+
+def get_depth(point: list, depth_frame, depth_radius: int) -> float:
     x = min(max(int(point[0]), 0), len(depth_frame[0]))
     y = min(max(int(point[1]), 0), len(depth_frame))
     # x = int(point[0])
@@ -16,28 +17,36 @@ def get_depth(point: list, depth_frame, r: int) -> float:
     # y = y if y < len(depth_frame) else len(depth_frame)
 
     try:
-        return np.float64(np.mean(depth_frame[max(y - r, 0) : min(y + r, len(depth_frame)), max(x - r, 0) : min(x + r, len(depth_frame[0]))]))
+        return np.float64(
+            np.mean(
+                depth_frame[
+                    max(y - depth_radius, 0) : min(y + depth_radius, len(depth_frame)),
+                    max(x - depth_radius, 0) : min(x + depth_radius, len(depth_frame[0])
+                    ),
+                ]
+            )
+        )
     except:
         return np.float64(depth_frame[x, y])
 
 
+def map_location(
+    point: list,
+    eyes_depth: int,
+    eyes_coordinates: list,
+    point_depth: int,
+    video_provider,
+) -> List[int]:
+    da = eyes_depth
+    db = point_depth
+    xa, ya, za = eyes_coordinates
 
-def map_location(point: list, eyes: list, video_provider, depth_frame, ref, r: int = 3):
-    da = get_depth(eyes, depth_frame, 4) # Depth of the eye
-
-    db = get_depth(point, depth_frame, r) if ref == 0 else ref # Depth of the point
-
-    xa, ya, za = rs.rs2_deproject_pixel_to_point(
-        video_provider.depth_intrinsics,
-        eyes ,
-        da)
     xb, yb, zb = rs.rs2_deproject_pixel_to_point(
-        video_provider.color_intrinsics,
-        point,
-        db)
+        video_provider.color_intrinsics, point, db
+    )
 
-    ya = ya*math.cos(theta) + za*math.sin(theta)
-    yb = yb*math.cos(theta) + zb*math.sin(theta)
+    ya = ya * math.cos(theta) + za * math.sin(theta)
+    yb = yb * math.cos(theta) + zb * math.sin(theta)
 
     dz = db + da
     dy = yb - ya
@@ -46,13 +55,41 @@ def map_location(point: list, eyes: list, video_provider, depth_frame, ref, r: i
         yi = ya + (da / dz) * dy
         xi = xa + (da / dz) * dx
         if not math.isnan(xi) and not math.isnan(yi):
-            return [round(xi), round(yi)]
+            return [int(xi), int(yi)]
 
     return [-1, -1]
 
-def project(points: List[List], eyes: list, video_provider, depth_frame, r, ref = 0) -> List[List]:
+
+def project(
+    points: List[List],
+    eyes_position: list,
+    video_provider,
+    depth_frame,
+    depth_radius,
+    ref=0,
+) -> List[List]:
+    """ Projects every keypoint in world coordinates based on the user's point of view """
+
     projected = []
+    eyes_depth = get_depth(eyes_position, depth_frame, 4)  # Depth of the eye
+    eyes_coordinates = rs.rs2_deproject_pixel_to_point(
+        video_provider.depth_intrinsics, eyes_position, eyes_depth
+    )
+
     for i, point in enumerate(points):
         if bool(point[2:4]):
-            projected.append(point[0:2] + map_location(point[2:4], eyes, video_provider, depth_frame, ref, r) + [get_depth(point[2:4], depth_frame, r)])
+            point_depth = (
+                get_depth(point[2:4], depth_frame, depth_radius) if ref == 0 else ref
+            )  # Depth of the point
+            projected.append(
+                point[0:2]
+                + map_location(
+                    point=point[2:4],
+                    eyes_depth=eyes_depth,
+                    eyes_coordinates=eyes_coordinates,
+                    point_depth=point_depth,
+                    video_provider=video_provider,
+                )
+                + [point_depth]
+            )
     return projected
