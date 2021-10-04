@@ -16,7 +16,7 @@ let Selector = (sketch) => {
     // sketch.rotation = 0;
     sketch.sliding = 0;
 
-    let description = `This is the alpha version of an interractive mirror, an interface integrating the user's reflection into the information displayed and the mirror's behavior.`
+    let description = `This is the alpha version of an interractive mirror. Place yourself at about 1m50 for a better experience. Use your left hand to display the menu.`
 
     let icons = ["info.svg", "disco.svg", "settings.svg"];
 
@@ -125,8 +125,8 @@ let Selector = (sketch) => {
                             this.rx,    // x
                             this.ry,    // y
                             this.slots[i],  // y offset
-                            this.d, 
-                            this.choice[i], 
+                            this.d,
+                            this.choice[i],
                             this
                         )
                     );
@@ -356,27 +356,29 @@ let Selector = (sketch) => {
         }
 
         show() {
-            sketch.stroke(255);
-            sketch.strokeWeight(4);
-            sketch.noFill();
-            sketch.rect(
-                this.x + this.offset, 
-                this.y - this.h / 2, 
-                this.w, 
-                this.h
-            );
+            if(this.parent.selected){
+                sketch.stroke(255);
+                sketch.strokeWeight(4);
+                sketch.noFill();
+                sketch.rect(
+                    this.x + this.offset,
+                    this.y - this.h / 2,
+                    this.w,
+                    this.h
+                );
 
-            sketch.stroke(255);
-            sketch.fill(255);
-            sketch.strokeWeight(2);
-            sketch.textSize(this.size);
-            sketch.text(
-                this.content, 
-                this.x + this.offset + this.w * 0.05, 
-                this.y - 0.45 * this.h, 
-                this.w * 0.9,
-                this.h * 0.9
-            );
+                sketch.stroke(255);
+                sketch.fill(255);
+                sketch.strokeWeight(2);
+                sketch.textSize(this.size);
+                sketch.text(
+                    this.content,
+                    this.x + this.offset + this.w * 0.05,
+                    this.y - 0.45 * this.h,
+                    this.w * 0.9,
+                    this.h * 0.9
+                );
+            }
         }
 
         update(x, y) {

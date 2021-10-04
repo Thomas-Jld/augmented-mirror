@@ -39,8 +39,9 @@ function setup() {
 
     socket.emit("update", true);
     socket.on("global_data", (data) => {
-        global_data = data;
-        // available = true;
+        for (let key in data) {
+            global_data[key] = data[key];
+          }
     });
 }
 
@@ -64,12 +65,12 @@ function draw() {
 }
 
 function selection(){
-    if (hands.left_hand.hand_pose_t[8] !== undefined && 
-        hands.left_hand.hand_pose_t[5] !== undefined && 
+    if (hands.left_hand.hand_pose_t[8] !== undefined &&
+        hands.left_hand.hand_pose_t[5] !== undefined &&
         hands.right_hand.hand_pose_t[8] !== undefined) {
         if (
             hands.left_hand.hand_pose_t[8][0] - hands.left_hand.hand_pose_t[5][0] > 80 && (
-            dance.dance.init === undefined || 
+            dance.dance.init === undefined ||
             !dance.dance.init)
             ){
             selector.display_bubbles = true;
@@ -152,7 +153,7 @@ function choseAction(opt, action){
                 face.selfCanvas.hide();
             }
             break;
-        
+
         case "Show Pose":
             if(action){
                 // pose.activated = true;
@@ -165,12 +166,12 @@ function choseAction(opt, action){
                 pose.selfCanvas.hide();
             }
             break;
-        
+
         case "Show Hands":
             if (action) hands.selfCanvas.show();
             else hands.selfCanvas.hide();
             break;
-        
+
         case  "Dance n°1":
             if(action){
                 dance.activated = false;
@@ -181,7 +182,7 @@ function choseAction(opt, action){
                 dance.activated = true;
             }
             break;
-        
+
         case "Dance n°2":
             if(action){
                 // Launch dance
@@ -190,7 +191,7 @@ function choseAction(opt, action){
                 // Stop dance
             }
             break;
-        
+
     }
 }
 
@@ -201,7 +202,7 @@ function keyPressed() {200
                 m.clearSketch();
             });
             break;
-        
+
         case "p":
             modules.forEach(m => {
                 m.activated = false;
@@ -210,7 +211,7 @@ function keyPressed() {200
             pose.activated = true;
             pose.selfCanvas.show();
             break;
-    
+
         case "h":
             modules.forEach(m => {
                 m.activated = false;
@@ -219,7 +220,7 @@ function keyPressed() {200
             hands.activated = true;
             hands.selfCanvas.show();
             break;
-    
+
         case "f":
             modules.forEach(m => {
                 m.activated = false;
@@ -228,7 +229,7 @@ function keyPressed() {200
             face.activated = true;
             face.selfCanvas.show();
             break;
-    
+
         case "b":
             modules.forEach(m => {
                 m.activated = false;
@@ -239,7 +240,7 @@ function keyPressed() {200
             hands.activated = true;
             hands.selfCanvas.show();
             break;
-    
+
         case "s":
             modules.forEach(m => {
                 m.activated = false;
@@ -249,7 +250,7 @@ function keyPressed() {200
             selector.activated = true;
             selector.selfCanvas.show();
             break;
-    
+
         case "a":
             modules.forEach(m => {
                 m.activated = true;

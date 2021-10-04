@@ -21,7 +21,7 @@ let Dance = (sketch) => {
     };
 
     sketch.update = (global_data) => {
-        if (global_data != undefined && "body_pose_t" in global_data) {
+        if ("body_pose_t" in global_data) {
             sketch.dance.body_pose = global_data["body_pose_t"]; // In pixels
             sketch.dance.update();
         }
@@ -35,7 +35,7 @@ let Dance = (sketch) => {
     class DanceLesson {
         constructor(file_name) {
             this.body_pose = [];
-            this.indexes_to_study = [0, 11, 12, 15, 16, 23, 24]
+            this.indexes_to_study = [0, 11, 12, 15, 16, 23, 24];
 
             this.init = false;
             this.offset = [0, 0];
@@ -52,13 +52,13 @@ let Dance = (sketch) => {
                 (moves) => {
                     sketch.dance.size = moves["size"]; // Original video size
                     sketch.dance.length = moves["length"]; // Original video size
-                }); 
+                });
             this.moves_index = 0;
 
             this.diff = 0; // The lower, the closer the moves are
-            this.limit = 150; // if this.diff < this.limit, it goes on
+            this.limit = 120; // if this.diff < this.limit, it goes on
         }
-        
+
         reset() {
             this.moves_index = 0;
             this.video_index = 0;
@@ -75,8 +75,8 @@ let Dance = (sketch) => {
             this.video.pause();
             this.video.setFrame(this.video_index);
             sketch.image(
-                this.video, 
-                this.offset[0], 
+                this.video,
+                this.offset[0],
                 this.offset[1],
                 this.size[0],
                 this.size[1]
@@ -87,12 +87,17 @@ let Dance = (sketch) => {
             sketch.strokeWeight(2);
             sketch.textSize(30);
             sketch.text(
-                Math.floor(this.diff), 
+                Math.floor(this.diff),
                 20,
                 80
             );
             sketch.noStroke();
-            sketch.fill('rgb( 255, 0, 0)');
+            if(this.diff < this.limit){
+                sketch.fill('rgb( 166,216,84)');
+            }
+            else {
+                sketch.fill('rgb( 215,25,28)');
+            }
             sketch.rect(
                 sketch.width - 80,
                 sketch.height - 50 - this.diff*3,
@@ -102,7 +107,9 @@ let Dance = (sketch) => {
         }
 
         update() {
-            if(this.moves_index >= this.length){
+            if(this.moves_index >= this.length-5){
+                sketch.selfCanvas.clear();
+                sketch.activated = false;
                 this.reset();
                 return;
             }
@@ -115,14 +122,14 @@ let Dance = (sketch) => {
                     let video_nose_reference = this.moves[Object.keys(this.moves)[0]][0].slice(1, 3); // Position in pixels of the first nose of this.moves
                     let video_left_hip_reference = this.moves[Object.keys(this.moves)[0]][23].slice(1, 3); // Position in pixels of the first left_hip of this.moves
 
-                    let mirror_distance = sketch.dist(
+                    let mirror_distance = sketch.dist(  //Nose Hip in the mirror
                         mirror_nose_reference[0],
                         mirror_nose_reference[1],
                         mirror_left_hip_reference[0],
                         mirror_left_hip_reference[1]
                     );
 
-                    let video_distance = sketch.dist(
+                    let video_distance = sketch.dist(   //Nose hip in the video
                         video_nose_reference[0],
                         video_nose_reference[1],
                         video_left_hip_reference[0],
@@ -131,7 +138,7 @@ let Dance = (sketch) => {
 
                     this.ratio = mirror_distance / video_distance;
                     this.size = [
-                        this.size[0] * this.ratio, 
+                        this.size[0] * this.ratio,
                         this.size[1] * this.ratio
                     ];
 
@@ -147,7 +154,7 @@ let Dance = (sketch) => {
                                 sketch.dist(
                                     this.offset[0] + this.moves[this.moves_index][this.indexes_to_study[i]][1] * this.ratio, //Video x
                                     this.offset[1] + this.moves[this.moves_index][this.indexes_to_study[i]][2] * this.ratio, //Video y
-                                    this.body_pose[this.indexes_to_study[i]][0], //Mirror x 
+                                    this.body_pose[this.indexes_to_study[i]][0], //Mirror x
                                     this.body_pose[this.indexes_to_study[i]][1], //Mirror y
                                 )
                             );
