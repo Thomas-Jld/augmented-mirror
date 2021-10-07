@@ -653,18 +653,20 @@ def connect(*args):
 if __name__ == "__main__":
 
     functionalities = {
-        "body_pose": [False, BodyProvider],  # Body pose, requires Face mesh
-        "hands_pose": [False, HandsProvider],  # Hands, requires Body pose
-        "face_mesh": [False, FaceProvider],  # Face mesh
-        "holistic_pose": [
-            True,
-            HolisticProvider,
-        ],  # Holistic, Body face and hands in one
-        "pifpaf_pose": [False, PifpafProvider],  # Pifpaf, Body face and hands in one
+        "body_pose": [False, BodyProvider], # Body pose, requires Face mesh
+        "hands_pose": [False, HandsProvider], # Hands, requires Body pose
+        "face_mesh": [True, FaceProvider], # Face mesh
+        "holistic_pose": [False, HolisticProvider], # Holistic, Body face and hands in one
+        "pifpaf_pose": [False, PifpafProvider], # Pifpaf, Body face and hands in one
     }
 
+<<<<<<< Updated upstream
     # feed = CameraVideoReader()
     feed = IntelVideoReader()
+=======
+    video_feed = CameraVideoReader()
+    #video_feed = IntelVideoReader()
+>>>>>>> Stashed changes
 
     camThread = FrameProvider("frame", feed)
 
