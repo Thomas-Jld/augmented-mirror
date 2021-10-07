@@ -356,7 +356,7 @@ let Selector = (sketch) => {
         }
 
         show() {
-            if(this.parent.selected){
+            if(this.parent.selected && this.per > 0.5){
                 sketch.stroke(255);
                 sketch.strokeWeight(4);
                 sketch.noFill();
@@ -387,16 +387,11 @@ let Selector = (sketch) => {
             // this.rx = this.x + this.per * this.offset;
             // this.ry = this.y;
 
-            // if (!this.parent.selected || !sketch.display_bubbles) {
-            //     this.per *= this.mul;
-            // } else {
-            //     if (this.per < 1) {
-            //         this.per += 0.1;
-            //         if(this.per > 1){
-            //             this.per = 1;
-            //         }
-            //     }
-            // }
+            if (!this.parent.selected || !sketch.display_bubbles) {
+                this.per *= this.mul;
+            } else {
+                this.per = 1;
+            }
         }
     }
 }

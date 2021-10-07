@@ -29,7 +29,9 @@ let Dance = (sketch) => {
 
     sketch.show = () => {
         sketch.selfCanvas.clear();
-        sketch.dance.show();
+        if(sketch.activated) {
+            sketch.dance.show();
+        }
     }
 
     class DanceLesson {
@@ -65,6 +67,7 @@ let Dance = (sketch) => {
             this.diff = 0;
             this.offset = [0, 0];
             this.ratio = 1;
+            this.size = this.moves["size"];
             this.init = false;
         }
 
@@ -111,6 +114,7 @@ let Dance = (sketch) => {
                 sketch.selfCanvas.clear();
                 sketch.activated = false;
                 this.reset();
+                console.log("EXECECECEC");
                 return;
             }
             if (this.body_pose.length > 0) {
