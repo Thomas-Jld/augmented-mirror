@@ -158,28 +158,29 @@ let Pose = (sketch) => {
                 sketch.fill(255);
                 if (this.body_pose_t[0][0] < -20) {
                     sketch.line(
-                        sides_offset,
-                        height - sides_offset,
                         sides_offset + shape_length,
+                        height - sides_offset,
+                        sides_offset,
                         height - (sides_offset + shape_length)
                         );
-                    sketch.line(sides_offset + shape_length,
-                        height - (sides_offset + shape_length),
+                    sketch.line(
                         sides_offset,
+                        height - (sides_offset + shape_length),
+                        sides_offset + shape_length,
                         height - (sides_offset + 2 * shape_length)
                     );
                 }
                 if (this.body_pose_t[0][0] > width + 20) {
                     sketch.line(
-                        width - sides_offset,
-                        height - sides_offset,
                         width - (sides_offset + shape_length),
+                        height - sides_offset,
+                        width - sides_offset,
                         height - (sides_offset + shape_length)
                     );
                     sketch.line(
-                        width - (sides_offset + shape_length),
-                        height - (sides_offset + shape_length),
                         width - sides_offset,
+                        height - (sides_offset + shape_length),
+                        width - (sides_offset + shape_length),
                         height - (sides_offset + 2 * shape_length)
                     );
                 }
