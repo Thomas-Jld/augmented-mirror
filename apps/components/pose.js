@@ -29,7 +29,7 @@ let Pose = (sketch) => {
     };
 
     sketch.update = (data) => {
-        if(data["body_pose"] != undefined){
+        if (data["body_pose"] != undefined) {
             sketch.pose.body_pose = data["body_pose"]
         }
     }
@@ -117,21 +117,19 @@ let Pose = (sketch) => {
                     let y;
                     let newx;
                     let newy;
-                    if (this.body_pose_t.length == this.body_pose.length){
+                    if (this.body_pose_t.length == this.body_pose.length) {
                         newx = width * (this.body_pose[i][2] - xoffset) / screenwidth;
                         newy = height * (this.body_pose[i][3] - yoffset) / screenheight;
-                        if(newy > 0){
+                        if (newy > 0) {
                             x = lerp(this.body_pose_t[i][0], newx, 0.8);
                             y = lerp(this.body_pose_t[i][1], newy, 0.8);
-                        }
-                        else{ // Assume it's an artifact and slows the update
+                        } else { // Assume it's an artifact and slows the update
                             x = lerp(this.body_pose_t[i][0], newx, 0.01);
                             y = lerp(this.body_pose_t[i][1], newy, 0.01);
                         }
 
                         this.body_pose_t[i] = [x, y];
-                    }
-                    else{
+                    } else {
                         x = width * (this.body_pose[i][2] - xoffset) / screenwidth;
                         y = height * (this.body_pose[i][3] - yoffset) / screenheight;
 
@@ -152,9 +150,41 @@ let Pose = (sketch) => {
                 }
             }
             if (this.body_pose_t.length > 0) {
-                // console.log(this.body_pose_t);
                 global_data["body_pose_t"] = this.body_pose_t;
+                let sides_offset = 20;
+                let shape_length = 50;
+                sketch.stroke(255);
+                sketch.strokeWeight(sides_offset);
+                sketch.fill(255);
+                if (this.body_pose_t[0][0] < -20) {
+                    sketch.line(
+                        sides_offset,
+                        height - sides_offset,
+                        sides_offset + shape_length,
+                        height - (sides_offset + shape_length)
+                        );
+                    sketch.line(sides_offset + shape_length,
+                        height - (sides_offset + shape_length),
+                        sides_offset,
+                        height - (sides_offset + 2 * shape_length)
+                    );
+                }
+                if (this.body_pose_t[0][0] > width + 20) {
+                    sketch.line(
+                        width - sides_offset,
+                        height - sides_offset,
+                        width - (sides_offset + shape_length),
+                        height - (sides_offset + shape_length)
+                    );
+                    sketch.line(
+                        width - (sides_offset + shape_length),
+                        height - (sides_offset + shape_length),
+                        width - sides_offset,
+                        height - (sides_offset + 2 * shape_length)
+                    );
+                }
             }
+
             if (sketch.show_body_lines) {
                 this.show_lines(this.body_pose_t);
             }
