@@ -16,7 +16,7 @@ push:
 
 pull:
 	git pull
-	-git lfs fetch --all	
+	-git lfs fetch --all
 
 run:
 	-sudo nvidia-docker rm $(REPO)
@@ -46,12 +46,12 @@ logs:
 	sudo docker logs --follow $(REPO)
 
 service_stop:
-	sudo systemctl stop mirror.service
+	systemctl --user stop mirror.service
 	systemctl --user stop mirrorfront.service
 	systemctl --user stop mirrorstartchrome.service
 
 service_start:
-	sudo systemctl start mirror.service
+	systemctl --user start mirror.service
 	systemctl --user start mirrorfront.service
 	systemctl --user start mirrorstartchrome.service
 
