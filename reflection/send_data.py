@@ -55,7 +55,7 @@ DEBUG_DATA = False
 
 def normalize_data(data: List[List]) -> List[List]:
     """Normalize the data to fit the hand sign inout data"""
-    return [[x / WIDTH, y / HEIGHT] for _, _, x, y in data]
+    return [[x / WIDTH, y / HEIGHT] for x, y in data]
 
 
 def lerp(P1, P2, f):
@@ -370,7 +370,7 @@ class HolisticProvider(threading.Thread):
                         if DEBUG_TIME:
                             flag_1 = time.time()
                             print(f"Inference: {(flag_1 - start_t)*1000} ms")
-                        eyes = data["body_pose"][0][2:4]
+                        eyes = data["body_pose"][0]
 
                         body = project(
                             points=data["body_pose"],
@@ -472,8 +472,8 @@ class DrawPose:
         for i, pose in enumerate(self.body_pose):
             if self.body_pose[2:4] != [-1, -1]:
                 if len(self.body_pose_t) == len(self.body_pose):
-                    newx = RESOLUTION_X * (pose[2] - OFFSET_X) / DIMENSION_X
-                    newy = RESOLUTION_Y * (pose[3] - OFFSET_Y) / DIMENSION_Y
+                    newx = RESOLUTION_X * (pose[0] - OFFSET_X) / DIMENSION_X
+                    newy = RESOLUTION_Y * (pose[1] - OFFSET_Y) / DIMENSION_Y
                     if newy > 0:
                         x = lerp(self.body_pose_t[i][0], newx, 0.8)
                         y = lerp(self.body_pose_t[i][1], newy, 0.8)
@@ -483,8 +483,8 @@ class DrawPose:
 
                     self.body_pose_t[i] = [int(x), int(y)]
                 else:
-                    x = RESOLUTION_X * (pose[2] - OFFSET_X) / DIMENSION_X
-                    y = RESOLUTION_Y * (pose[3] - OFFSET_Y) / DIMENSION_Y
+                    x = RESOLUTION_X * (pose[0] - OFFSET_X) / DIMENSION_X
+                    y = RESOLUTION_Y * (pose[1] - OFFSET_Y) / DIMENSION_Y
                     self.body_pose_t.append([int(x), int(y)])
 
         for parts in self.body_junctions:
@@ -575,7 +575,7 @@ class PifpafProvider(threading.Thread):
                     self.data = gpp.find_all_poses(self.processor, color, WINDOW)
 
                     if bool(self.data["body_pose"]):
-                        eyes = self.data["body_pose"][0][2:4]
+                        eyes = self.data["body_pose"][0]
 
                         body = project(
                             self.data["body_pose"], eyes, self.feed, depth, 4

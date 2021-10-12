@@ -21,7 +21,8 @@ def get_depth(point: list, depth_frame, depth_radius: int) -> float:
             np.mean(
                 depth_frame[
                     max(y - depth_radius, 0) : min(y + depth_radius, len(depth_frame)),
-                    max(x - depth_radius, 0) : min(x + depth_radius, len(depth_frame[0])
+                    max(x - depth_radius, 0) : min(
+                        x + depth_radius, len(depth_frame[0])
                     ),
                 ]
             )
@@ -68,7 +69,7 @@ def project(
     depth_radius,
     ref=0,
 ) -> List[List]:
-    """ Projects every keypoint in world coordinates based on the user's point of view """
+    """Projects every keypoint in world coordinates based on the user's point of view"""
 
     projected = []
     eyes_depth = get_depth(eyes_position, depth_frame, 4)  # Depth of the eye
@@ -77,14 +78,13 @@ def project(
     )
 
     for i, point in enumerate(points):
-        if bool(point[2:4]):
+        if bool(point):
             point_depth = (
-                get_depth(point[2:4], depth_frame, depth_radius) if ref == 0 else ref
+                get_depth(point, depth_frame, depth_radius) if ref == 0 else ref
             )  # Depth of the point
             projected.append(
-                point[0:2]
-                + map_location(
-                    point=point[2:4],
+                map_location(
+                    point=point,
                     eyes_depth=eyes_depth,
                     eyes_coordinates=eyes_coordinates,
                     point_depth=point_depth,

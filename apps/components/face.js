@@ -93,9 +93,9 @@ let Faces = (sketch) => {
             sketch.fill(200);
             for(let i = 0; i < this.face_mesh.length; i++){
 
-                if (this.face_mesh[i].slice(2, 4) != [-1, -1]) {
-                    let x = width * (this.face_mesh[i][2] - xoffset) / screenwidth;
-                    let y = height * (this.face_mesh[i][3] - yoffset) / screenheight;
+                if (this.face_mesh[i] != [-1, -1]) {
+                    let x = width * (this.face_mesh[i][0] - xoffset) / screenwidth;
+                    let y = height * (this.face_mesh[i][1] - yoffset) / screenheight;
 
                     transposed.push([x, y]);
 

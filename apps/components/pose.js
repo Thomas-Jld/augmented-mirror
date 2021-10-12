@@ -112,14 +112,14 @@ let Pose = (sketch) => {
             sketch.fill(200);
 
             for (let i = 0; i < this.body_pose.length; i++) {
-                if (this.body_pose[i].slice(2, 4) != [-1, -1]) {
+                if (this.body_pose[i] != [-1, -1]) {
                     let x;
                     let y;
                     let newx;
                     let newy;
                     if (this.body_pose_t.length == this.body_pose.length) {
-                        newx = width * (this.body_pose[i][2] - xoffset) / screenwidth;
-                        newy = height * (this.body_pose[i][3] - yoffset) / screenheight;
+                        newx = width * (this.body_pose[i][0] - xoffset) / screenwidth;
+                        newy = height * (this.body_pose[i][1] - yoffset) / screenheight;
                         if (newy > 0) {
                             x = lerp(this.body_pose_t[i][0], newx, 0.8);
                             y = lerp(this.body_pose_t[i][1], newy, 0.8);
@@ -130,8 +130,8 @@ let Pose = (sketch) => {
 
                         this.body_pose_t[i] = [x, y];
                     } else {
-                        x = width * (this.body_pose[i][2] - xoffset) / screenwidth;
-                        y = height * (this.body_pose[i][3] - yoffset) / screenheight;
+                        x = width * (this.body_pose[i][0] - xoffset) / screenwidth;
+                        y = height * (this.body_pose[i][1] - yoffset) / screenheight;
 
                         this.body_pose_t.push([x, y]);
                     }

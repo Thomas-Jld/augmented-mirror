@@ -195,7 +195,7 @@ function choseAction(opt, action){
     }
 }
 
-function keyPressed() {200
+function keyPressed() {
     switch(key){
         case "c":
             modules.forEach(m => {
